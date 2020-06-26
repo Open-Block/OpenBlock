@@ -8,9 +8,6 @@ import org.block.panel.block.Shapes;
 import org.block.util.ClassCompare;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
