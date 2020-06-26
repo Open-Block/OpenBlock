@@ -112,6 +112,7 @@ public class JSONConfigNode implements ConfigNode {
         int index = 0;
         for(Object value : collection){
             array.put(index, value);
+            index++;
         }
     }
 
@@ -121,14 +122,14 @@ public class JSONConfigNode implements ConfigNode {
         try {
             array = this.path.getJSONArray(title);
         }catch (JSONException e){
-            JSONArray jArray = new JSONArray();
-            this.path.put(title, jArray);
-            array = this.path.getJSONArray(title);
+            array = new JSONArray();
+            this.path.put(title, array);
         }
         JSONArrayConfigNode node = new JSONArrayConfigNode(array);
         int index = 0;
         for(T value : collection){
             parser.serialize(node, index + "", value);
+            index++;
         }
     }
 }

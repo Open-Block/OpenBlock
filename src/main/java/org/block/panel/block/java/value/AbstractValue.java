@@ -6,9 +6,6 @@ import org.block.panel.block.Block;
 import org.block.panel.block.Shapes;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.util.function.Function;
 
 public abstract class AbstractValue<V> extends AbstractBlock implements Block.ValueBlock<V> {
@@ -17,7 +14,6 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Block.Va
     private V value;
     private int marginX = 2;
     private int marginY = 2;
-
 
     public AbstractValue(int x, int y, V value, Function<V, String> toString) {
         super(x, y, 10, 10, "");

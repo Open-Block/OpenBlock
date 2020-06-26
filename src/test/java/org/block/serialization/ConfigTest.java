@@ -24,28 +24,28 @@ public class ConfigTest {
         }
         System.out.println("Loading file: " + file.getAbsolutePath());
         ConfigNode node = ConfigImplementation.JSON.load(file.toPath());
-        System.out.println("String: Test: " + node.getString("Test"));
+        //System.out.println("String: Test: " + node.getString("Test"));
 
         ConfigNode node2 = node.getNode("array", "another", "test");
         System.out.println("Array: Numbers: " + node2.getCollection("Numbers", Parser.INTEGER));
 
 
 
-
         Random random = new Random();
-        char[] chars = new char[random.nextInt(12)];
+        /*char[] chars = new char[random.nextInt(12)];
         for(int A = 0; A < chars.length; A++){
             int ascii = 97 + random.nextInt(26);
             chars[A] = (char)ascii;
-        }
-        int[] array = new int[random.nextInt(20)];
+        }*/
+        Integer[] array = new Integer[random.nextInt(20)];
         for(int A = 0; A < array.length; A++){
             array[A] = random.nextInt(10000);
         }
-        String value = String.valueOf(chars);
+        /*String value = String.valueOf(chars);
         System.out.println("Writing: Test: " + value);
         System.out.println("Writing: Array: ");
-        node.setValue("Test", value);
+        node.setValue("Test", value);*/
+        System.out.println("Node: " + node2.getClass().getSimpleName());
         node2.setCollection("Numbers", Parser.INTEGER, array);
         System.out.println("Saving");
         ConfigImplementation.JSON.write(node, file.toPath());

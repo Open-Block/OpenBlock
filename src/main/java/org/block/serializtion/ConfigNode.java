@@ -26,10 +26,6 @@ public interface ConfigNode {
         return this.getCollection(title, parser, new ArrayList<>());
     }
 
-    default void setCollection(String title, Object... collection){
-        this.setCollection(title, Arrays.asList(collection));
-    }
-
     default <T> void setCollection(String title, Parser<T> parser, T... collection){
         this.setCollection(title, parser, Arrays.asList(collection));
     }

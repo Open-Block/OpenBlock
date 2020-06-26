@@ -1,6 +1,9 @@
 package org.block.panel.block.java.operation;
 
 import org.block.panel.block.BlockType;
+import org.block.serializtion.ConfigNode;
+
+import java.io.File;
 
 public class SumOperation extends AbstractNumberOperation {
 
@@ -9,6 +12,21 @@ public class SumOperation extends AbstractNumberOperation {
         @Override
         public SumOperation build(int x, int y) {
             return new SumOperation(x, y);
+        }
+
+        @Override
+        public SumOperation build(ConfigNode node) {
+            return null;
+        }
+
+        @Override
+        public File saveLocation() {
+            return new File("blocks/maths/sum/");
+        }
+
+        @Override
+        public String getName() {
+            return "Sum";
         }
     }
 
