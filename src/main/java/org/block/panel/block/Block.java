@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface Block {
 
@@ -94,6 +95,7 @@ public interface Block {
     void setHighlighted(boolean selected);
     Collection<BlockEvent> getEvents();
     void registerEvent(BlockEvent event);
+    UUID getUniqueId();
 
     void paint(Graphics2D graphics2D);
     String writeCode();

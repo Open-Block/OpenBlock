@@ -2,10 +2,7 @@ package org.block.panel.block;
 
 import org.block.panel.block.event.BlockEvent;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AbstractBlock implements Block.TextBlock {
 
@@ -17,6 +14,7 @@ public abstract class AbstractBlock implements Block.TextBlock {
     protected boolean selected;
     protected boolean highlighted;
     protected Set<BlockEvent> events = new HashSet<>();
+    protected UUID id;
 
     public AbstractBlock(int x, int y, int width, int height, String text){
         this.x = x;
@@ -94,5 +92,21 @@ public abstract class AbstractBlock implements Block.TextBlock {
     @Override
     public void setText(String text) {
         this.text = text;
+    }
+
+    @Override
+    public UUID getUniqueId(){
+        if(this.id == null){
+            this.id = UUID.randomUUID();
+        }
+        return this.id;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(!(obj instanceof Block)){
+            return false;
+        }
+        return ((Block)obj).getUniqueId().equals(this.id);
     }
 }
