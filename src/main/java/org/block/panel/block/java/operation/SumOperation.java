@@ -2,8 +2,14 @@ package org.block.panel.block.java.operation;
 
 import org.block.panel.block.BlockType;
 
+/**
+ * The implementation for sum Blocks
+ */
 public class SumOperation extends AbstractNumberOperation {
 
+    /**
+     * The BlockType for the Sum Block.
+     */
     public static class SumOperationType implements BlockType<SumOperation> {
 
         @Override

@@ -7,7 +7,13 @@ import java.util.function.Function;
 
 public class ClassCompare {
 
-
+    /**
+     * When doing maths using different number classes, Java will give the outputted value as the best number class out of the provided. This allows the comparing of multiple values by the number class type
+     * @param function This converts the provided data into a number class
+     * @param collection The provided data
+     * @param <T> The provided data type
+     * @return The best value from the provided data
+     */
     public static <T> Optional<T> compareNumberClasses(Function<T, Class<? extends Number>> function, Collection<T> collection){
         final Map<String, Integer> map = new HashMap<>();
         map.put(Byte.class.getSimpleName(), 0);
