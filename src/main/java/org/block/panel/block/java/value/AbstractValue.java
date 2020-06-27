@@ -19,7 +19,7 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Block.Va
     private V value;
     private int marginX = 2;
     private int marginY = 2;
-
+  
     /**
      * Th init of the Abstract value.
      * This uses {@link Object#toString()} to calculate the display name

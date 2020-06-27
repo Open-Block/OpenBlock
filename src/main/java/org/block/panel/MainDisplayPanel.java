@@ -4,6 +4,7 @@ import org.block.panel.block.java.operation.SumOperation;
 import org.block.panel.block.java.value.NumberBlock;
 import org.block.panel.section.ConnectedSection;
 import org.block.panel.section.DisplaySection;
+import org.block.serializtion.parse.Parser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +16,7 @@ public class MainDisplayPanel extends JPanel {
 
     public MainDisplayPanel(){
         this.chooser.register(new DisplaySection<>(null, "Sum", new SumOperation.SumOperationType()));
-        this.chooser.register(new DisplaySection<>(null, "Integer", new NumberBlock.IntegerBlockType()));
+        this.chooser.register(new DisplaySection<>(null, "Integer", new NumberBlock.NumberBlockType(Parser.INTEGER, 0)));
         init();
     }
 
