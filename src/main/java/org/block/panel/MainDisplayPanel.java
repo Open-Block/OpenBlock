@@ -37,4 +37,16 @@ public class MainDisplayPanel extends JPanel {
         this.setBackground(Color.DARK_GRAY);
     }
 
+    /**
+     * Gets the BlockDisplayPanel section of this panel
+     * @return The BlockDisplayPanel
+     */
+    public BlockDisplayPanel getBlockPanel(){
+        return this.block;
+    }
+
+    public ChooserDisplayPanel getChooserPanel(){
+        return this.chooser;
+    }
+
 }

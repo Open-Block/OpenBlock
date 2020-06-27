@@ -5,6 +5,10 @@ import org.block.serializtion.ConfigNode;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * The interface of both serialize and deserialize in a combined faction
+ * @param <T> The expected value class type for serialization and deserialization
+ */
 public interface Parser<T> extends Serialize<T>, Deserialize<T> {
 
     Parser<Integer> INTEGER = new Abstract<>(ConfigNode::setValue, ConfigNode::getInteger);
