@@ -1,6 +1,5 @@
 package org.block.panel.block.java.operation;
 
-import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.panel.MainDisplayPanel;
 import org.block.panel.block.Block;
@@ -8,6 +7,7 @@ import org.block.panel.block.BlockType;
 import org.block.serializtion.ConfigNode;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,7 +52,7 @@ public class SumOperation extends AbstractNumberOperation {
                 if(!opBlock.isPresent()){
                     throw new IllegalStateException("Unable to find dependency of " + uuid.toString());
                 }
-                sumBlock.addParameter(A, (ValueBlock<?>) opBlock.get());
+                sumBlock.setAttachment(A, opBlock.get());
             }
             return sumBlock;
         }
@@ -60,7 +60,11 @@ public class SumOperation extends AbstractNumberOperation {
         @Override
         public void write(ConfigNode node, SumOperation block) {
             BlockType.super.write(node, block);
-            TITLE_DEPENDS.serialize(node, ArrayUtils.convert(p -> p.getUniqueId(), block.getCurrentParameters()));
+            List<UUID> list = new ArrayList<>();
+            for(int A = 0; A < block.getMaxAttachments(); A++){
+                block.getAttachment(A).ifPresent(b -> list.add(b.getUniqueId()));
+            }
+            TITLE_DEPENDS.serialize(node, list);
         }
 
         @Override

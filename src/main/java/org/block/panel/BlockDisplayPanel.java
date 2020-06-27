@@ -26,16 +26,7 @@ public class BlockDisplayPanel extends JPanel {
                 Block block = BlockDisplayPanel.this.context.getDragging();
                 BlockDisplayPanel.this.context.getAttached().ifPresent(b -> {
                     if(b instanceof Block.AttachableBlock){
-                        Block.AttachableBlock<?> target = (Block.AttachableBlock<?>)b;
-                        target.removeAttached();
-                    }
-                    if(b instanceof Block.SequenceBlock){
-                        Block.SequenceBlock target = (Block.SequenceBlock) b;
-                        target.removeFromSequence(block);
-                    }
-                    if(b instanceof Block.ParameterInsertBlock){
-                        Block.ParameterInsertBlock target = (Block.ParameterInsertBlock) b;
-                        target.removeParameter((Block.ValueBlock<?>) block);
+                        ((Block.AttachableBlock) b).removeAttachment(block);
                     }
                     BlockDisplayPanel.this.context.setAttached(null);
                 });
@@ -53,23 +44,12 @@ public class BlockDisplayPanel extends JPanel {
                     block.setY(e.getY() + BlockDisplayPanel.this.context.getOffY());
                 }else{
                     if(target instanceof Block.AttachableBlock){
-                        Block.AttachableBlock<?> target2 = (Block.AttachableBlock<?>)target;
-                        if(target2.canAttach(block)) {
-                            target2.setAttached(block);
-                            BlockDisplayPanel.this.context.setAttached(target);
+                        Block.AttachableBlock target2 = (Block.AttachableBlock) target;
+                        try{
+                            target2.addAttachment(block);
+                        }catch (IllegalStateException ignore){
+
                         }
-
-                    }
-                    if(target instanceof Block.SequenceBlock){
-                        Block.SequenceBlock target2 = (Block.SequenceBlock) target;
-                        target2.addToSequence(block);
-                        BlockDisplayPanel.this.context.setAttached(target);
-
-                    }
-                    if(target instanceof Block.ParameterInsertBlock){
-                        Block.ParameterInsertBlock target2 = (Block.ParameterInsertBlock) target;
-                        target2.addParameter((Block.ValueBlock<?>) block);
-                        BlockDisplayPanel.this.context.setAttached(target);
                     }
                 }
             }
@@ -109,20 +89,8 @@ public class BlockDisplayPanel extends JPanel {
             BlockDisplayPanel.this.context = new DragContext().setDragging(block).setOffX(block.getX() - e.getX()).setOffY(block.getY() - e.getY());
             for(Block check : BlockDisplayPanel.this.getBlocks()){
                 if(check instanceof Block.AttachableBlock){
-                    Block.AttachableBlock<?> target2 = (Block.AttachableBlock<?>)check;
-                    if(target2.getAttached().isPresent() && target2.getAttached().get().equals(block)){
-                        BlockDisplayPanel.this.context.setAttached(target2);
-                    }
-                }
-                if(check instanceof Block.SequenceBlock){
-                    Block.SequenceBlock target2 = (Block.SequenceBlock) check;
-                    if (target2.getSequence().contains(block)) {
-                        BlockDisplayPanel.this.context.setAttached(target2);
-                    }
-                }
-                if(check instanceof Block.ParameterInsertBlock){
-                    Block.ParameterInsertBlock target2 = (Block.ParameterInsertBlock) check;
-                    if (target2.getCurrentParameters().contains(block)){
+                    Block.AttachableBlock target2 = (Block.AttachableBlock) check;
+                    if(target2.containsAttachment(block)){
                         BlockDisplayPanel.this.context.setAttached(target2);
                     }
                 }

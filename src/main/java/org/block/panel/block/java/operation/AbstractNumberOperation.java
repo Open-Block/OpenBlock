@@ -2,24 +2,24 @@ package org.block.panel.block.java.operation;
 
 import org.array.utils.ArrayUtils;
 import org.block.Blocks;
-import org.block.panel.block.AbstractBlock;
 import org.block.panel.block.Block;
 import org.block.panel.block.Shapes;
+import org.block.panel.block.assists.AbstractAttachable;
 import org.block.util.ClassCompare;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * The basic Block implementation for all number operations.
  * All methods are implemented for block including code and paint.
+ * All attachments must be of {@link Number}
  */
-public class AbstractNumberOperation extends AbstractBlock implements Block.ParameterInsertBlock, Block.ValueBlock<Number> {
+public class AbstractNumberOperation extends AbstractAttachable implements Block.ValueBlock<Number> {
 
-    private String operator;
-    private List<ValueBlock<?>> list = new ArrayList<>();
+    private final String operator;
+    private final List<ValueBlock<?>> list = new ArrayList<>();
     private int marginX = 2;
     private int marginY = 2;
 
@@ -31,7 +31,7 @@ public class AbstractNumberOperation extends AbstractBlock implements Block.Para
      * @param operator The Java maths operator
      */
     public AbstractNumberOperation(int x, int y, String text, String operator) {
-        super(x, y, 0, 0, text);
+        super(x, y, 0, 0, text, -1);
         this.operator = operator;
         setText(text);
     }
@@ -49,63 +49,6 @@ public class AbstractNumberOperation extends AbstractBlock implements Block.Para
     }
 
     @Override
-    public int getMaxCount() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public List<ValueBlock<?>> getCurrentParameters() {
-        return Collections.unmodifiableList(this.list);
-    }
-
-    @Override
-    public void addParameter(ValueBlock<?> block) {
-        this.list.add(block);
-        block.setX(this.getX() + (this.getWidth() - Shapes.ATTACHABLE_WIDTH));
-        block.setY(this.getY() + (this.list.size() * Blocks.getInstance().getFont().getSize()));
-
-        int width = Blocks.getInstance().getMetrics().stringWidth(this.text);
-        this.height = Blocks.getInstance().getFont().getSize() + this.marginY;
-        this.height = (this.list.size() + 2) * this.height;
-        this.width = width + this.marginX + Shapes.ATTACHABLE_WIDTH;
-        if(this.height < Shapes.ATTACHABLE_HEIGHT){
-            this.height = Shapes.ATTACHABLE_HEIGHT * 2;
-        }
-    }
-
-    @Override
-    public void addParameter(int index, ValueBlock<?> block) {
-        this.list.add(index, block);
-    }
-
-    @Override
-    public void removeParameter(ValueBlock<?> block) {
-        this.list.remove(block);
-        
-        int width = Blocks.getInstance().getMetrics().stringWidth(this.text);
-        this.height = Blocks.getInstance().getFont().getSize() + this.marginY;
-        this.height = (this.list.size() + 2) * this.height;
-        this.width = width + this.marginX + Shapes.ATTACHABLE_WIDTH;
-        if(this.height < Shapes.ATTACHABLE_HEIGHT){
-            this.height = Shapes.ATTACHABLE_HEIGHT * 2;
-        }
-    }
-
-    @Override
-    public void removeParameter(int space) {
-        this.list.remove(space);
-    }
-
-    @Override
-    public boolean canAccept(int slot, ValueBlock<?> block) {
-        Class<?> clazz = block.getExpectedValue();
-        if(!clazz.isAssignableFrom(Number.class)){
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public void paint(Graphics2D graphics2D) {
         graphics2D.setColor(new Color(100, 0, 255));
         graphics2D.fillRect(getX(), getY(), getWidth() - Shapes.ATTACHABLE_WIDTH, getHeight());
@@ -116,7 +59,7 @@ public class AbstractNumberOperation extends AbstractBlock implements Block.Para
         int amount = this.list.size() + 1;
         for(int A = 0; A < amount; A++){
             graphics2D.setColor(new Color(100, 0, 255));
-            graphics2D.fillPolygon(Shapes.drawAttachingConnector(this.getX() + (this.getWidth() - Shapes.ATTACHABLE_WIDTH), this.getY() + ((A + 1) * Blocks.getInstance().getFont().getSize()), Shapes.ATTACHABLE_HEIGHT, Shapes.ATTACHABLE_WIDTH));
+            graphics2D.fillPolygon(Shapes.drawAttachingConnector(this.getX() + (this.getWidth() - Shapes.ATTACHABLE_WIDTH), this.getY() + ((A + 1) * Blocks.getInstance().getFont().getSize()), Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT));
             graphics2D.setColor(Color.BLACK);
             graphics2D.drawString(this.operator, this.getX(), this.getY() + ((A + 2) * Blocks.getInstance().getFont().getSize()));
         }
@@ -124,11 +67,20 @@ public class AbstractNumberOperation extends AbstractBlock implements Block.Para
 
     @Override
     public String writeCode() {
-        return ArrayUtils.toString(" " + this.operator + " ", b -> b.writeCode() , this.list);
+        return ArrayUtils.toString(" " + this.operator + " ", Block::writeCode, this.list);
     }
 
     @Override
     public Class<Number> getExpectedValue() {
-        return (Class<Number>) ClassCompare.compareNumberClasses(b -> (Class<? extends Number>)b.getExpectedValue(), this.list).get().getExpectedValue();
+        return (Class<Number>) ClassCompare.toPrimitive((Class<Number>)ClassCompare.compareNumberClasses(b -> (Class<? extends Number>)b.getExpectedValue(), this.list).get().getExpectedValue());
+    }
+
+    @Override
+    public boolean canAcceptAttachment(int index, Block block) {
+        if(!(block instanceof Block.ValueBlock)){
+            return false;
+        }
+        Block.ValueBlock<?> aBlock = (ValueBlock<?>) block;
+        return Number.class.isAssignableFrom(aBlock.getExpectedValue());
     }
 }

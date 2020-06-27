@@ -1,12 +1,10 @@
 package org.block.panel.block;
 
-
 import org.block.panel.block.event.BlockEvent;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,95 +15,227 @@ import java.util.UUID;
 public interface Block {
 
     /**
-     * If a Block requires more data that can be provided in a programmable way, then the Block should implement ParameterInsertBlock which is a standard method of Parameters.
-     * This isn't descriptive as there is a issue which removes this and replaces it with something else.
-     *
-     * The main issue with this implementation is that it assumes that all parameters can be accepted but doesn't let all parameters to be accepted, resulting in a lot of errors.
+     * If the Block requires additional information to function properly that is in code form, then it should implement Attachable.
+     * This allows users to add blocks directly to this block
      */
-    interface ParameterInsertBlock extends Block {
+    interface AttachableBlock extends Block {
 
         /**
-         * Gets the max amount of parameters that the Block can accept. This can be 0.
-         * If you wish to have unlimited, do {@link Integer#MAX_VALUE}
-         * @return The max amount of parameters that the Block can accept
+         * If the block is guaranteed to have only one attachment then the block should implement this instead of AttachableBlock.
          */
-        int getMaxCount();
+        interface Single extends AttachableBlock {
 
-        /**
-         * Gets all the parameters the user has currently linked to the Block.
-         * This also includes hovering Blocks (where the user is dragging an item which has hovered over this block and the program is suggesting the attachment).
-         * @return A ordered unmodifiable list of all parameters currently linked
-         */
-        List<ValueBlock<?>> getCurrentParameters();
+            /**
+             * Gets the only attachment from the block
+             * @return The attached block, if none are attached then it will return {@link Optional#empty()}
+             */
+            Optional<Block> getAttachment();
 
-        /**
-         * Adds the parameter to the next free slot.
-         * Please note that the parameter is not shown until the panel is repainted.
-         * @param block The block you wish to add
-         * @throws IllegalArgumentException If the parameter you have given cannot be added to the slot then this will be thrown
-         */
-        void addParameter(ValueBlock<?> block);
+            /**
+             * Sets the only attachment to the block
+             * @param block The new block
+             * @throws IllegalArgumentException If the block can not be accept then this will be thrown
+             */
+            void setAttachment(Block block);
 
-        /**
-         * Adds the parameter to the index value set, this will override the current block in its slot if there is one.
-         * Please note that the parameter is not shown until the panel is repainted.
-         * @param index The position to add to
-         * @param block The block to add
-         * @throws IllegalArgumentException If the parameter you have given cannot be added to the slot then this will be thrown
-         */
-        void addParameter(int index, ValueBlock<?> block);
+            /**
+             * Removes the only attachment from the block
+             * @return The block that was removed, {@link Optional#empty()} is returned if nothing was returned
+             */
+            Optional<Block> removeAttachment();
 
-        /**
-         * Removes the provided parameter from the list of parameters.
-         * Please note that the parameter will continue to show until the panel is repainted
-         * @param block The block to remove
-         */
-        void removeParameter(ValueBlock<?> block);
+            /**
+             * Checks if the provided block can be attached to the block
+             * @param block The block to check
+             * @return if the block was acceptable or not
+             */
+            boolean canAcceptAttachment(Block block);
 
-        /**
-         * Removes the parameter in the provided slot
-         * Please note that the parameter will continue to show until the panel is repainted
-         * @param space The slot you wish to remove
-         */
-        void removeParameter(int space);
+            /**
+             * Gets the max amount of attachments that this block may have.
+             * If unlimited attachments then it would return {@link Integer#MAX_VALUE}
+             * @return The max amount of attachments this block can accept. This number will always be positive
+             * @deprecated The only possible answer is 1, therefore if known it shouldn't need to be checked
+             */
+            @Deprecated
+            @Override
+            default int getMaxAttachments(){
+                return 1;
+            }
 
-        /**
-         * Checks if the provided block can be accepted within the provided slot.
-         * This is useful for if you need one parameter to be {@link Boolean} and the other to be {@link Integer}
-         * @param slot The slot to check
-         * @param block The block to check
-         * @return if the provided block can be accepted within the provided slot.
-         */
-        boolean canAccept(int slot, ValueBlock<?> block);
+            /**
+             * Gets the attachment in the slot provided
+             * @param index The index to check
+             * @return A optional of the block, if no block is found then it will be {@link Optional#empty()}
+             * @throws IndexOutOfBoundsException if the provided index is out of range
+             * @deprecated use {@link Single#getAttachment()} instead
+             */
+            @Deprecated
+            @Override
+            default Optional<Block> getAttachment(int index){
+                if(index != 0){
+                    throw new IndexOutOfBoundsException(index + " is out of range");
+                }
+                return this.getAttachment();
+            }
 
-        /**
-         * Moves the provided block down the list.
-         * @param block The block to move
-         * @param spaces The amount of spaces to move down (this can be a negative number)
-         * @throws IllegalArgumentException If the block can not be found
-         * @throws IllegalArgumentException if the block (or a moved block from this block moving) cannot be accepted in its new slot
-         */
-        default void moveParameter(ValueBlock<?> block, int spaces){
-            List<ValueBlock<?>> list = this.getCurrentParameters();
-            int space = -1;
-            for(int A = 0; A < list.size(); A++){
-                if(list.get(A).equals(block)){
-                    space = A;
-                    break;
+            /**
+             * Sets (overrides if needed) the block in its position
+             * @param index The index value
+             * @param block The new block
+             * @throws IndexOutOfBoundsException if the provided index is out of range
+             * @throws IllegalArgumentException If the block can not be accepted in that slot
+             * @deprecated use {@link Single#setAttachment(Block)} instead
+             */
+            @Deprecated
+            @Override
+            default void setAttachment(int index, Block block){
+                if(index != 0){
+                    throw new IndexOutOfBoundsException(index + " is out of range");
+                }
+                this.setAttachment(block);
+            }
+
+            @Override
+            default void removeAttachment(Block block){
+                Optional<Block> opBlock = getAttachment();
+                if(!opBlock.isPresent()){
+                    return;
+                }
+                if(opBlock.get().equals(block)){
+                    this.removeAttachment();
                 }
             }
-            if(space == -1){
-                throw new IllegalArgumentException("Could not find block within parameter list");
+
+            /**
+             * Removes the block in the provided slot
+             * @param index The index slot to remove
+             * @return The block that was removed, if it wasn't found then this will return {@link Optional#empty()}
+             * @throws IndexOutOfBoundsException If the index is out of range
+             * @deprecated use {@link Single#removeAttachment()} instead
+             */
+            @Deprecated
+            @Override
+            default Optional<Block> removeAttachment(int index){
+                if(index != 0){
+                    throw new IndexOutOfBoundsException(index + " is out of range");
+                }
+                return removeAttachment();
             }
-            int newSpace = (space + spaces) - 1;
-            if(newSpace < 0){
-                newSpace = 0;
+
+            /**
+             * Checks if the block can be accepted in the slot
+             * @param index The index to check
+             * @param block The block to check
+             * @return If the block was accepted
+             * @deprecated use {@link Single#canAcceptAttachment(Block)} instead
+             */
+            @Deprecated
+            @Override
+            default boolean canAcceptAttachment(int index, Block block){
+                return this.canAcceptAttachment(block);
             }
-            if(newSpace >= list.size()){
-                newSpace = list.size();
+
+            /**
+             * Adds the provided block into the first free slot
+             * @param block The block to add
+             * @throws IllegalStateException If the block can not be accepted in any slot
+             */
+            default void addAttachment(Block block){
+                if(this.getAttachment().isPresent()){
+                    throw new IllegalStateException("Could not find a valid free slot");
+                }
+                if(this.canAcceptAttachment(block)) {
+                    this.setAttachment(block);
+                }
             }
-            this.removeParameter(block);
-            this.addParameter(newSpace, block);
+
+        }
+
+        /**
+         * Gets the max amount of attachments that this block may have.
+         * If unlimited attachments then it would return the current amount of attachments + 1
+         * @return The max amount of attachments this block can accept. This number will always be positive
+         */
+        int getMaxAttachments();
+
+        /**
+         * Gets the attachment in the slot provided
+         * @param index The index to check
+         * @return A optional of the block, if no block is found then it will be {@link Optional#empty()}
+         * @throws IndexOutOfBoundsException if the provided index is out of range
+         */
+        Optional<Block> getAttachment(int index);
+
+        /**
+         * Sets (overrides if needed) the block in its position
+         * @param index The index value
+         * @param block The new block
+         * @throws IndexOutOfBoundsException if the provided index is out of range
+         * @throws IllegalArgumentException If the block can not be accepted in that slot
+         */
+        void setAttachment(int index, Block block);
+
+        /**
+         * Removes the attachment
+         * @param block The block to remove
+         */
+        void removeAttachment(Block block);
+
+        /**
+         * Checks if the block can be accepted in the slot
+         * @param index The index to check
+         * @param block The block to check
+         * @return If the block was accepted
+         */
+        boolean canAcceptAttachment(int index, Block block);
+
+        /**
+         * Adds the provided block into the first free slot
+         * @param block The block to add
+         * @throws IllegalStateException If the block can not be accepted in any slot
+         */
+        default void addAttachment(Block block){
+            for(int A = 0; A < this.getMaxAttachments(); A++){
+                if(this.canAcceptAttachment(A, block)){
+                    this.setAttachment(A, block);
+                    return;
+                }
+            }
+            throw new IllegalStateException("Could not find a valid free slot");
+        }
+
+        /**
+         * Removes the block in the provided slot
+         * @param index The index slot to remove
+         * @return The block that was removed, if it wasn't found then this will return {@link Optional#empty()}
+         * @throws IndexOutOfBoundsException If the index is out of range
+         */
+        default Optional<Block> removeAttachment(int index){
+            Optional<Block> opBlock = this.getAttachment(index);
+            if(!opBlock.isPresent()){
+                return Optional.empty();
+            }
+            this.removeAttachment(opBlock.get());
+            return opBlock;
+        }
+
+        /**
+         * Checks if the provided block is contained within the attached set of blocks
+         * @param block The block to test
+         * @return If the block is contained
+         */
+        default boolean containsAttachment(Block block){
+            for(int A = 0; A < this.getMaxAttachments(); A++){
+                Optional<Block> opAttachment = this.getAttachment(A);
+                if(!opAttachment.isPresent()){
+                    continue;
+                }
+                if (opAttachment.get().equals(block)){
+                    return true;
+                }
+            }
+            return false;
         }
 
     }
@@ -121,68 +251,6 @@ public interface Block {
          * @return The expected class of the code output
          */
         Class<V> getExpectedValue();
-
-    }
-
-    /**
-     * This is being removed so once again not much info
-     *
-     * The attachable block is for Blocks that expect a single Block to be attached to it for more information
-     * @param <V> The expected class type of the outputted value. See {@link ValueBlock} for more info
-     */
-    interface AttachableBlock<V> extends ValueBlock<V> {
-
-        /**
-         * Checks if the provided block can be attached to this block
-         * @param block The block to check
-         * @return If the provided block can be attached
-         */
-        boolean canAttach(Block block);
-
-        /**
-         * Gets the attached block.
-         * @return A Optional of the attached block, if none then it will return {@link Optional#empty()}
-         */
-        Optional<Block> getAttached();
-
-        /**
-         * Removes the attached block if present. Please note that the panel will need to be repainted for changes visually to take affect
-         */
-        void removeAttached();
-
-        /**
-         * Sets (overrides if needed) the attached block. Please note that the panel will need ot be repainted for changes visually to take affect
-         * @param block The new block
-         * @throws IllegalArgumentException If the provided block is not accepted
-         */
-        void setAttached(Block block);
-
-    }
-
-    /**
-     * Planned to remove so once again, not much information
-     *
-     * A SquenceBlock is a Block designed to connect multiple blocks together. This maybe for a method or a loop or something like that
-     */
-    interface SequenceBlock extends Block {
-
-        /**
-         * Gets all the attached blocks
-         * @return Gets the Blocks in a ordered unmodified list
-         */
-        List<Block> getSequence();
-
-        /**
-         * Removes the provided block from the sequence
-         * @param block The block to remove
-         */
-        void removeFromSequence(Block block);
-
-        /**
-         * Adds the provided block to the sequence
-         * @param block The block to add
-         */
-        void addToSequence(Block block);
 
     }
 
@@ -207,11 +275,24 @@ public interface Block {
     }
 
     /**
-     * This will be changed. Ignore.
+     * If your code requires calls to be added into the output code project, then this should be implemented.
+     *
+     * Please note, if two callables are found to have the same name with the same parameters/location then
+     * an exception will be thrown when outputting the code (This is not a good thing)
      */
-    interface CallerBlock extends Block {
+    interface CalledBlock extends Block {
 
-        String writeCall();
+        int FIELD = 0;
+        int METHOD = 1;
+        int CONSTRUCTOR = 2;
+        int CLASS = 3;
+
+        /**
+         * Provides the callables
+         * The map should provide the code as the key with one of the provided Integer keys as its value
+         * @return
+         */
+        Map<String, Integer> writeBlockCode();
 
     }
 
@@ -324,9 +405,6 @@ public interface Block {
         if(x > (getX() + getWidth())){
             return false;
         }
-        if(y > (getY() + getHeight())){
-            return false;
-        }
-        return true;
+        return y <= (getY() + getHeight());
     }
 }

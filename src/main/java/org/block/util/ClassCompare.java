@@ -24,4 +24,29 @@ public class ClassCompare {
         map.put(Double.class.getSimpleName(), 5);
         return ArrayUtils.getBest(b -> map.get(function.apply(b)), (c1, c2) -> c1 > c2, collection);
     }
+
+    /**
+     * Converts object based number class type to the primitive form
+     * @param class1 The object based number class
+     * @return The primitive class type
+     * @throws IllegalArgumentException Unknown primitive form
+     */
+    public static Class<? extends Number> toPrimitive(Class<? extends Number> class1){
+        if(class1.equals(Byte.class) || class1.equals(byte.class)){
+            return byte.class;
+        }
+        if(class1.equals(Short.class) || class1.equals(short.class)){
+            return short.class;
+        }
+        if(class1.equals(Integer.class) || class1.equals(int.class)){
+            return int.class;
+        }
+        if(class1.equals(Float.class) || class1.equals(float.class)){
+            return float.class;
+        }
+        if(class1.equals(Double.class) || class1.equals(double.class)){
+            return double.class;
+        }
+        throw new IllegalArgumentException("Unknown primitive type");
+    }
 }
