@@ -2,6 +2,9 @@ package org.block.panel.block;
 
 import java.awt.*;
 
+/**
+ * Assists with building common shapes.
+ */
 public interface Shapes {
 
     int ATTACHABLE_WIDTH = 10;

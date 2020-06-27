@@ -8,13 +8,14 @@ import org.block.panel.block.Shapes;
 import org.block.util.ClassCompare;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The basic Block implementation for all number operations.
+ * All methods are implemented for block including code and paint.
+ */
 public class AbstractNumberOperation extends AbstractBlock implements Block.ParameterInsertBlock, Block.ValueBlock<Number> {
 
     private String operator;
@@ -22,6 +23,13 @@ public class AbstractNumberOperation extends AbstractBlock implements Block.Para
     private int marginX = 2;
     private int marginY = 2;
 
+    /**
+     * The constructor for abstract number operations
+     * @param x The X position
+     * @param y The Y position
+     * @param text The text to display, this would typically be the English word for the operation
+     * @param operator The Java maths operator
+     */
     public AbstractNumberOperation(int x, int y, String text, String operator) {
         super(x, y, 0, 0, text);
         this.operator = operator;
@@ -112,7 +120,6 @@ public class AbstractNumberOperation extends AbstractBlock implements Block.Para
             graphics2D.setColor(Color.BLACK);
             graphics2D.drawString(this.operator, this.getX(), this.getY() + ((A + 2) * Blocks.getInstance().getFont().getSize()));
         }
-
     }
 
     @Override
