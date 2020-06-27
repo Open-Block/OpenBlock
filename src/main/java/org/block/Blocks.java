@@ -1,13 +1,13 @@
 package org.block;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 
 public class Blocks {
 
     private Font font;
     private FontMetrics metrics;
+    private JWindow window;
 
     /**
      * Init a Blocks object with default values. <br>
@@ -40,6 +40,18 @@ public class Blocks {
 
     public void setFont(Font font){
         this.font = font;
+    }
+
+    /**
+     * Gets the current GUI window. This maybe NULL if you attempt to get the Window before its init
+     * @return The current GUI Window
+     */
+    public JWindow getWindow(){
+        return this.window;
+    }
+
+    public void setWindow(JWindow window){
+        this.window = window;
     }
 
     public FontMetrics getMetrics(){
