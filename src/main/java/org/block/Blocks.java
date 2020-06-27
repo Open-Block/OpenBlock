@@ -9,10 +9,20 @@ public class Blocks {
     private Font font;
     private FontMetrics metrics;
 
+    /**
+     * Init a Blocks object with default values. <br>
+     * Font: SANS_SERIF<br>
+     * Font Size: <br>
+     * FontMetrics: Default
+     */
     public Blocks(){
         this(new Font(Font.SANS_SERIF, Font.BOLD, 18));
     }
 
+    /**
+     * Init a Blocks object with specified font
+     * @param font The font that all applicable text follows
+     */
     public Blocks(Font font){
         this(font, new Canvas().getFontMetrics(font));
     }

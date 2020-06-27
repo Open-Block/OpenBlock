@@ -5,8 +5,14 @@ import org.block.serializtion.ConfigNode;
 
 import java.io.File;
 
+/**
+ * The implementation for sum Blocks
+ */
 public class SumOperation extends AbstractNumberOperation {
 
+    /**
+     * The BlockType for the Sum Block.
+     */
     public static class SumOperationType implements BlockType<SumOperation> {
 
         @Override

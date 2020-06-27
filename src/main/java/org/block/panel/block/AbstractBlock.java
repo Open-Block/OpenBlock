@@ -4,6 +4,11 @@ import org.block.panel.block.event.BlockEvent;
 
 import java.util.*;
 
+/**
+ * The most common implementation for a Block, while this does not provided all functions,
+ * it does provided majority of the default functions.
+ * This also takes on {@link Block.TextBlock} as all default blocks will have text of some sort
+ */
 public abstract class AbstractBlock implements Block.TextBlock {
 
     protected int height;
