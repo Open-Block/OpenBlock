@@ -69,7 +69,6 @@ public abstract class AbstractBlockList<T extends Block> implements BlockList<T>
 
     @Override
     public void setAttachment(int index, T block) {
-        int oldSize = this.blocks.size();
         if(index >= this.getMaxAttachments()){
             throw new IndexOutOfBoundsException(index + " is out of range of 0 - " + this.getMaxAttachments());
         }
@@ -79,7 +78,6 @@ public abstract class AbstractBlockList<T extends Block> implements BlockList<T>
             }
         }
         this.blocks.set(index, block);
-        System.out.println("Added block to " + index + ". New Size: " + this.blocks.size() + " | Old Size: " + oldSize);
         int x = this.getParent().getX() + this.getXPosition(index);
         int y = this.getParent().getY() + this.getYPosition(index);
         block.setX(x);

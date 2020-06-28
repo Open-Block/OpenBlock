@@ -53,7 +53,9 @@ public class BlockDisplayPanel extends JPanel {
                             try {
                                 attachment.removeAttachment(block);
                                 int slot = attachment.getSlot(relX, relY);
-                                attachment.setAttachment(slot, block);
+                                if (!attachment.getAttachment(slot).isPresent()) {
+                                    attachment.setAttachment(slot, block);
+                                }
                             }catch (IllegalArgumentException ignore){
 
                             }
@@ -123,7 +125,7 @@ public class BlockDisplayPanel extends JPanel {
         }
     }
 
-    private List<Block> blocks = new ArrayList<>(Arrays.asList(new SumOperation(100, 80), new NumberBlock(20, 40, 100)));
+    private List<Block> blocks = new ArrayList<>(Arrays.asList(new SumOperation(100, 80), new NumberBlock(30, 40, 100), new NumberBlock(50, 40, 200), new NumberBlock(40, 40, 50)));
     private boolean mouseDown;
     private DragContext context;
 
