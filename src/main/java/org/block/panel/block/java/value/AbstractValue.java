@@ -4,6 +4,7 @@ import org.block.Blocks;
 import org.block.panel.block.AbstractBlock;
 import org.block.panel.block.Block;
 import org.block.panel.block.Shapes;
+import org.block.util.ClassCompare;
 
 import java.awt.*;
 import java.util.function.Function;
@@ -13,9 +14,9 @@ import java.util.function.Function;
  * affect this block in terms of it being attached to another block.
  * @param <V> The expected output type of the value
  */
-public abstract class AbstractValue<V> extends AbstractBlock implements Block.ValueBlock<V> {
+public abstract class AbstractValue<V> extends AbstractBlock implements Block.ValueBlock.ConnectedValueBlock<V> {
 
-    private Function<V, String> toString;
+    private final Function<V, String> toString;
     private V value;
     private int marginX = 2;
     private int marginY = 2;
@@ -45,14 +46,6 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Block.Va
     }
 
     /**
-     * Gets the value of the block
-     * @return The actual value of the block
-     */
-    public V getValue(){
-        return this.value;
-    }
-
-    /**
      * Sets the value of the block. Please note that for the change to take affect visually the panel must be repainted
      * @param value The new value
      */
@@ -71,8 +64,8 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Block.Va
     }
 
     @Override
-    public Class<V> getExpectedValue() {
-        return (Class<V>)this.value.getClass();
+    public V getValue(){
+        return this.value;
     }
 
     /**

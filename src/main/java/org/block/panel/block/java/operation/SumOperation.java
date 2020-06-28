@@ -4,6 +4,7 @@ import org.block.Blocks;
 import org.block.panel.MainDisplayPanel;
 import org.block.panel.block.Block;
 import org.block.panel.block.BlockType;
+import org.block.panel.block.assists.BlockList;
 import org.block.serializtion.ConfigNode;
 
 import java.io.File;
@@ -45,6 +46,7 @@ public class SumOperation extends AbstractNumberOperation {
             MainDisplayPanel panel = (MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane();
             List<Block> blocks = panel.getBlockPanel().getBlocks();
             SumOperation sumBlock = new SumOperation(opX.get(), opY.get());
+            BlockList<ValueBlock<? extends Number>> blockList = sumBlock.getAttachments();
             sumBlock.id = opUUID.get();
             for(int A = 0; A < connected.size(); A++){
                 UUID uuid = connected.get(A);
@@ -52,7 +54,10 @@ public class SumOperation extends AbstractNumberOperation {
                 if(!opBlock.isPresent()){
                     throw new IllegalStateException("Unable to find dependency of " + uuid.toString());
                 }
-                sumBlock.setAttachment(A, opBlock.get());
+                if(!(opBlock.get() instanceof ValueBlock)){
+                    throw new IllegalStateException("Attached block was not a value block");
+                }
+                blockList.setAttachment(A, (ValueBlock<? extends Number>) opBlock.get());
             }
             return sumBlock;
         }
@@ -61,8 +66,9 @@ public class SumOperation extends AbstractNumberOperation {
         public void write(ConfigNode node, SumOperation block) {
             BlockType.super.write(node, block);
             List<UUID> list = new ArrayList<>();
-            for(int A = 0; A < block.getMaxAttachments(); A++){
-                block.getAttachment(A).ifPresent(b -> list.add(b.getUniqueId()));
+            BlockList<ValueBlock<? extends Number>> blockList = block.getAttachments();
+            for(int A = 0; A < blockList.getMaxAttachments(); A++){
+                blockList.getAttachment(A).ifPresent(b -> list.add(b.getUniqueId()));
             }
             TITLE_DEPENDS.serialize(node, list);
         }

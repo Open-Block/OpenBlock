@@ -2,6 +2,7 @@ package org.block.panel;
 
 import org.array.utils.ArrayUtils;
 import org.block.panel.block.Block;
+import org.block.panel.block.assists.BlockList;
 import org.block.panel.block.java.operation.SumOperation;
 import org.block.panel.block.java.value.NumberBlock;
 import org.block.panel.context.DragContext;
@@ -45,11 +46,18 @@ public class BlockDisplayPanel extends JPanel {
                 }else{
                     if(target instanceof Block.AttachableBlock){
                         Block.AttachableBlock target2 = (Block.AttachableBlock) target;
-                        try{
-                            target2.addAttachment(block);
-                        }catch (IllegalStateException ignore){
+                        target2.containsSection(e.getX(), e.getY()).ifPresent(s -> {
+                            BlockList<Block> attachment = target2.getAttachments(s);
+                            int relX = e.getX() - target2.getX();
+                            int relY = e.getY() - target2.getY();
+                            try {
+                                attachment.removeAttachment(block);
+                                int slot = attachment.getSlot(relX, relY);
+                                attachment.setAttachment(slot, block);
+                            }catch (IllegalArgumentException ignore){
 
-                        }
+                            }
+                        });
                     }
                 }
             }
@@ -95,6 +103,9 @@ public class BlockDisplayPanel extends JPanel {
                     }
                 }
             }
+            BlockDisplayPanel.this.repaint();
+            BlockDisplayPanel.this.revalidate();
+
         }
 
         @Override
