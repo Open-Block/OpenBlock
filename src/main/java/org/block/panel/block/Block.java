@@ -1,14 +1,10 @@
 package org.block.panel.block;
 
-
+import org.block.panel.block.assists.BlockList;
 import org.block.panel.block.event.BlockEvent;
 
 import java.awt.*;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * A Block is a shape that can have specific functions with code attached to it.
@@ -17,97 +13,70 @@ import java.util.UUID;
 public interface Block {
 
     /**
-     * If a Block requires more data that can be provided in a programmable way, then the Block should implement ParameterInsertBlock which is a standard method of Parameters.
-     * This isn't descriptive as there is a issue which removes this and replaces it with something else.
-     *
-     * The main issue with this implementation is that it assumes that all parameters can be accepted but doesn't let all parameters to be accepted, resulting in a lot of errors.
+     * If a block is directly affected by another block then the former should implement this.
      */
-    interface ParameterInsertBlock extends Block {
+    interface LinkedBlock extends Block {
 
         /**
-         * Gets the max amount of parameters that the Block can accept. This can be 0.
-         * If you wish to have unlimited, do {@link Integer#MAX_VALUE}
-         * @return The max amount of parameters that the Block can accept
+         * Gets the linked block
+         * @return A optional of the linked block, if no link is defined then {@link Optional#empty()} will be returned
          */
-        int getMaxCount();
+        Optional<Block> getLinkedBlock();
+
+    }
+
+    /**
+     * If the Block requires additional information to function properly that is in code form, then it should implement Attachable.
+     * This allows users to add blocks directly to this block
+     */
+    interface AttachableBlock extends Block {
 
         /**
-         * Gets all the parameters the user has currently linked to the Block.
-         * This also includes hovering Blocks (where the user is dragging an item which has hovered over this block and the program is suggesting the attachment).
-         * @return A ordered unmodifiable list of all parameters currently linked
+         * Gets all attached block of the the provided section
+         * @param section The section to get
+         * @param <B> The expected block, this isn't defined when called, specify in the variable or use "< >" before the call
+         * @return The block list
+         * @throws IllegalArgumentException thrown if section does not exist
          */
-        List<ValueBlock<?>> getCurrentParameters();
+        <B extends Block> BlockList<B> getAttachments(String section);
 
         /**
-         * Adds the parameter to the next free slot.
-         * Please note that the parameter is not shown until the panel is repainted.
-         * @param block The block you wish to add
-         * @throws IllegalArgumentException If the parameter you have given cannot be added to the slot then this will be thrown
+         * Gets all sections supported by the block
+         * @return A unmodifiable collection of sections
          */
-        void addParameter(ValueBlock<?> block);
+        Collection<String> getSections();
 
         /**
-         * Adds the parameter to the index value set, this will override the current block in its slot if there is one.
-         * Please note that the parameter is not shown until the panel is repainted.
-         * @param index The position to add to
-         * @param block The block to add
-         * @throws IllegalArgumentException If the parameter you have given cannot be added to the slot then this will be thrown
+         * Gets the section based upon the provided X and Y
+         * @param x The X position
+         * @param y The Y position
+         * @return The section, if no section can be found will return {@link Optional#empty()}
          */
-        void addParameter(int index, ValueBlock<?> block);
+        Optional<String> containsSection(int x, int y);
 
         /**
-         * Removes the provided parameter from the list of parameters.
-         * Please note that the parameter will continue to show until the panel is repainted
-         * @param block The block to remove
-         */
-        void removeParameter(ValueBlock<?> block);
-
-        /**
-         * Removes the parameter in the provided slot
-         * Please note that the parameter will continue to show until the panel is repainted
-         * @param space The slot you wish to remove
-         */
-        void removeParameter(int space);
-
-        /**
-         * Checks if the provided block can be accepted within the provided slot.
-         * This is useful for if you need one parameter to be {@link Boolean} and the other to be {@link Integer}
-         * @param slot The slot to check
+         * Checks all sections to see if the block is attached
          * @param block The block to check
-         * @return if the provided block can be accepted within the provided slot.
+         * @return if the block is attached
          */
-        boolean canAccept(int slot, ValueBlock<?> block);
-
-        /**
-         * Moves the provided block down the list.
-         * @param block The block to move
-         * @param spaces The amount of spaces to move down (this can be a negative number)
-         * @throws IllegalArgumentException If the block can not be found
-         * @throws IllegalArgumentException if the block (or a moved block from this block moving) cannot be accepted in its new slot
-         */
-        default void moveParameter(ValueBlock<?> block, int spaces){
-            List<ValueBlock<?>> list = this.getCurrentParameters();
-            int space = -1;
-            for(int A = 0; A < list.size(); A++){
-                if(list.get(A).equals(block)){
-                    space = A;
-                    break;
+        default boolean containsAttachment(Block block){
+            for(String section : this.getSections()){
+                if(this.getAttachments(section).containsAttachment(block)){
+                    return true;
                 }
             }
-            if(space == -1){
-                throw new IllegalArgumentException("Could not find block within parameter list");
-            }
-            int newSpace = (space + spaces) - 1;
-            if(newSpace < 0){
-                newSpace = 0;
-            }
-            if(newSpace >= list.size()){
-                newSpace = list.size();
-            }
-            this.removeParameter(block);
-            this.addParameter(newSpace, block);
+            return false;
         }
 
+        /**
+         * Removes a block from all attached list
+         * @param block The block to remove
+         */
+        default void removeAttachment(Block block){
+            for(String section : this.getSections()){
+                this.getAttachments(section).removeAttachment(block);
+            }
+        }
     }
 
     /**
@@ -116,73 +85,24 @@ public interface Block {
      */
     interface ValueBlock<V> extends Block {
 
+        interface ConnectedValueBlock<V> extends ValueBlock<V>{
+
+            /**
+             * Gets the value of the block
+             * @return The actual value of the block
+             */
+            V getValue();
+
+            default Class<V> getExpectedValue(){
+                return (Class<V>)getValue().getClass();
+            }
+        }
+
         /**
          * Gets the expected value type that the block returns
          * @return The expected class of the code output
          */
         Class<V> getExpectedValue();
-
-    }
-
-    /**
-     * This is being removed so once again not much info
-     *
-     * The attachable block is for Blocks that expect a single Block to be attached to it for more information
-     * @param <V> The expected class type of the outputted value. See {@link ValueBlock} for more info
-     */
-    interface AttachableBlock<V> extends ValueBlock<V> {
-
-        /**
-         * Checks if the provided block can be attached to this block
-         * @param block The block to check
-         * @return If the provided block can be attached
-         */
-        boolean canAttach(Block block);
-
-        /**
-         * Gets the attached block.
-         * @return A Optional of the attached block, if none then it will return {@link Optional#empty()}
-         */
-        Optional<Block> getAttached();
-
-        /**
-         * Removes the attached block if present. Please note that the panel will need to be repainted for changes visually to take affect
-         */
-        void removeAttached();
-
-        /**
-         * Sets (overrides if needed) the attached block. Please note that the panel will need ot be repainted for changes visually to take affect
-         * @param block The new block
-         * @throws IllegalArgumentException If the provided block is not accepted
-         */
-        void setAttached(Block block);
-
-    }
-
-    /**
-     * Planned to remove so once again, not much information
-     *
-     * A SquenceBlock is a Block designed to connect multiple blocks together. This maybe for a method or a loop or something like that
-     */
-    interface SequenceBlock extends Block {
-
-        /**
-         * Gets all the attached blocks
-         * @return Gets the Blocks in a ordered unmodified list
-         */
-        List<Block> getSequence();
-
-        /**
-         * Removes the provided block from the sequence
-         * @param block The block to remove
-         */
-        void removeFromSequence(Block block);
-
-        /**
-         * Adds the provided block to the sequence
-         * @param block The block to add
-         */
-        void addToSequence(Block block);
 
     }
 
@@ -207,11 +127,24 @@ public interface Block {
     }
 
     /**
-     * This will be changed. Ignore.
+     * If your code requires calls to be added into the output code project, then this should be implemented.
+     *
+     * Please note, if two callables are found to have the same name with the same parameters/location then
+     * an exception will be thrown when outputting the code (This is not a good thing)
      */
-    interface CallerBlock extends Block {
+    interface CalledBlock extends Block {
 
-        String writeCall();
+        int FIELD = 0;
+        int METHOD = 1;
+        int CONSTRUCTOR = 2;
+        int CLASS = 3;
+
+        /**
+         * Provides the callables
+         * The map should provide the code as the key with one of the provided Integer keys as its value
+         * @return
+         */
+        Map<String, Integer> writeBlockCode();
 
     }
 
@@ -324,9 +257,6 @@ public interface Block {
         if(x > (getX() + getWidth())){
             return false;
         }
-        if(y > (getY() + getHeight())){
-            return false;
-        }
-        return true;
+        return y <= (getY() + getHeight());
     }
 }

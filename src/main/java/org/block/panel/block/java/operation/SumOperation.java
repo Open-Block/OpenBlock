@@ -1,13 +1,14 @@
 package org.block.panel.block.java.operation;
 
-import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.panel.MainDisplayPanel;
 import org.block.panel.block.Block;
 import org.block.panel.block.BlockType;
+import org.block.panel.block.assists.BlockList;
 import org.block.serializtion.ConfigNode;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,6 +46,7 @@ public class SumOperation extends AbstractNumberOperation {
             MainDisplayPanel panel = (MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane();
             List<Block> blocks = panel.getBlockPanel().getBlocks();
             SumOperation sumBlock = new SumOperation(opX.get(), opY.get());
+            BlockList<ValueBlock<? extends Number>> blockList = sumBlock.getAttachments();
             sumBlock.id = opUUID.get();
             for(int A = 0; A < connected.size(); A++){
                 UUID uuid = connected.get(A);
@@ -52,7 +54,10 @@ public class SumOperation extends AbstractNumberOperation {
                 if(!opBlock.isPresent()){
                     throw new IllegalStateException("Unable to find dependency of " + uuid.toString());
                 }
-                sumBlock.addParameter(A, (ValueBlock<?>) opBlock.get());
+                if(!(opBlock.get() instanceof ValueBlock)){
+                    throw new IllegalStateException("Attached block was not a value block");
+                }
+                blockList.setAttachment(A, (ValueBlock<? extends Number>) opBlock.get());
             }
             return sumBlock;
         }
@@ -60,7 +65,12 @@ public class SumOperation extends AbstractNumberOperation {
         @Override
         public void write(ConfigNode node, SumOperation block) {
             BlockType.super.write(node, block);
-            TITLE_DEPENDS.serialize(node, ArrayUtils.convert(p -> p.getUniqueId(), block.getCurrentParameters()));
+            List<UUID> list = new ArrayList<>();
+            BlockList<ValueBlock<? extends Number>> blockList = block.getAttachments();
+            for(int A = 0; A < blockList.getMaxAttachments(); A++){
+                blockList.getAttachment(A).ifPresent(b -> list.add(b.getUniqueId()));
+            }
+            TITLE_DEPENDS.serialize(node, list);
         }
 
         @Override

@@ -5,6 +5,7 @@ import org.block.panel.block.BlockType;
 import org.block.serializtion.ConfigNode;
 import org.block.serializtion.FixedTitle;
 import org.block.serializtion.parse.Parser;
+import org.block.util.ClassCompare;
 
 import java.io.File;
 import java.util.Optional;
@@ -69,6 +70,11 @@ public class NumberBlock<V extends Number> extends AbstractValue<V> {
 
     public NumberBlock(int x, int y, V value) {
         super(x, y, value, (n) -> n.toString());
+    }
+
+    @Override
+    public Class<V> getExpectedValue() {
+        return (Class<V>) ClassCompare.toPrimitive(this.getValue().getClass());
     }
 
     @Override

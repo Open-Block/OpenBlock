@@ -12,8 +12,8 @@ public interface Shapes {
 
     static Polygon drawAttachableConnector(int x, int y, int width, int height){
         Polygon poly = new Polygon();
-        poly.addPoint(x, y - (height/4));
-        poly.addPoint(x + width, y + (height/4));
+        poly.addPoint(x, y + (height / 4));
+        poly.addPoint(x + width, y + (height / 4));
         poly.addPoint(x + width, y + (height - (height / 4)));
         poly.addPoint(x, y + (height - (height / 4)));
         return poly;
