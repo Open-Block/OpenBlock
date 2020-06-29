@@ -1,5 +1,6 @@
 package org.block.panel;
 
+import org.block.panel.block.BlockType;
 import org.block.panel.block.java.operation.SumOperation;
 import org.block.panel.block.java.value.NumberBlock;
 import org.block.panel.section.ConnectedSection;
@@ -15,8 +16,8 @@ public class MainDisplayPanel extends JPanel {
     private final ChooserDisplayPanel chooser = new ChooserDisplayPanel();
 
     public MainDisplayPanel(){
-        this.chooser.register(new DisplaySection<>(null, "Sum", new SumOperation.SumOperationType()));
-        this.chooser.register(new DisplaySection<>(null, "Integer", new NumberBlock.NumberBlockType(Parser.INTEGER, 0)));
+        this.chooser.register(new DisplaySection<>(null, "Sum", BlockType.BLOCK_TYPE_SUM));
+        this.chooser.register(new DisplaySection<>(null, "Integer", BlockType.BLOCK_TYPE_INTEGER));
         init();
     }
 

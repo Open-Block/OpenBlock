@@ -1,6 +1,7 @@
 package org.block.panel.block;
 
 import org.block.panel.block.event.BlockEvent;
+import org.block.panel.block.event.BlockListener;
 
 import java.util.*;
 
@@ -18,7 +19,7 @@ public abstract class AbstractBlock implements Block.TextBlock {
     protected String text;
     protected boolean selected;
     protected boolean highlighted;
-    protected Set<BlockEvent> events = new HashSet<>();
+    protected Set<BlockListener<? extends BlockEvent>> events = new HashSet<>();
     protected UUID id;
 
     public AbstractBlock(int x, int y, int width, int height, String text){
@@ -80,12 +81,12 @@ public abstract class AbstractBlock implements Block.TextBlock {
     }
 
     @Override
-    public Collection<BlockEvent> getEvents() {
+    public Collection<BlockListener<? extends BlockEvent>> getEvents() {
         return Collections.unmodifiableCollection(this.events);
     }
 
     @Override
-    public void registerEvent(BlockEvent event) {
+    public void registerEventListener(BlockListener<? extends BlockEvent> event) {
         this.events.add(event);
     }
 
