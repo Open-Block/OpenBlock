@@ -3,8 +3,10 @@ package org.block.panel;
 import org.array.utils.ArrayUtils;
 import org.block.panel.block.Block;
 import org.block.panel.block.assists.BlockList;
+import org.block.panel.block.event.mouse.BlockMouseClickEvent;
 import org.block.panel.block.java.operation.SumOperation;
 import org.block.panel.block.java.value.NumberBlock;
+import org.block.panel.block.java.value.number.IntegerBlock;
 import org.block.panel.context.DragContext;
 
 import javax.swing.*;
@@ -12,8 +14,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,8 +83,19 @@ public class BlockDisplayPanel extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            BlockDisplayPanel.this.getBlocks().forEach(b -> b.setSelected(false));
-            BlockDisplayPanel.this.getBlocks(e.getX(), e.getY()).forEach(b -> b.setSelected(true));
+            if(e.getClickCount() == 1) {
+                Map<Block, Boolean> map = new HashMap<>();
+                BlockDisplayPanel.this.getBlocks(e.getX(), e.getY()).forEach(block -> {
+                    map.put(block, block.isSelected());
+                });
+                BlockDisplayPanel.this.getBlocks().forEach(b -> b.setSelected(false));
+                map.entrySet().forEach(entry -> entry.getKey().setSelected(!entry.getValue()));
+            }else{
+                BlockDisplayPanel.this.getBlocks(e.getX(), e.getY()).forEach(b -> {
+                    BlockMouseClickEvent event = new BlockMouseClickEvent(b, e);
+                    b.callEvent(event);
+                });
+            }
             BlockDisplayPanel.this.repaint();
             BlockDisplayPanel.this.revalidate();
         }
@@ -125,7 +137,11 @@ public class BlockDisplayPanel extends JPanel {
         }
     }
 
-    private List<Block> blocks = new ArrayList<>(Arrays.asList(new SumOperation(100, 80), new NumberBlock(30, 40, 100), new NumberBlock(50, 40, 200), new NumberBlock(40, 40, 50)));
+    private List<Block> blocks = new ArrayList<>(Arrays.asList(
+            new SumOperation(100, 80),
+            new IntegerBlock(30, 40, 100),
+            new IntegerBlock(50, 40, 200),
+            new IntegerBlock(40, 40, 50)));
     private boolean mouseDown;
     private DragContext context;
 

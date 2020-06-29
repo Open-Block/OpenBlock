@@ -2,6 +2,7 @@ package org.block.panel.block;
 
 import org.block.panel.block.assists.BlockList;
 import org.block.panel.block.event.BlockEvent;
+import org.block.panel.block.event.BlockListener;
 
 import java.awt.*;
 import java.util.*;
@@ -213,13 +214,19 @@ public interface Block {
      * Gets the attached events
      * @return Gets a unordered unmodifiable list of BlockEvent
      */
-    Collection<BlockEvent> getEvents();
+    Collection<BlockListener<? extends BlockEvent>> getEvents();
 
     /**
      * Register a event to the block. Note that these are not saved by default, implementations may save some
      * @param event The new event to register
      */
-    void registerEvent(BlockEvent event);
+    void registerEventListener(BlockListener<? extends BlockEvent> event);
+
+    default <B extends BlockEvent> void callEvent(B event){
+        getEvents().stream().filter(l -> l.getEventClass().isInstance(event)).forEach(b -> {
+            ((BlockListener<B>)b).onEvent(event);
+        });
+    }
 
     /**
      * Gets a unique id for the block.

@@ -1,12 +1,19 @@
 package org.block.panel.block.java.value;
 
+import org.block.Blocks;
 import org.block.panel.block.Block;
 import org.block.panel.block.BlockType;
+import org.block.panel.block.event.BlockListener;
+import org.block.panel.block.event.mouse.BlockMouseClickEvent;
+import org.block.panel.block.input.OpenBlockDialog;
+import org.block.panel.block.input.PanelDialog;
+import org.block.panel.block.input.type.ValueDialog;
 import org.block.serializtion.ConfigNode;
 import org.block.serializtion.FixedTitle;
 import org.block.serializtion.parse.Parser;
 import org.block.util.ClassCompare;
 
+import java.awt.*;
 import java.io.File;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,21 +24,14 @@ import java.util.UUID;
  * This needs to be worked on ... might need a overhaul to {@link Block.ValueBlock} as generics can not accept primitives
  * @param <V> The expected value
  */
-public class NumberBlock<V extends Number> extends AbstractValue<V> {
+public abstract class NumberBlock<V extends Number> extends AbstractValue<V> {
 
-    public static class NumberBlockType<N extends Number> implements BlockType<NumberBlock<N>>{
+    public abstract static class NumberBlockType<N extends Number> implements BlockType<NumberBlock<N>>{
 
         private final Parser<N> parser;
-        private final N defaul;
 
-        public NumberBlockType(Parser<N> parser, N defau){
+        public NumberBlockType(Parser<N> parser){
             this.parser = parser;
-            this.defaul = defau;
-        }
-
-        @Override
-        public NumberBlock<N> build(int x, int y) {
-            return new NumberBlock<>(x, y, this.defaul);
         }
 
         @Override
@@ -52,7 +52,8 @@ public class NumberBlock<V extends Number> extends AbstractValue<V> {
             if(!opValue.isPresent()){
                 throw new IllegalStateException("Could not find ID");
             }
-            NumberBlock<N> block = new NumberBlock<>(opX.get(), opY.get(), opValue.get());
+            NumberBlock<N> block = this.build(opX.get(), opY.get());
+            block.setValue(opValue.get());
             block.id = opUUID.get();
             return block;
         }
@@ -68,9 +69,36 @@ public class NumberBlock<V extends Number> extends AbstractValue<V> {
         }
     }
 
+    public class OnClickListener implements BlockListener<BlockMouseClickEvent>{
+
+        @Override
+        public Class<BlockMouseClickEvent> getEventClass() {
+            return BlockMouseClickEvent.class;
+        }
+
+        @Override
+        public void onEvent(BlockMouseClickEvent event) {
+            PanelDialog panel = (PanelDialog)NumberBlock.this.createDialog();
+            OpenBlockDialog<? extends Container> dialog = new OpenBlockDialog<>((Window)Blocks.getInstance().getWindow(), panel);
+            panel.getAcceptButton().addActionListener((e) -> {
+                NumberBlock.this.setValue((V)((ValueDialog<? extends Number>)panel).getOutput());
+                dialog.dispose();
+
+            });
+            dialog.setVisible(true);
+        }
+    }
+
     public NumberBlock(int x, int y, V value) {
         super(x, y, value, (n) -> n.toString());
+        init();
     }
+
+    private void init(){
+        this.registerEventListener(new OnClickListener());
+    }
+
+    protected abstract ValueDialog<? extends Number> createDialog();
 
     @Override
     public Class<V> getExpectedValue() {

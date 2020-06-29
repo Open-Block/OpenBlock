@@ -1,5 +1,7 @@
 package org.block.panel.block;
 
+import org.block.panel.block.java.operation.SumOperation;
+import org.block.panel.block.java.value.number.IntegerBlock;
 import org.block.serializtion.ConfigNode;
 import org.block.serializtion.FixedTitle;
 import org.block.serializtion.parse.Parser;
@@ -18,6 +20,9 @@ public interface BlockType<B extends Block> {
     FixedTitle<Integer> TITLE_Y = new FixedTitle<>("Y", Parser.INTEGER);
     FixedTitle<UUID> TITLE_UUID = new FixedTitle<>("UUID", Parser.UNIQUE_ID);
     FixedTitle.Listable<UUID> TITLE_DEPENDS = new FixedTitle.Listable<>("Depends", Parser.UNIQUE_ID);
+
+    IntegerBlock.IntegerBlockType BLOCK_TYPE_INTEGER = new IntegerBlock.IntegerBlockType();
+    SumOperation.SumOperationType BLOCK_TYPE_SUM = new SumOperation.SumOperationType();
 
     /**
      * Creates a new instanceof a block with the provided position
