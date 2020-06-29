@@ -9,6 +9,15 @@ public abstract class AbstractAttachable extends AbstractBlock implements Block.
 
     protected final Map<String, BlockList<? extends Block>> attached;
 
+    /**
+     * Init the AbstractAttachable
+     * @param x The X position
+     * @param y The Y position
+     * @param width The width of the block
+     * @param height The height of the block
+     * @param text The text to display on the block
+     * @param entries The blocklist for the attached
+     */
     public AbstractAttachable(int x, int y, int width, int height, String text, Map.Entry<String, BlockList<? extends Block>>... entries){
         this(x, y, width, height, text, new HashMap<>());
         for(Map.Entry<String, BlockList<? extends Block>> entry : entries){
@@ -23,6 +32,7 @@ public abstract class AbstractAttachable extends AbstractBlock implements Block.
      * @param width The width of the block
      * @param height The height of the block
      * @param text The text to display on the block
+     * @param map The blocklist for the attached
      */
     public AbstractAttachable(int x, int y, int width, int height, String text, Map<String, BlockList<? extends Block>> map) {
         super(x, y, width, height, text);

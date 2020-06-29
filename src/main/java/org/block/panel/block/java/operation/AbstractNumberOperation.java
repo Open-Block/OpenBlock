@@ -131,7 +131,7 @@ public class AbstractNumberOperation extends AbstractAttachable implements Block
     public void setText(String text) {
         super.setText(text);
         int width = Blocks.getInstance().getMetrics().stringWidth(text);
-        this.width = width + (this.marginX * 2) + Shapes.ATTACHABLE_WIDTH;
+        this.width = width + (this.marginX * 2) + (Shapes.ATTACHABLE_WIDTH * 2);
         AbstractNumberOperation.this.updateHeight();
     }
 
@@ -139,11 +139,13 @@ public class AbstractNumberOperation extends AbstractAttachable implements Block
     public void paint(Graphics2D graphics2D) {
         updateHeight();
         graphics2D.setColor(this.drawColor);
-        graphics2D.fillRoundRect(getX(), getY(), getWidth() - Shapes.ATTACHABLE_WIDTH, getHeight(), 20, 20);
+        graphics2D.fillPolygon(Shapes.drawAttachableConnector(this.getX(), this.getY(), Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT));
+        graphics2D.fillRect(getX() + Shapes.ATTACHABLE_WIDTH, getY(), 20, 20);
+        graphics2D.fillRoundRect(getX() + Shapes.ATTACHABLE_WIDTH, getY(), getWidth() - (Shapes.ATTACHABLE_WIDTH * 2), getHeight(), 20, 20);
         graphics2D.drawRect((getX() + getWidth()) - 30, (getY() + getHeight()) - 2, 20, 1);
         graphics2D.setColor(Color.BLACK);
         graphics2D.setFont(Blocks.getInstance().getFont());
-        graphics2D.drawString(this.getText(), getX() + this.marginX, getY() + Blocks.getInstance().getFont().getSize());
+        graphics2D.drawString(this.getText(), getX() + Shapes.ATTACHABLE_WIDTH + this.marginX, getY() + Blocks.getInstance().getFont().getSize());
 
         int amount = this.getAttachments().getMaxAttachments();
         BlockList<ValueBlock<? extends Number>> attachments = this.getAttachments();
