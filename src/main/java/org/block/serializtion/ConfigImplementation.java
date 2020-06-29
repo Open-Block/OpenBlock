@@ -28,7 +28,6 @@ public interface ConfigImplementation {
      * This is useful for if the file was provided from a abnormal location such as user inputted text
      * @param structure the text of the structured file
      * @return The root node
-     * @throws Throwable Implementation specific error
      */
     ConfigNode load(String structure);
 
@@ -46,7 +45,6 @@ public interface ConfigImplementation {
      * @return The Root node
      * @throws java.nio.file.NoSuchFileException If the file does not exist
      * @throws IOException error reading file
-     * @throws Throwable implementation specific error
      */
     default ConfigNode load(Path path) throws IOException {
         StringBuilder builder = new StringBuilder();
@@ -62,7 +60,6 @@ public interface ConfigImplementation {
      * @throws IllegalArgumentException If the provided node isn't of the correct implementation
      * @throws java.nio.file.NoSuchFileException If the file does not exist
      * @throws IOException error reading file
-     * @throws Throwable implementation specific error
      */
     default String write(ConfigNode node, Path path) throws IOException {
         FileWriter writer = new FileWriter(path.toFile());

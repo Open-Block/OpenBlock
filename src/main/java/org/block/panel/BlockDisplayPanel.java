@@ -138,6 +138,7 @@ public class BlockDisplayPanel extends JPanel {
     }
 
     private List<Block> blocks = new ArrayList<>(Arrays.asList(
+            new SumOperation(200, 80),
             new SumOperation(100, 80),
             new IntegerBlock(30, 40, 100),
             new IntegerBlock(50, 40, 200),

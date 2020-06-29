@@ -35,7 +35,7 @@ public interface Block {
         /**
          * Gets all attached block of the the provided section
          * @param section The section to get
-         * @param <B> The expected block, this isn't defined when called, specify in the variable or use "< >" before the call
+         * @param <B> The expected block, this isn't defined when called, specify in the variable or use &lt; &gt; before the call
          * @return The block list
          * @throws IllegalArgumentException thrown if section does not exist
          */
@@ -143,7 +143,7 @@ public interface Block {
         /**
          * Provides the callables
          * The map should provide the code as the key with one of the provided Integer keys as its value
-         * @return
+         * @return A map of all none caller code to insert
          */
         Map<String, Integer> writeBlockCode();
 
