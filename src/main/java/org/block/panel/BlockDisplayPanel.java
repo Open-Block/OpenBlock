@@ -163,6 +163,14 @@ public class BlockDisplayPanel extends JPanel {
         return this.blocks.stream().filter(b -> b.contains(x, y)).collect(Collectors.toList());
     }
 
+    public void register(Block block){
+        this.blocks.add(block);
+    }
+
+    public void unregister(Block block){
+        this.blocks.remove(block);
+    }
+
     @Override
     public Dimension getPreferredSize(){
         int height = ArrayUtils.getBest(b -> b.getHeight(),(x1, x2) -> x1 > x2 , this.blocks).get().getHeight();

@@ -87,4 +87,9 @@ public class SumOperation extends AbstractNumberOperation {
     public SumOperation(int x, int y) {
         super(x, y, "Sum", "+");
     }
+
+    @Override
+    public BlockType<?> getType() {
+        return BlockType.BLOCK_TYPE_SUM;
+    }
 }

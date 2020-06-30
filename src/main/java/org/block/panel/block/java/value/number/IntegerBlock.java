@@ -1,5 +1,6 @@
 package org.block.panel.block.java.value.number;
 
+import org.block.panel.block.BlockType;
 import org.block.panel.block.input.type.WholeNumberDialog;
 import org.block.panel.block.java.value.NumberBlock;
 import org.block.serializtion.parse.Parser;
@@ -25,5 +26,10 @@ public class IntegerBlock extends NumberBlock<Integer> {
     @Override
     protected WholeNumberDialog createDialog() {
         return new WholeNumberDialog();
+    }
+
+    @Override
+    public BlockType<?> getType() {
+        return BlockType.BLOCK_TYPE_INTEGER;
     }
 }

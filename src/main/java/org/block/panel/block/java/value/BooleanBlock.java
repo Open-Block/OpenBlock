@@ -1,5 +1,7 @@
 package org.block.panel.block.java.value;
 
+import org.block.panel.block.BlockType;
+
 /**
  * The custom block to display a pre-set {@link Boolean} value
  */
@@ -17,5 +19,10 @@ public class BooleanBlock extends AbstractValue<Boolean> {
     @Override
     public String writeCode() {
         return this.getValue().toString();
+    }
+
+    @Override
+    public BlockType<?> getType() {
+        return null;
     }
 }

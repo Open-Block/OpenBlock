@@ -20,7 +20,7 @@ import java.util.Optional;
  * All methods are implemented for block including code and paint.
  * All attachments must be of {@link Number}
  */
-public class AbstractNumberOperation extends AbstractAttachable implements Block.ValueBlock<Number> {
+public abstract class AbstractNumberOperation extends AbstractAttachable implements Block.ValueBlock<Number> {
 
     public class NumberOperationBlockList extends AbstractBlockList<ValueBlock<? extends Number>>{
 
@@ -154,16 +154,9 @@ public class AbstractNumberOperation extends AbstractAttachable implements Block
             int posY = this.getY() + attachments.getYPosition(A);
             graphics2D.setColor(this.drawColor);
             graphics2D.fillPolygon(Shapes.drawAttachingConnector(posX, posY, Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT));
-            graphics2D.setColor(Color.GREEN);
-            graphics2D.drawRect(posX, posY, 1, 1);
             graphics2D.setColor(Color.BLACK);
             graphics2D.drawString(this.operator, this.getX() + (this.marginX * 2), posY + (Blocks.getInstance().getFont().getSize() / 2));
         }
-
-        graphics2D.setColor(Color.YELLOW);
-        graphics2D.drawRect(getX(), getY(), 1, this.getHeight());
-        graphics2D.setColor(Color.GREEN);
-        graphics2D.drawRect(getX(), getY(), 1, 1);
     }
 
     @Override

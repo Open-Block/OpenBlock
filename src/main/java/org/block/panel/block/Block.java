@@ -222,12 +222,6 @@ public interface Block {
      */
     void registerEventListener(BlockListener<? extends BlockEvent> event);
 
-    default <B extends BlockEvent> void callEvent(B event){
-        getEvents().stream().filter(l -> l.getEventClass().isInstance(event)).forEach(b -> {
-            ((BlockListener<B>)b).onEvent(event);
-        });
-    }
-
     /**
      * Gets a unique id for the block.
      * This is used for checking if the block is equal as well as used for dependents when saving and loading.
@@ -249,6 +243,12 @@ public interface Block {
     String writeCode();
 
     /**
+     * Gets the BlockType for this block, it may not be the block type that was used to create the block, however it will be of the same type.
+     * @return The BlockType for the block
+     */
+    BlockType<?> getType();
+
+    /**
      * Checks to see if the provided X and Y is contained within the Block
      * @param x The X position to check
      * @param y The Y position to check
@@ -265,5 +265,16 @@ public interface Block {
             return false;
         }
         return y <= (getY() + getHeight());
+    }
+
+    /**
+     * Sends a BlockEvent to the block, all listeners which react to the provided event will be fired
+     * @param event The event to fire
+     * @param <B> The event type
+     */
+    default <B extends BlockEvent> void callEvent(B event){
+        getEvents().stream().filter(l -> l.getEventClass().isInstance(event)).forEach(b -> {
+            ((BlockListener<B>)b).onEvent(event);
+        });
     }
 }
