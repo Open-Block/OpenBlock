@@ -5,7 +5,7 @@ import org.block.serializtion.ConfigNode;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 
-public class JSONConfigImplementation implements ConfigImplementation {
+public class JSONConfigImplementation implements ConfigImplementation<JSONConfigNode> {
 
     @Override
     public JSONConfigNode createEmptyNode() {
@@ -48,15 +48,20 @@ public class JSONConfigImplementation implements ConfigImplementation {
                 tabBefore = true;
                 continue;
             }
+            if(at == ','){
+                newPage += at + "\n";
+                tabBefore = true;
+                continue;
+            }
             if(at == '}' || at == ']'){
                 tab--;
                 if(tabBefore) {
                     newPage += tab(tab);
                 }
                 if((A + 1) != singleLined.length() && singleLined.charAt(A + 1) == ','){
-                    newPage += at + ",\n";
+                    newPage += "\n" + tab(tab) + at + ",\n";
                 }else{
-                    newPage += at + "\n";
+                    newPage += "\n" + tab(tab) + at + "\n";
                 }
                 continue;
             }

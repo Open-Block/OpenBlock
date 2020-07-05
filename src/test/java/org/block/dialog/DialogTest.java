@@ -1,7 +1,7 @@
 package org.block.dialog;
 
-import org.block.panel.block.input.OpenBlockDialog;
-import org.block.panel.block.input.type.DecimalNumberDialog;
+import org.block.project.block.input.OpenBlockDialog;
+import org.block.project.block.input.type.DecimalNumberDialog;
 
 import javax.swing.*;
 

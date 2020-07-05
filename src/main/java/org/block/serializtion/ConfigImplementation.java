@@ -9,8 +9,9 @@ import java.nio.file.Path;
 
 /**
  * This is all the global settings for loading and saving from a particular implementation of structured file
+ * @param <CN> The default configuration node
  */
-public interface ConfigImplementation {
+public interface ConfigImplementation<CN extends ConfigNode> {
 
     /**
      * Easy access to the implementation for manipulation of JSON files
@@ -21,7 +22,7 @@ public interface ConfigImplementation {
      * Creates a empty root node for creation of the structured file
      * @return An empty node at the root
      */
-    ConfigNode createEmptyNode();
+    CN createEmptyNode();
 
     /**
      * Loads the root node of the provided text from the structured file.
@@ -29,7 +30,7 @@ public interface ConfigImplementation {
      * @param structure the text of the structured file
      * @return The root node
      */
-    ConfigNode load(String structure);
+    CN load(String structure);
 
     /**
      * Writes the structured contents as a String treating the provided node as the root
@@ -46,7 +47,7 @@ public interface ConfigImplementation {
      * @throws java.nio.file.NoSuchFileException If the file does not exist
      * @throws IOException error reading file
      */
-    default ConfigNode load(Path path) throws IOException {
+    default CN load(Path path) throws IOException {
         StringBuilder builder = new StringBuilder();
         Files.lines(path).forEach(l -> builder.append(l + "\n"));
         return load(builder.toString());

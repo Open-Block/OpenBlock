@@ -29,11 +29,11 @@ public class FixedTitle<N> {
         }
 
         public void serialize(ConfigNode node, List<N> value){
-            node.setCollection(this.title, ((Parser<N>)this.parser), value);
+            node.getNode(this.node).setCollection(this.title, ((Parser<N>)this.parser), value);
         }
 
         public Optional<List<N>> deserialize(ConfigNode node){
-            return Optional.of(node.getCollection(this.title, ((Parser<N>)this.parser)));
+            return Optional.of(node.getNode(this.node).getCollection(this.title, ((Parser<N>)this.parser)));
         }
     }
 
