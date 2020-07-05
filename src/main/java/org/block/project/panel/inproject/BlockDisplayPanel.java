@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.*;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class BlockDisplayPanel extends JPanel {
 
@@ -168,11 +170,30 @@ public class BlockDisplayPanel extends JPanel {
         this.requestFocusInWindow(false);
     }
 
-    public boolean updateBlockPosition(Block block){
-        if(this.blocks.remove(block)){
-            return this.blocks.add(block);
+    /**
+     * Updates the layers for every block found within the BlockDisplayPanel.
+     * The Consumer is used for any modification to blocks with the key being the block in question and then value
+     * being the layer the block is on. Modifying the value is safe to change and will take affect on a
+     * {@link JPanel#repaint()} and {@link JPanel#revalidate()}
+     * @param preChanges The changes to make
+     */
+    public void updateBlockPosition(Consumer<Map<Block, Integer>> preChanges){
+        Map<Block, Integer> map = new HashMap<>();
+        this.blocks.forEach(b -> map.put(b, b.getLayer()));
+        preChanges.accept(map);
+        List<Map.Entry<Block, Integer>> entries = new ArrayList<>(map.entrySet());
+        entries.sort(Comparator.comparingInt(b -> b.getValue()));
+        TreeSet<Block> set = new TreeSet<>(Comparator.comparingInt(l -> l.getLayer()));
+        for(int A = 0; A < entries.size(); A++){
+            Map.Entry<Block, Integer> entry = entries.get(A);
+            Block block = entry.getKey();
+            block.setLayer(A);
+            while(set.contains(block)){
+                block.setLayer(block.getLayer() + 1);
+            }
+            set.add(block);
         }
-        return false;
+        this.blocks = set;
     }
 
     public NavigableSet<Block> getBlocks(){
@@ -185,10 +206,20 @@ public class BlockDisplayPanel extends JPanel {
         return set;
     }
 
-    public void register(Block block){
-        this.blocks.add(block);
+    /**
+     * Adds the block to the panel, note that if the layer is the same as another one then this block will fail
+     * to be added
+     * @param block The block to add
+     * @return If it added or not
+     */
+    public boolean register(Block block){
+        return this.blocks.add(block);
     }
 
+    /**
+     * Removes the block from the panel
+     * @param block The block to remove
+     */
     public void unregister(Block block){
         this.blocks.remove(block);
     }

@@ -1,8 +1,8 @@
-package org.block.serializtion.parse;
+package org.block.serialization.parse;
 
 import org.block.Blocks;
 import org.block.project.module.Module;
-import org.block.serializtion.ConfigNode;
+import org.block.serialization.ConfigNode;
 
 import java.awt.*;
 import java.util.Optional;

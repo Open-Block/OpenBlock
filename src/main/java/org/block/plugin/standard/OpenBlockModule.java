@@ -1,5 +1,6 @@
 package org.block.plugin.standard;
 
+import org.block.Blocks;
 import org.block.plugin.PluginContainer;
 import org.block.plugin.standard.panel.OpenBlockNewPanel;
 import org.block.project.module.project.Project;
@@ -7,6 +8,7 @@ import org.block.project.module.Module;
 import org.block.project.module.project.UnloadedProject;
 import org.block.project.panel.inproject.MainDisplayPanel;
 import org.block.project.panel.inproject.Toolbar;
+import org.block.util.BlockUtils;
 
 import java.awt.*;
 
@@ -40,7 +42,16 @@ public final class OpenBlockModule implements Module {
 
     @Override
     public OpenBlockProject load(UnloadedProject project) {
-        return new OpenBlockProject(project);
+        OpenBlockProject project1 = new OpenBlockProject(project);
+        return project1;
+    }
+
+    @Override
+    public void loadBlocks(Project.Loaded project) {
+        BlockUtils.load(project, b -> {
+            project.getPanel().repaint();
+            project.getPanel().revalidate();
+        });
     }
 
     @Override

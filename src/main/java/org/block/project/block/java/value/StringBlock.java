@@ -7,7 +7,7 @@ import org.block.plugin.event.EventListener;
 import org.block.project.block.event.mouse.BlockMouseClickEvent;
 import org.block.project.block.input.OpenBlockDialog;
 import org.block.project.block.input.type.StringDialog;
-import org.block.serializtion.ConfigNode;
+import org.block.serialization.ConfigNode;
 
 import java.awt.*;
 import java.io.File;

@@ -9,8 +9,8 @@ import org.block.project.block.input.OpenBlockDialog;
 import org.block.project.block.input.PanelDialog;
 import org.block.project.block.input.type.ValueDialog;
 import org.block.project.block.java.value.AbstractValue;
-import org.block.serializtion.ConfigNode;
-import org.block.serializtion.parse.Parser;
+import org.block.serialization.ConfigNode;
+import org.block.serialization.parse.Parser;
 import org.block.util.ClassCompare;
 
 import java.awt.*;
@@ -57,7 +57,14 @@ public abstract class NumberBlock<V extends Number> extends AbstractValue<V> imp
             NumberBlock<N> block = this.build(opX.get(), opY.get());
             block.setValue(opValue.get());
             block.id = opUUID.get();
+            block.layer = TITLE_LAYER.deserialize(node).orElse(Blocks.getInstance().getLoadedProject().get().getPanel().getBlockPanel().getBlocks().size());
             return block;
+        }
+
+        @Override
+        public void write(ConfigNode node, NumberBlock<N> block) {
+            BlockType.super.write(node, block);
+            node.setValue("Title", this.parser, block.getValue());
         }
 
         @Override

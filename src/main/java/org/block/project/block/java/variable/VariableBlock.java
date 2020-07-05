@@ -8,7 +8,7 @@ import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractSingleBlockList;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.section.GUISection;
-import org.block.serializtion.ConfigNode;
+import org.block.serialization.ConfigNode;
 
 import java.awt.*;
 import java.io.File;

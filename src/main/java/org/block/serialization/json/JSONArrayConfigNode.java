@@ -1,12 +1,13 @@
-package org.block.serializtion.json;
+package org.block.serialization.json;
 
-import org.block.serializtion.ConfigNode;
-import org.block.serializtion.parse.Parser;
+import org.block.serialization.ConfigNode;
+import org.block.serialization.parse.Parser;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class JSONArrayConfigNode implements ConfigNode {
 
@@ -35,25 +36,32 @@ public class JSONArrayConfigNode implements ConfigNode {
         return Optional.ofNullable(this.path.optString(Integer.parseInt(title)));
     }
 
+    public <T extends Number> Optional<T> getNumber(String title, Function<Number, T> function){
+        Number number = this.path.optNumber(Integer.parseInt(title));
+        if(number == null){
+            return Optional.empty();
+        }
+        return Optional.of(function.apply(number));
+    }
+
     @Override
     public Optional<Integer> getInteger(String title) {
-        return Optional.ofNullable(this.path.optInt(Integer.parseInt(title)));
+        return getNumber(title, Number::intValue);
     }
 
     @Override
     public Optional<Long> getLong(String title) {
-        return Optional.ofNullable(this.path.optLong(Integer.parseInt(title)));
+        return getNumber(title, Number::longValue);
     }
 
     @Override
     public Optional<Double> getDouble(String title) {
-        return Optional.ofNullable(this.path.optDouble(Integer.parseInt(title)));
+        return getNumber(title, Number::doubleValue);
     }
 
     @Override
     public Optional<Float> getFloat(String title) {
-        return Optional.ofNullable(this.path.optFloat(Integer.parseInt(title)));
-
+        return getNumber(title, Number::floatValue);
     }
 
     @Override

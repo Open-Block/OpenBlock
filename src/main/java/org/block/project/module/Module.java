@@ -45,12 +45,14 @@ public interface Module {
     boolean canLoad(UnloadedProject project);
 
     /**
-     * Loads the project
+     * Loads the basic information of the project
      * @param project The project to load
      * @return The loaded project
      * @throws IllegalArgumentException If the project does not belong to the module
      */
     Project.Loaded load(UnloadedProject project);
+
+    void loadBlocks(Project.Loaded loaded);
 
     /**
      * Creates the MainDisplayPanel and loads the project into the panel.

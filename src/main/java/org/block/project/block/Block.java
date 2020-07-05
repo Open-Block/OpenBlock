@@ -15,12 +15,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A Block is a shape that can have specific functions with code attached to it.
  * The idea of the Block is very abstract so please look at the classes that extend upon the Block interface for a more specific description
  */
-public interface Block{
+public interface Block {
 
     /**
      * If a block is directly affected by another block then the former should implement this.
@@ -375,6 +376,7 @@ public interface Block{
     /**
      * This writes the calling/in line code for the block.
      * The first line should not have a tab indent, however other lines should have the tab indent
+     * @param tabs The indent to provide
      * @return The output code
      */
     String writeCode(int tabs);
@@ -414,6 +416,8 @@ public interface Block{
 
     /**
      * Sets the layer to show on the panel, the higher the layer then the more blocks this block will appear ontop of.
+     * Note. This value should not be changed while the block is on the BlockDisplayPanel as the layer is what is
+     * compared using the TreeSet. Use {@link BlockDisplayPanel#updateBlockPosition(Consumer)} to update the layer.
      * @param layer The new layer.
      */
     void setLayer(int layer);

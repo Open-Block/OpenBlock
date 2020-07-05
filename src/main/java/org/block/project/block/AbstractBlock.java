@@ -132,8 +132,10 @@ public abstract class AbstractBlock implements Block {
     @Override
     public boolean equals(Object obj){
         if(!(obj instanceof Block)){
+            System.out.println("AbstractBlock: Comparing: Failed: " + obj.getClass().getSimpleName() + " is not Block");
             return false;
         }
-        return ((Block)obj).getUniqueId().equals(this.id);
+        System.out.println("AbstractBlock: Comparing: " + ((Block)obj).getUniqueId().toString() + " | " + this.getUniqueId().toString() + " | " + ((Block)obj).getUniqueId().equals(this.getUniqueId()));
+        return ((Block)obj).getUniqueId().equals(this.getUniqueId());
     }
 }

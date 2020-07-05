@@ -1,5 +1,7 @@
 package org.block.project.panel.inproject;
 
+import org.array.utils.ArrayUtils;
+import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.section.BlockSection;
 import org.block.project.section.GUISection;
@@ -100,6 +102,25 @@ public class ChooserDisplayPanel extends JPanel {
 
     public List<GUISection> getSectionList(){
         return Collections.unmodifiableList(this.sectionList);
+    }
+
+    public List<BlockType<? extends Block>> getBlockTypes(){
+        List<BlockSection> list = new ArrayList<>();
+        for(GUISection section : this.getSectionList()){
+            this.getBlockTypes(section, list);
+        }
+        return ArrayUtils.convert(s -> s.getBlockType(), list);
+    }
+
+    private List<BlockSection> getBlockTypes(GUISection section, List<BlockSection> list){
+        if(section instanceof BlockSection){
+            list.add((BlockSection)section);
+            return list;
+        }
+        for(GUISection section1 : section.getSectionsChildren()){
+            getBlockTypes(section1, list);
+        }
+        return list;
     }
 
     public void register(GUISection section){

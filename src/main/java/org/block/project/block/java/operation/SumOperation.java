@@ -1,11 +1,12 @@
 package org.block.project.block.java.operation;
 
+import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.project.panel.inproject.MainDisplayPanel;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.block.assists.BlockList;
-import org.block.serializtion.ConfigNode;
+import org.block.serialization.ConfigNode;
 
 import java.io.File;
 import java.util.*;
@@ -40,14 +41,18 @@ public class SumOperation extends AbstractNumberOperation {
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
-            MainDisplayPanel panel = (MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane();
+            MainDisplayPanel panel = Blocks.getInstance().getLoadedProject().get().getPanel();
             NavigableSet<Block> blocks = panel.getBlockPanel().getBlocks();
             SumOperation sumBlock = new SumOperation(opX.get(), opY.get());
             BlockList<ValueBlock<? extends Number>> blockList = sumBlock.getAttachments();
             sumBlock.id = opUUID.get();
             for(int A = 0; A < connected.size(); A++){
                 UUID uuid = connected.get(A);
-                Optional<Block> opBlock = blocks.stream().filter(b -> b.getUniqueId().equals(uuid)).findAny();
+                System.out.println("Blocks: " + ArrayUtils.toString(", ", b -> b.getUniqueId().toString() , blocks));
+                Optional<Block> opBlock = blocks.stream().filter(b -> {
+                    System.out.println("Sum Compare: " + b.getUniqueId().toString() + " | " + uuid.toString() + " | " + b.getUniqueId().equals(uuid));
+                    return b.getUniqueId().equals(uuid);
+                }).findAny();
                 if(!opBlock.isPresent()){
                     throw new IllegalStateException("Unable to find dependency of " + uuid.toString());
                 }

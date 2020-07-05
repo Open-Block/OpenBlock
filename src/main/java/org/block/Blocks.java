@@ -2,10 +2,12 @@ package org.block;
 
 import org.block.plugin.PluginContainer;
 import org.block.plugin.PluginContainers;
+import org.block.project.module.project.Project;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,6 +17,7 @@ public class Blocks {
     private FontMetrics metrics;
     private RootPaneContainer window;
     private final PluginContainers plugins = new PluginContainers();
+    private Project.Loaded loadedProject;
 
     /**
      * Init a Blocks object with default values. <br>
@@ -40,6 +43,14 @@ public class Blocks {
     }
 
     private static Blocks instance;
+
+    public Optional<Project.Loaded> getLoadedProject(){
+        return Optional.ofNullable(this.loadedProject);
+    }
+
+    public void setLoadedProject(Project.Loaded loaded){
+        this.loadedProject = loaded;
+    }
 
     public Font getFont(){
         return this.font;

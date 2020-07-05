@@ -1,7 +1,7 @@
-package org.block.serializtion.json;
+package org.block.serialization.json;
 
-import org.block.serializtion.ConfigImplementation;
-import org.block.serializtion.ConfigNode;
+import org.block.serialization.ConfigImplementation;
+import org.block.serialization.ConfigNode;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 
@@ -28,7 +28,6 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
         String singleLined = JSONWriter.valueToString(((JSONConfigNode)node).getPath());
         String newPage = "";
         int tab = 0;
-        boolean isInArray = false;
         boolean isInString = false;
         boolean tabBefore = false;
         for(int A = 0; A < singleLined.length(); A++){
@@ -48,21 +47,25 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
                 tabBefore = true;
                 continue;
             }
-            if(at == ','){
-                newPage += at + "\n";
-                tabBefore = true;
-                continue;
-            }
             if(at == '}' || at == ']'){
                 tab--;
                 if(tabBefore) {
                     newPage += tab(tab);
                 }
                 if((A + 1) != singleLined.length() && singleLined.charAt(A + 1) == ','){
-                    newPage += "\n" + tab(tab) + at + ",\n";
+                    newPage += "\n" + tab(tab) + at;
                 }else{
                     newPage += "\n" + tab(tab) + at + "\n";
                 }
+                continue;
+            }
+            if(at == ','){
+                System.out.println("At: " + at + " | Before At: " + ((A >= 1) ? singleLined.charAt(A - 1) : '|'));
+                if(A >= 1 && singleLined.charAt(A - 1) == ','){
+                    continue;
+                }
+                newPage += at + "\n";
+                tabBefore = true;
                 continue;
             }
             if(tabBefore){

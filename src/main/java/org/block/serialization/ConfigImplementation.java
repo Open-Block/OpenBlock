@@ -1,6 +1,6 @@
-package org.block.serializtion;
+package org.block.serialization;
 
-import org.block.serializtion.json.JSONConfigImplementation;
+import org.block.serialization.json.JSONConfigImplementation;
 
 import java.io.FileWriter;
 import java.io.IOException;

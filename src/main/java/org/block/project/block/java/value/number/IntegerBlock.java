@@ -2,7 +2,7 @@ package org.block.project.block.java.value.number;
 
 import org.block.project.block.BlockType;
 import org.block.project.block.input.type.WholeNumberDialog;
-import org.block.serializtion.parse.Parser;
+import org.block.serialization.parse.Parser;
 
 public class IntegerBlock extends NumberBlock<Integer> {
 

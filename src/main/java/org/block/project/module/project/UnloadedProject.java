@@ -3,8 +3,8 @@ package org.block.project.module.project;
 import org.block.Blocks;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
-import org.block.serializtion.ConfigImplementation;
-import org.block.serializtion.json.JSONConfigNode;
+import org.block.serialization.ConfigImplementation;
+import org.block.serialization.json.JSONConfigNode;
 
 import java.awt.*;
 import java.io.File;
@@ -72,7 +72,9 @@ public final class UnloadedProject implements Project {
     }
 
     public Project.Loaded load(Module module){
-        return module.load(this);
+        Project.Loaded loaded = module.load(this);
+        Blocks.getInstance().setLoadedProject(loaded);
+        return loaded;
     }
 
     @Override

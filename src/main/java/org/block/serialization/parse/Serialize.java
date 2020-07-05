@@ -1,6 +1,6 @@
-package org.block.serializtion.parse;
+package org.block.serialization.parse;
 
-import org.block.serializtion.ConfigNode;
+import org.block.serialization.ConfigNode;
 
 /**
  * Base interface for serialization

@@ -1,6 +1,6 @@
-package org.block.serializtion;
+package org.block.serialization;
 
-import org.block.serializtion.parse.Parser;
+import org.block.serialization.parse.Parser;
 
 import java.util.*;
 

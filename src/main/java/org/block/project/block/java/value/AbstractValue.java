@@ -81,7 +81,7 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Block.Va
 
     /**
      * Gets the text of the block. This should display the value that is attached.
-     * @return
+     * @return The text provided on the block
      */
     @Override
     public String getText() {

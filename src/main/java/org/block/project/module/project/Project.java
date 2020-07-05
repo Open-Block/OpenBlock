@@ -3,10 +3,10 @@ package org.block.project.module.project;
 import org.block.project.module.Module;
 import org.block.project.panel.inproject.MainDisplayPanel;
 import org.block.project.panel.inproject.Toolbar;
-import org.block.serializtion.ConfigImplementation;
-import org.block.serializtion.FixedTitle;
-import org.block.serializtion.json.JSONConfigNode;
-import org.block.serializtion.parse.Parser;
+import org.block.serialization.ConfigImplementation;
+import org.block.serialization.FixedTitle;
+import org.block.serialization.json.JSONConfigNode;
+import org.block.serialization.parse.Parser;
 
 import java.awt.*;
 import java.io.File;

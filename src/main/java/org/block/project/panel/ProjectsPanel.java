@@ -1,7 +1,7 @@
 package org.block.project.panel;
 
 import org.block.Blocks;
-import org.block.plugin.standard.panel.OpenBlockNewPanel;
+import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.project.module.project.Project;
 import org.block.project.module.project.UnloadedProject;
@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Optional;
@@ -68,11 +67,16 @@ public class ProjectsPanel extends JPanel {
 
     public class Search implements Runnable {
 
+        private boolean searching = true;
+
+        public void stop(){
+            this.searching = false;
+        }
+
         @Override
         public void run() {
-            File file = ProjectsPanel.this.projectsDirectory;
-            while(true) {
-                File[] files = file.listFiles(File::isDirectory);
+            while(this.searching) {
+                File[] files = ProjectsPanel.this.projectsDirectory.listFiles(File::isDirectory);
                 if (files == null) {
                     continue;
                 }
@@ -106,7 +110,7 @@ public class ProjectsPanel extends JPanel {
 
         private JMenu createNew(){
             JMenu menu = new JMenu("+");
-            Blocks.getInstance().getAllEnabledPlugins().getAll(p -> p.getModules()).parallelStream().forEach(m -> {
+            Blocks.getInstance().getAllEnabledPlugins().getAll(PluginContainer::getModules).parallelStream().forEach(m -> {
                 JMenuItem item = new JMenuItem(m.getDisplayName());
                 item.addActionListener((a) -> {
                     JDialog dialog = new JDialog();
@@ -132,7 +136,7 @@ public class ProjectsPanel extends JPanel {
     private final JPanel projectsPanel = new JPanel();
     private final JPanel projectSettings = new JPanel();
     private UnloadedProject selected = null;
-    private final Thread searchingThread = new Thread(new Search());
+    private final Search searchingThread = new Search();
 
 
     private final JButton loadButton = new JButton("Load");
@@ -151,13 +155,11 @@ public class ProjectsPanel extends JPanel {
 
     private void init(){
         this.deleteButton.addActionListener((a) -> {
-            GeneralUntil.getFiles(this.selected.getDirectory()).parallelStream().forEach(f -> f.delete());
+            GeneralUntil.getFiles(this.selected.getDirectory()).parallelStream().forEach(File::delete);
             ProjectsPanel.this.updateProjects();
             ProjectsPanel.this.updateSettings();
         });
-        this.loadButton.addActionListener((a) -> {
-            new Thread(() -> ProjectsPanel.this.loadProject()).start();
-        });
+        this.loadButton.addActionListener((a) -> new Thread(ProjectsPanel.this::loadProject).start());
         this.setBackground(Color.GRAY);
         this.setOpaque(true);
         this.setLayout(new GridBagLayout());
@@ -174,7 +176,7 @@ public class ProjectsPanel extends JPanel {
         this.add(this.projectSettings, c);
         updateProjects();
         updateSettings();
-        this.searchingThread.start();
+        new Thread(this.searchingThread).start();
     }
 
     public void updateProjects(){
@@ -262,8 +264,9 @@ public class ProjectsPanel extends JPanel {
             e.printStackTrace();
             return;
         }
-        frame.setContentPane(module.createPanel(loaded));
-        frame.setJMenuBar(module.createToolbar(project));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setContentPane(loaded.getPanel());
+        frame.setJMenuBar(loaded.getToolbar());
         Rectangle size = loaded.getPreferredSize();
         frame.setSize(size.width, size.height);
         frame.setLocation(size.x, size.y);
@@ -271,6 +274,8 @@ public class ProjectsPanel extends JPanel {
         //last thing to do
         SwingUtilities.getWindowAncestor(this).dispose();
         frame.setVisible(true);
+        module.loadBlocks(loaded);
+        this.searchingThread.stop();
     }
 
 }
