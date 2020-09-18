@@ -1,6 +1,7 @@
 package org.block.serialization;
 
 import org.block.serialization.json.JSONConfigImplementation;
+import org.block.serialization.network.NetworkConfigImplementation;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,6 +18,10 @@ public interface ConfigImplementation<CN extends ConfigNode> {
      * Easy access to the implementation for manipulation of JSON files
      */
     JSONConfigImplementation JSON = new JSONConfigImplementation();
+    /**
+     * Easy access to the implementation for manipulation of file storage over network
+     */
+    NetworkConfigImplementation NETWORK = new NetworkConfigImplementation();
 
     /**
      * Creates a empty root node for creation of the structured file
@@ -49,7 +54,7 @@ public interface ConfigImplementation<CN extends ConfigNode> {
      */
     default CN load(Path path) throws IOException {
         StringBuilder builder = new StringBuilder();
-        Files.lines(path).forEach(l -> builder.append(l + "\n"));
+        Files.lines(path).forEach(l -> builder.append(l).append("\n"));
         return load(builder.toString());
     }
 

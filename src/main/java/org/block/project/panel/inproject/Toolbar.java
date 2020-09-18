@@ -7,7 +7,6 @@ import org.block.project.exception.InvalidBlockException;
 import org.block.project.module.project.Project;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
-import sun.applet.Main;
 
 import javax.swing.*;
 import java.io.File;

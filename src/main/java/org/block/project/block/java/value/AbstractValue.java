@@ -29,7 +29,7 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Block.Va
      * @param value The attached value
      */
     public AbstractValue(int x, int y, V value){
-        this(x, y, value, v -> v.toString());
+        this(x, y, value, Object::toString);
     }
 
     /**

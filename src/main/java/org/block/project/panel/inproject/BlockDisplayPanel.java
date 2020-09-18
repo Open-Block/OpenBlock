@@ -1,11 +1,13 @@
 package org.block.project.panel.inproject;
 
 import org.array.utils.ArrayUtils;
+import org.block.Blocks;
 import org.block.project.block.Block;
 import org.block.project.block.assists.BlockList;
 import org.block.project.block.event.mouse.BlockMouseClickEvent;
 import org.block.project.context.DragContext;
 import org.block.project.exception.InvalidBlockException;
+import org.block.project.section.SpecificSection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +19,44 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class BlockDisplayPanel extends JPanel {
+
+    private class ContainsSectionConsumer<B extends Block> implements Consumer<String>{
+
+        private final Block.AttachableBlock target;
+        private final B block;
+        private final MouseEvent e;
+
+        public ContainsSectionConsumer(B block, Block.AttachableBlock target, MouseEvent event){
+            this.target = target;
+            this.block = block;
+            this.e = event;
+        }
+
+        @Override
+        public void accept(String s) {
+            BlockList<B> attachment = (BlockList<B>) this.target.getAttachments(s);
+            int relX = this.e.getX() - this.target.getX();
+            int relY = this.e.getY() - this.target.getY();
+            try {
+                attachment.removeAttachment(this.block);
+                int slot = attachment.getSlot(relX, relY);
+                if (!attachment.getAttachment(slot).isPresent() && attachment.canAcceptAttachment(slot, this.block)) {
+                    attachment.setAttachment(slot, this.block);
+                    this.block.setAttachedTo(this.target);
+                    target.update();
+                } else {
+                    block.setX(e.getX() + BlockDisplayPanel.this.context.getOffX());
+                    block.setY(e.getY() + BlockDisplayPanel.this.context.getOffY());
+                }
+            } catch (IllegalArgumentException ignore) {
+                block.setX(e.getX() + BlockDisplayPanel.this.context.getOffX());
+                block.setY(e.getY() + BlockDisplayPanel.this.context.getOffY());
+            }
+            block.update();
+            BlockDisplayPanel.this.repaint();
+            BlockDisplayPanel.this.revalidate();
+        }
+    }
 
     private class OnMouseMove implements MouseMotionListener {
 
@@ -47,29 +87,7 @@ public class BlockDisplayPanel extends JPanel {
                 }else{
                     if(target instanceof Block.AttachableBlock){
                         Block.AttachableBlock target2 = (Block.AttachableBlock) target;
-                        target2.containsSection(e.getX(), e.getY()).ifPresent(s -> {
-                            BlockList<Block> attachment = target2.getAttachments(s);
-                            int relX = e.getX() - target2.getX();
-                            int relY = e.getY() - target2.getY();
-                            try {
-                                attachment.removeAttachment(block);
-                                int slot = attachment.getSlot(relX, relY);
-                                if (!attachment.getAttachment(slot).isPresent() && attachment.canAcceptAttachment(slot, block)) {
-                                    attachment.setAttachment(slot, block);
-                                    block.setAttachedTo(target2);
-                                    target2.update();
-                                }else{
-                                    block.setX(e.getX() + BlockDisplayPanel.this.context.getOffX());
-                                    block.setY(e.getY() + BlockDisplayPanel.this.context.getOffY());
-                                }
-                            }catch (IllegalArgumentException ignore){
-                                block.setX(e.getX() + BlockDisplayPanel.this.context.getOffX());
-                                block.setY(e.getY() + BlockDisplayPanel.this.context.getOffY());
-                            }
-                            block.update();
-                            BlockDisplayPanel.this.repaint();
-                            BlockDisplayPanel.this.revalidate();
-                        });
+                        target2.containsSection(e.getX(), e.getY()).ifPresent(new ContainsSectionConsumer<>(block, target2, e));
                     }
                 }
             }
@@ -94,11 +112,31 @@ public class BlockDisplayPanel extends JPanel {
         public void mouseClicked(MouseEvent e) {
             if(e.getClickCount() == 1 && e.getButton() == 1) {
                 Map<Block, Boolean> map = new HashMap<>();
-                BlockDisplayPanel.this.getBlocks(e.getX(), e.getY()).forEach(block -> {
-                    map.put(block, block.isSelected());
-                });
+                BlockDisplayPanel.this.getBlocks(e.getX(), e.getY()).forEach(block -> map.put(block, block.isSelected()));
                 BlockDisplayPanel.this.getBlocks().forEach(b -> b.setSelected(false));
-                map.entrySet().forEach(entry -> entry.getKey().setSelected(!entry.getValue()));
+                boolean newRegister = false;
+                SpecificSection section = null;
+                Optional<SpecificSection> opSection = Blocks.getInstance().getLoadedProject().get().getPanel().getChooserPanel().getSpecificSection();
+                if(opSection.isPresent()){
+                    section = opSection.get();
+                }else{
+                    section = new SpecificSection(null, "Temp", Collections.emptyList());
+                    newRegister = true;
+                }
+                section.unregisterAll();
+                final SpecificSection finalSection = section;
+                map.entrySet().stream().filter(entry -> !entry.getValue()).filter(entry -> entry.getKey() instanceof Block.SpecificSectionBlock).findAny().ifPresent(entry -> {
+                    Block b = entry.getKey();
+                    if(b instanceof Block.TextBlock) {
+                        finalSection.setTitle(((Block.TextBlock)b).getText());
+                    }
+                    ((Block.SpecificSectionBlock)b).getUniqueSections(finalSection).forEach(finalSection::register);
+                });
+                if(newRegister) {
+                    Blocks.getInstance().getLoadedProject().get().getPanel().getChooserPanel().register(finalSection);
+                    Blocks.getInstance().getLoadedProject().get().getPanel().getChooserPanel().updatePanel();
+                }
+                map.forEach((key, value) -> key.setSelected(!value));
             }else if(e.getClickCount() == 1 && e.getButton() == 3){
                 NavigableSet<Block> blocks = BlockDisplayPanel.this.getBlocks(e.getX(), e.getY());
                 if(blocks.isEmpty()){
@@ -156,7 +194,7 @@ public class BlockDisplayPanel extends JPanel {
         }
     }
 
-    private TreeSet<Block> blocks = new TreeSet<>(Comparator.comparingInt(l -> l.getLayer()));
+    private TreeSet<Block> blocks = new TreeSet<>(Comparator.comparingInt(Block::getLayer));
     private boolean mouseDown;
     private DragContext context;
 
@@ -182,8 +220,8 @@ public class BlockDisplayPanel extends JPanel {
         this.blocks.forEach(b -> map.put(b, b.getLayer()));
         preChanges.accept(map);
         List<Map.Entry<Block, Integer>> entries = new ArrayList<>(map.entrySet());
-        entries.sort(Comparator.comparingInt(b -> b.getValue()));
-        TreeSet<Block> set = new TreeSet<>(Comparator.comparingInt(l -> l.getLayer()));
+        entries.sort(Comparator.comparingInt(Map.Entry::getValue));
+        TreeSet<Block> set = new TreeSet<>(Comparator.comparingInt(Block::getLayer));
         for(int A = 0; A < entries.size(); A++){
             Map.Entry<Block, Integer> entry = entries.get(A);
             Block block = entry.getKey();
@@ -202,7 +240,7 @@ public class BlockDisplayPanel extends JPanel {
 
     public NavigableSet<Block> getBlocks(int x, int y){
         TreeSet<Block> set = new TreeSet<>(Comparator.comparingInt(b -> ((Block)b).getLayer()).reversed());
-        this.blocks.stream().filter(b -> b.contains(x, y)).forEach(b -> set.add(b));
+        this.blocks.stream().filter(b -> b.contains(x, y)).forEach(set::add);
         return set;
     }
 
@@ -252,14 +290,14 @@ public class BlockDisplayPanel extends JPanel {
         clazz.append("package org.openblock;\n\n");
         for(Block.CalledBlock.CodeStartBlock block : set){
             for(String impor : block.getCodeImports()){
-                clazz.append("import " + impor + ";\n");
+                clazz.append("import ").append(impor).append(";\n");
             }
         }
         clazz.append("\npublic class Main {\n\n");
         int tab = 1;
         for(Block.CalledBlock.CodeStartBlock block : set){
             block.writeBlockCode(tab).entrySet().stream().filter(e -> e.getValue() == Block.CalledBlock.METHOD).forEach(e -> {
-                clazz.append(e.getKey() + "\n\n");
+                clazz.append(e.getKey()).append("\n\n");
             });
         }
         clazz.append("}");
@@ -272,15 +310,15 @@ public class BlockDisplayPanel extends JPanel {
         if(this.blocks.isEmpty()){
             return super.getPreferredSize();
         }
-        int height = ArrayUtils.getBest(b -> b.getHeight(),(x1, x2) -> x1 > x2 , this.blocks).get().getHeight();
-        int width = ArrayUtils.getBest(b -> b.getWidth(),(x1, x2) -> x1 > x2 , this.blocks).get().getWidth();
-        return new Dimension(height, width);
+        int height = ArrayUtils.getBest(Block::getHeight,(x1, x2) -> x1 > x2 , this.blocks).get().getHeight();
+        int width = ArrayUtils.getBest(Block::getWidth,(x1, x2) -> x1 > x2 , this.blocks).get().getWidth();
+        return new Dimension(width, height);
     }
 
     @Override
     public void paint(Graphics graphics){
         super.paint(graphics);
         Graphics2D graphics2D = (Graphics2D)graphics;
-        this.blocks.stream().forEachOrdered(b -> b.paint(graphics2D));
+        this.blocks.forEach(b -> b.paint(graphics2D));
     }
 }

@@ -114,6 +114,7 @@ public class JSONArrayConfigNode implements ConfigNode {
         int index = 0;
         for(T value : collection){
             parser.serialize(node, index + "", value);
+            index++;
         }
     }
 }

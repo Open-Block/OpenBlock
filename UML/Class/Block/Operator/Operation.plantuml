@@ -1,0 +1,76 @@
+@startuml
+
+title __OPERATION's Class Diagram__\n
+
+  namespace org.block {
+    namespace project.block {
+      namespace java.operation {
+        abstract class org.block.project.block.java.operation.AbstractNumberOperation {
+            {static} + PARAMETER_SECTION : String
+            - drawColor : Color
+            - marginX : int
+            - marginY : int
+            - name : String
+            - operator : String
+            + AbstractNumberOperation()
+            + containsSection()
+            + getAttached()
+            + getAttachments()
+            + getCodeImports()
+            + getExpectedValue()
+            + getText()
+            + paint()
+            + setText()
+            + updateHeight()
+            + writeCode()
+        }
+        class org.block.project.block.java.operation.AbstractNumberOperation.NumberOperationBlockList {
+            + NumberOperationBlockList()
+            + addAttachment()
+            + canAcceptAttachment()
+            + getParent()
+            + getSlot()
+            + getXPosition()
+            + getYPosition()
+            + removeAttachment()
+        }
+        class org.block.project.block.java.operation.MinusOperation {
+            + MinusOperation()
+            + getType()
+        }
+        class org.block.project.block.java.operation.MinusOperation.MinusOperationType {
+            + build()
+            + build()
+            + getName()
+            + saveLocation()
+            + write()
+        }
+        class org.block.project.block.java.operation.SumOperation {
+            + SumOperation()
+            + getType()
+        }
+        class org.block.project.block.java.operation.SumOperation.SumOperationType {
+            + build()
+            + build()
+            + getName()
+            + saveLocation()
+            + write()
+        }
+      }
+    }
+  }
+  
+
+  org.block.project.block.java.operation.AbstractNumberOperation .up.|> org.block.project.block.Block.TextBlock
+  org.block.project.block.java.operation.AbstractNumberOperation .up.|> org.block.project.block.Block.ValueBlock
+  org.block.project.block.java.operation.AbstractNumberOperation -up-|> org.block.project.block.assists.AbstractAttachable
+  org.block.project.block.java.operation.AbstractNumberOperation +-down- org.block.project.block.java.operation.AbstractNumberOperation.NumberOperationBlockList
+  org.block.project.block.java.operation.AbstractNumberOperation.NumberOperationBlockList -up-|> org.block.project.block.assists.AbstractBlockList
+  org.block.project.block.java.operation.MinusOperation -up-|> org.block.project.block.java.operation.AbstractNumberOperation
+  org.block.project.block.java.operation.MinusOperation +-down- org.block.project.block.java.operation.MinusOperation.MinusOperationType
+  org.block.project.block.java.operation.MinusOperation.MinusOperationType .up.|> org.block.project.block.BlockType
+  org.block.project.block.java.operation.SumOperation -up-|> org.block.project.block.java.operation.AbstractNumberOperation
+  org.block.project.block.java.operation.SumOperation +-down- org.block.project.block.java.operation.SumOperation.SumOperationType
+  org.block.project.block.java.operation.SumOperation.SumOperationType .up.|> org.block.project.block.BlockType
+
+@enduml

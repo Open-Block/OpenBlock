@@ -6,6 +6,7 @@ import org.block.project.block.BlockType;
 import org.block.project.section.BlockSection;
 import org.block.project.section.GUISection;
 import org.block.project.section.GroupedSection;
+import org.block.project.section.SpecificSection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +22,22 @@ public class ChooserDisplayPanel extends JPanel {
 
         @Override
         public void keyTyped(KeyEvent e) {
-            new Thread(ChooserDisplayPanel.this::updatePanel).start();
+            new Thread(() -> {
+                if(ChooserDisplayPanel.this.search.getText().length() == 0) {
+                    ChooserDisplayPanel.this.updatePanel();
+                }else{
+                    List<GUISection> backup = new ArrayList<>(ChooserDisplayPanel.this.displayList);
+                    List<BlockSection> newSections = new ArrayList<>();
+                    for (GUISection gui : ChooserDisplayPanel.this.displayList) {
+                        ChooserDisplayPanel.this.getBlockSections(gui, newSections);
+                    }
+                    ChooserDisplayPanel.this.displayList.clear();
+                    ChooserDisplayPanel.this.displayList.addAll(newSections);
+                    ChooserDisplayPanel.this.updatePanel();
+                    ChooserDisplayPanel.this.displayList.clear();
+                    ChooserDisplayPanel.this.displayList.addAll(backup);
+                }
+            }).start();
         }
 
         @Override
@@ -36,6 +52,7 @@ public class ChooserDisplayPanel extends JPanel {
     }
 
     private final List<GUISection> sectionList = new ArrayList<>();
+    private final List<GUISection> displayList = new ArrayList<>();
     private final JTextField search = new JTextField();
     private final JPanel panel = new JPanel();
 
@@ -76,8 +93,9 @@ public class ChooserDisplayPanel extends JPanel {
 
     public ChooserDisplayPanel(){
         this.search.addKeyListener(new OnKey());
-        init();
-        updateLayout();
+        this.init();
+        this.resetLayout();
+        this.updateLayout();
     }
 
     public void init(){
@@ -104,28 +122,54 @@ public class ChooserDisplayPanel extends JPanel {
         return Collections.unmodifiableList(this.sectionList);
     }
 
-    public List<BlockType<? extends Block>> getBlockTypes(){
-        List<BlockSection> list = new ArrayList<>();
-        for(GUISection section : this.getSectionList()){
-            this.getBlockTypes(section, list);
-        }
-        return ArrayUtils.convert(s -> s.getBlockType(), list);
+    public Optional<SpecificSection> getSpecificSection(){
+        return (Optional<SpecificSection>)(Object)this.displayList.stream().filter(s -> s instanceof SpecificSection).findAny();
     }
 
-    private List<BlockSection> getBlockTypes(GUISection section, List<BlockSection> list){
+    public List<BlockType<? extends Block>> getBlockTypes(){
+        return ArrayUtils.convert(s -> s.getBlockType(), this.getBlockSections());
+    }
+
+    public List<BlockSection> getBlockSections(){
+        List<BlockSection> list = new ArrayList<>();
+        for(GUISection section : this.getSectionList()){
+            this.getBlockSections(section, list);
+        }
+        return list;
+    }
+
+    private List<BlockSection> getBlockSections(GUISection section, List<BlockSection> list){
         if(section instanceof BlockSection){
             list.add((BlockSection)section);
             return list;
         }
         for(GUISection section1 : section.getSectionsChildren()){
-            getBlockTypes(section1, list);
+            getBlockSections(section1, list);
         }
         return list;
     }
 
     public void register(GUISection section){
         this.sectionList.add(section);
-        updateLayout();
+        this.displayList.add(section);
+    }
+
+    public void unregister(GUISection section){
+        this.sectionList.remove(section);
+        this.displayList.remove(section);
+    }
+
+    public void registerOnDisplay(GUISection section){
+        this.displayList.add(section);
+    }
+
+    public void unregisterOnDisplay(GUISection section){
+        this.displayList.remove(section);
+    }
+
+    public void resetLayout(){
+        this.displayList.clear();
+        this.displayList.addAll(this.sectionList);
     }
 
     private void updateLayout(){
@@ -144,7 +188,7 @@ public class ChooserDisplayPanel extends JPanel {
         updatePanel();
     }
 
-    private synchronized void updatePanel(){
+    public synchronized void updatePanel(){
         GridBagConstraints c = new GridBagConstraints();
         this.panel.removeAll();
         this.panel.setLayout(new GridBagLayout());
@@ -155,7 +199,7 @@ public class ChooserDisplayPanel extends JPanel {
         c.weighty = 0.0;
         c.insets = new Insets(0, 0, 2, 0);
         List<Map.Entry<GUISection, Double>> likelyhood = new ArrayList<>();
-        this.sectionList.forEach(s -> {
+        this.displayList.forEach(s -> {
             Double percent = FILTER.apply(s);
             likelyhood.add(new AbstractMap.SimpleEntry<>(s, percent));
             Comparator<Map.Entry<GUISection, Double>> compare = Comparator.comparingDouble(Map.Entry::getValue);

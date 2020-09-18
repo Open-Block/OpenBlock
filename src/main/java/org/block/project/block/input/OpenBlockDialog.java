@@ -3,6 +3,10 @@ package org.block.project.block.input;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The default Dialog box for all value setters for specific values
+ * @param <T> The container to change the value
+ */
 public class OpenBlockDialog<T extends Container> extends JDialog {
 
     public OpenBlockDialog(Window window, T show){

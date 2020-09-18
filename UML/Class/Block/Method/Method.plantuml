@@ -1,0 +1,67 @@
+@startuml
+
+title __METHOD's Class Diagram__\n
+
+  namespace org.block {
+    namespace project.block {
+      namespace java.start.method {
+        class org.block.project.block.java.start.method.MethodBlock {
+            {static} + SECTION_NAME : String
+            {static} + SECTION_PARAMETER : String
+            {static} + SECTION_VALUE : String
+            - marginX : int
+            - marginY : int
+            + MethodBlock()
+            + MethodBlock()
+            + containsSection()
+            + getCodeImports()
+            + getNameAttachment()
+            + getType()
+            + getUniqueSections()
+            + getVariableAttachment()
+            + paint()
+            + writeBlockCode()
+            + writeCode()
+            - updateSize()
+        }
+        class org.block.project.block.java.start.method.MethodBlock.MethodBlockType {
+            + build()
+            + build()
+            + getName()
+            + saveLocation()
+        }
+        class org.block.project.block.java.start.method.MethodBlock.StringBlockList {
+            + StringBlockList()
+            + StringBlockList()
+            + canAcceptAttachment()
+            + getParent()
+            + getSlot()
+            + getXPosition()
+            + getYPosition()
+        }
+        class org.block.project.block.java.start.method.MethodBlock.VariableBlockList {
+            + VariableBlockList()
+            + addAttachment()
+            + canAcceptAttachment()
+            + getParent()
+            + getSlot()
+            + getXPosition()
+            + getYPosition()
+            + removeAttachment()
+        }
+      }
+    }
+  }
+  
+
+  org.block.project.block.java.start.method.MethodBlock .up.|> org.block.project.block.Block.CalledBlock.CodeStartBlock
+  org.block.project.block.java.start.method.MethodBlock .up.|> org.block.project.block.Block.SpecificSectionBlock
+  org.block.project.block.java.start.method.MethodBlock -up-|> org.block.project.block.assists.AbstractAttachable
+  org.block.project.block.java.start.method.MethodBlock +-down- org.block.project.block.java.start.method.MethodBlock.MethodBlockType
+  org.block.project.block.java.start.method.MethodBlock +-down- org.block.project.block.java.start.method.MethodBlock.StringBlockList
+  org.block.project.block.java.start.method.MethodBlock +-down- org.block.project.block.java.start.method.MethodBlock.VariableBlockList
+  org.block.project.block.java.start.method.MethodBlock.MethodBlockType .up.|> org.block.project.block.BlockType
+  org.block.project.block.java.start.method.MethodBlock.StringBlockList -up-|> org.block.project.block.assists.AbstractSingleBlockList
+  org.block.project.block.java.start.method.MethodBlock.VariableBlockList -up-|> org.block.project.block.assists.AbstractBlockList
+
+@enduml

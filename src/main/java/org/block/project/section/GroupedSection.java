@@ -37,11 +37,11 @@ public class GroupedSection extends JPanel implements GUISection {
         }
     }
 
-    private final List<GUISection> sections = new ArrayList<>();
-    private final JPanel panel = new JPanel();
-    private final JLabel text;
-    private final GUISection parent;
-    private final Collection<String> collection;
+    protected final List<GUISection> sections = new ArrayList<>();
+    protected final JPanel panel = new JPanel();
+    protected final JLabel text;
+    protected final GUISection parent;
+    protected final Collection<String> collection;
 
     public GroupedSection(GUISection parent, String text, Collection<String> tags, GUISection... collection){
         this(parent, text, tags, Arrays.asList(collection));
@@ -90,6 +90,11 @@ public class GroupedSection extends JPanel implements GUISection {
 
     public void register(GUISection section){
         this.sections.add(section);
+        updatePanel();
+    }
+
+    public void unregister(GUISection section){
+        this.sections.remove(section);
         updatePanel();
     }
 

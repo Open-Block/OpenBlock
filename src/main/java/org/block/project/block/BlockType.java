@@ -1,9 +1,11 @@
 package org.block.project.block;
 
+import org.block.project.block.java.operation.MinusOperation;
 import org.block.project.block.java.operation.SumOperation;
 import org.block.project.block.java.start.method.MethodBlock;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.java.value.number.IntegerBlock;
+import org.block.project.block.java.variable.UseVariableBlock;
 import org.block.project.block.java.variable.VariableBlock;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
@@ -28,20 +30,45 @@ public interface BlockType<B extends Block> {
     IntegerBlock.IntegerBlockType BLOCK_TYPE_INTEGER = new IntegerBlock.IntegerBlockType();
     StringBlock.StringBlockType BLOCK_TYPE_STRING = new StringBlock.StringBlockType();
     SumOperation.SumOperationType BLOCK_TYPE_SUM = new SumOperation.SumOperationType();
+    MinusOperation.MinusOperationType BLOCK_TYPE_MINUS = new MinusOperation.MinusOperationType();
     VariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE = new VariableBlock.VariableBlockType();
+    UseVariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE_USE = new UseVariableBlock.VariableBlockType();
     MethodBlock.MethodBlockType BLOCK_TYPE_METHOD = new MethodBlock.MethodBlockType();
 
     /**
-     * Creates a new instanceof a block with the provided position
+     * Creates a new instance of a block with the provided position
      * @param x The X position
      * @param y The Y position
      * @return The newly created Block
      */
     B build(int x, int y);
+
+    /**
+     * Creates a new instance of a block with the values found within the provided ConfigNode
+     * @param node The node with the values
+     * @return The built instance
+     * @throws IllegalStateException If the ConfigNode does not have the required values stored within
+     */
     B build(ConfigNode node);
+
+    /**
+     * Gets the default save location for all of the Blocks of this type
+     * @return The save location
+     */
     File saveLocation();
+
+    /**
+     * Gets the BlockType's name
+     * @return The Block type's name
+     */
     String getName();
 
+    /**
+     * Designed to be overwritten with super call to this.
+     * Writes the provided block to the provided ConfigNode
+     * @param node The save location
+     * @param block The block to save
+     */
     default void write(ConfigNode node, B block){
         TITLE_X.serialize(node, block.getX());
         TITLE_Y.serialize(node, block.getY());

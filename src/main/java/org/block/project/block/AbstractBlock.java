@@ -1,15 +1,10 @@
 package org.block.project.block;
 
-import org.block.project.block.event.BlockEvent;
 import org.block.plugin.event.EventListener;
+import org.block.project.block.event.BlockEvent;
 
 import java.util.*;
 
-/**
- * The most common implementation for a Block, while this does not provided all functions,
- * it does provided majority of the default functions.
- * This also takes on {@link Block.TextBlock} as all default blocks will have text of some sort
- */
 public abstract class AbstractBlock implements Block {
 
     protected int height;
@@ -21,7 +16,7 @@ public abstract class AbstractBlock implements Block {
     protected boolean error;
     protected Set<EventListener<? extends BlockEvent>> events = new HashSet<>();
     protected UUID id;
-    protected Block.AttachableBlock attachedTo;
+    protected AttachableBlock attachedTo;
     protected int layer;
 
     public AbstractBlock(int x, int y, int width, int height){
@@ -72,13 +67,13 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public boolean isHighlighted(){
+    public boolean isHighlighted() {
         return this.highlighted;
     }
 
     @Override
-    public void setHighlighted(boolean check){
-        this.highlighted = check;
+    public void setHighlighted(boolean selected) {
+        this.highlighted = selected;
     }
 
     @Override
@@ -102,12 +97,12 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public Optional<Block.AttachableBlock> getAttachedTo() {
+    public Optional<AttachableBlock> getAttachedTo() {
         return Optional.ofNullable(this.attachedTo);
     }
 
     @Override
-    public void setAttachedTo(Block.AttachableBlock block) {
+    public void setAttachedTo(AttachableBlock block) {
         this.attachedTo = block;
     }
 
@@ -122,20 +117,7 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public UUID getUniqueId(){
-        if(this.id == null){
-            this.id = UUID.randomUUID();
-        }
+    public UUID getUniqueId() {
         return this.id;
-    }
-
-    @Override
-    public boolean equals(Object obj){
-        if(!(obj instanceof Block)){
-            System.out.println("AbstractBlock: Comparing: Failed: " + obj.getClass().getSimpleName() + " is not Block");
-            return false;
-        }
-        System.out.println("AbstractBlock: Comparing: " + ((Block)obj).getUniqueId().toString() + " | " + this.getUniqueId().toString() + " | " + ((Block)obj).getUniqueId().equals(this.getUniqueId()));
-        return ((Block)obj).getUniqueId().equals(this.getUniqueId());
     }
 }

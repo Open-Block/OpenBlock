@@ -48,6 +48,10 @@ public class BlockUtils {
                 }
                 try {
                     Block block = t.build(node);
+                    if(block == null){
+                        System.err.println("Could not load '" + file.getName() + "' as a '" + t.getName() + "'");
+                        continue;
+                    }
                     handle(block, project, load, loaded);
                 }catch (IllegalStateException e){
                     e.printStackTrace();

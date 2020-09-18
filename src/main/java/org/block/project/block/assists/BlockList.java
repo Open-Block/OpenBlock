@@ -254,7 +254,7 @@ public interface BlockList<T extends Block> extends Iterable<T>{
      * @param block The block to test
      * @return If the block is contained
      */
-    default boolean containsAttachment(T block){
+    default boolean containsAttachment(Block block){
         for(int A = 0; A < this.getMaxAttachments(); A++){
             Optional<T> opAttachment = this.getAttachment(A);
             if(!opAttachment.isPresent()){

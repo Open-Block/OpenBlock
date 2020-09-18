@@ -7,7 +7,9 @@ import org.block.project.block.Shapes;
 import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractSingleBlockList;
 import org.block.project.block.java.value.StringBlock;
+import org.block.project.section.BlockSection;
 import org.block.project.section.GUISection;
+import org.block.project.section.GroupedSection;
 import org.block.serialization.ConfigNode;
 
 import java.awt.*;
@@ -169,6 +171,14 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
         updateSize();
     }
 
+    public Optional<String> getName(){
+        Optional<StringBlock> opBlock = this.getNameAttachment().getAttachment();
+        if(opBlock.isPresent()){
+            return Optional.of(opBlock.get().getValue());
+        }
+        return Optional.empty();
+    }
+
     private void updateSize(){
         int max = Math.max(Blocks.getInstance().getMetrics().stringWidth("Name"), Blocks.getInstance().getMetrics().stringWidth("Value"));
         this.width = max + Shapes.ATTACHABLE_WIDTH + (this.marginX * 2);
@@ -200,8 +210,9 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
     }
 
     @Override
-    public List<GUISection> getUniqueSections() {
+    public List<GUISection> getUniqueSections(GroupedSection section) {
         List<GUISection> list = new ArrayList<>();
+        list.add(new BlockSection(section, BlockType.BLOCK_TYPE_VARIABLE_USE, "Use"));
         return list;
     }
 

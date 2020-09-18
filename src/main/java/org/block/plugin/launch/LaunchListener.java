@@ -15,6 +15,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LaunchListener {
 
+    /**
+     * If the event requires another handler to be fired first, then you can specify it here
+     * @return
+     */
     Dependent[] dependsOn() default {};
 
 }

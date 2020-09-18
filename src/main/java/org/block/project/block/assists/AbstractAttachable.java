@@ -17,6 +17,7 @@ public abstract class AbstractAttachable extends AbstractBlock implements Block.
      * @param height The height of the block
      * @param entries The blocklist for the attached
      */
+    @SafeVarargs
     public AbstractAttachable(int x, int y, int width, int height, Map.Entry<String, BlockList<? extends Block>>... entries){
         this(x, y, width, height, new HashMap<>());
         for(Map.Entry<String, BlockList<? extends Block>> entry : entries){

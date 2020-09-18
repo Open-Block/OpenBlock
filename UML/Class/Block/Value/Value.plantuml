@@ -1,0 +1,63 @@
+@startuml
+
+title __VALUE's Class Diagram__\n
+
+  namespace org.block {
+    namespace project.block {
+      namespace java.value {
+        abstract class org.block.project.block.java.value.AbstractValue {
+            # marginX : int
+            # marginY : int
+            # text : String
+            # toString : Function<V, String>
+            + AbstractValue()
+            + AbstractValue()
+            + getText()
+            + getValue()
+            + paint()
+            + setText()
+            + setValue()
+        }
+        class org.block.project.block.java.value.BooleanBlock {
+            + BooleanBlock()
+            + getCodeImports()
+            + getType()
+            + writeCode()
+        }
+        class org.block.project.block.java.value.StringBlock {
+            + StringBlock()
+            + StringBlock()
+            + createDialog()
+            + getCodeImports()
+            + getType()
+            + writeCode()
+        }
+        class org.block.project.block.java.value.StringBlock.OnClickListener {
+            + getEventClass()
+            + onEvent()
+        }
+        class org.block.project.block.java.value.StringBlock.StringBlockType {
+            + build()
+            + build()
+            + buildDefault()
+            + getName()
+            + saveLocation()
+        }
+      }
+    }
+  }
+  
+
+  org.block.project.block.java.value.AbstractValue .up.|> org.block.project.block.Block.TextBlock
+  org.block.project.block.java.value.AbstractValue .up.|> org.block.project.block.Block.ValueBlock.ConnectedValueBlock
+  org.block.project.block.java.value.AbstractValue -up-|> org.block.project.block.AbstractBlock
+  org.block.project.block.java.value.AbstractValue o-- V : value
+  org.block.project.block.java.value.BooleanBlock -up-|> org.block.project.block.java.value.AbstractValue
+  org.block.project.block.java.value.StringBlock .up.|> org.block.project.block.Block.ValueBlock.ConnectedValueBlock.MutableConnectedValueBlock
+  org.block.project.block.java.value.StringBlock -up-|> org.block.project.block.java.value.AbstractValue
+  org.block.project.block.java.value.StringBlock +-down- org.block.project.block.java.value.StringBlock.OnClickListener
+  org.block.project.block.java.value.StringBlock +-down- org.block.project.block.java.value.StringBlock.StringBlockType
+  org.block.project.block.java.value.StringBlock.OnClickListener .up.|> org.block.plugin.event.EventListener
+  org.block.project.block.java.value.StringBlock.StringBlockType .up.|> org.block.project.block.BlockType
+
+@enduml

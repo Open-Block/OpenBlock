@@ -9,7 +9,9 @@ import org.block.project.block.assists.AbstractBlockList;
 import org.block.project.block.assists.AbstractSingleBlockList;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.section.GUISection;
+import org.block.project.section.GroupedSection;
 import org.block.serialization.ConfigNode;
+import org.block.util.GeneralUntil;
 
 import java.awt.*;
 import java.io.File;
@@ -200,7 +202,7 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
     }
 
     @Override
-    public List<GUISection> getUniqueSections() {
+    public List<GUISection> getUniqueSections(GroupedSection section) {
         List<GUISection> list = new ArrayList<>();
         return list;
     }
@@ -236,7 +238,7 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
         if(opStringBlock.get().getValue().length() == 0){
             throw new IllegalStateException("Could not find the name specified. Provide one in the block");
         }
-        String retur = "public static void " + opStringBlock.get().getValue() + " () {\n";
+        String retur = "public static void " + GeneralUntil.formatToMethodName(opStringBlock.get().getValue()) + " () {\n";
         for (Block attachment : this.getVariableAttachment()) {
             retur += Block.tab(tab + 1) + attachment.writeCode(tab) + "\n";
         }

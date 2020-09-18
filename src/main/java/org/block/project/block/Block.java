@@ -10,9 +10,12 @@ import org.block.project.block.input.OpenBlockDialog;
 import org.block.project.block.input.PanelDialog;
 import org.block.project.block.input.type.ValueDialog;
 import org.block.project.section.GUISection;
+import org.block.project.section.GroupedSection;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
@@ -49,7 +52,6 @@ public interface Block {
         /**
          * Gets all attached block of the the provided section
          * @param section The section to get
-         * @param <B> The expected block, this isn't defined when called, specify in the variable or use &lt; &gt; before the call
          * @return The block list
          * @throws IllegalArgumentException thrown if section does not exist
          */
@@ -91,7 +93,7 @@ public interface Block {
         default Collection<BlockList<? extends Block>> canAttach(Block block){
             Set<BlockList<? extends Block>> set = new HashSet<>();
             for(String section : this.getSections()){
-                BlockList<?> list = this.getAttachments(section);
+                BlockList<? extends Block> list = this.getAttachments(section);
                 for(int A = 0; A < list.getMaxAttachments(); A++){
                     if(list.canAcceptAttachment(A, block)){
                         set.add(list);
@@ -118,7 +120,7 @@ public interface Block {
             for(String section : this.getSections()){
                 BlockList<? extends Block> list = this.getAttachments(section);
                 for(int A = 0; A < list.getMaxAttachments(); A++){
-                    list.getAttachment(A).ifPresent(b -> b.delete());
+                    list.getAttachment(A).ifPresent(Block::delete);
                 }
             }
         }
@@ -139,8 +141,8 @@ public interface Block {
                     });
                 }
             }
-            Block.super.update();
 
+            Block.super.update();
         }
     }
 
@@ -270,7 +272,7 @@ public interface Block {
          * Gets a list of the sections.
          * @return A unmodifiable list of sections
          */
-        List<GUISection> getUniqueSections();
+        List<GUISection> getUniqueSections(GroupedSection child);
 
     }
 
@@ -397,13 +399,13 @@ public interface Block {
      * Sets the block that this is attached to, to remove the block it is currently attached to provide 'null' (however it is prefered to use {@link Block#removeAttachedTo()} just in case this changes)
      * @param block The block that is attaching this
      */
-    void setAttachedTo(Block.AttachableBlock block);
+    void setAttachedTo(AttachableBlock block);
 
     /**
      * Gets the BlockType for this block, it may not be the block type that was used to create the block, however it will be of the same type.
      * @return The BlockType for the block
      */
-    BlockType<?> getType();
+    BlockType<? extends Block> getType();
 
     /**
      * This is the layer to show on the panel, the higher the layer then the more blocks this block will appear ontop of.
@@ -427,8 +429,6 @@ public interface Block {
      * by default, this updates the layer on the panel
      */
     default void update(){
-        //This is bugged, it will sometimes delete the block from the panel
-        //((MainDisplayPanel)Blocks.getInstance().getWindow().getContentPane()).getBlockPanel().updateBlockPosition(this);
     }
 
     /**
@@ -437,7 +437,7 @@ public interface Block {
     default void delete(){
         this.removeAttachedTo();
         BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlockPanel();
-        panel.unregister(Block.this);
+        panel.unregister(this);
     }
 
     /**
@@ -475,9 +475,7 @@ public interface Block {
      * @param <B> The event type
      */
     default <B extends BlockEvent> void callEvent(B event){
-        getEvents().stream().filter(l -> l.getEventClass().isInstance(event)).forEach(b -> {
-            ((EventListener<B>)b).onEvent(event);
-        });
+        getEvents().stream().filter(l -> l.getEventClass().isInstance(event)).forEach(b -> ((EventListener<B>)b).onEvent(event));
     }
 
     /**
@@ -487,11 +485,14 @@ public interface Block {
     default JPopupMenu getRightClick(){
         JPopupMenu menu = new JPopupMenu();
         JMenuItem delete = new JMenuItem("Delete");
-        delete.addActionListener((e) -> {
-            BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlockPanel();
-            this.delete();
-            panel.repaint();
-            panel.revalidate();
+        delete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlockPanel();
+                Block.this.delete();
+                panel.repaint();
+                panel.revalidate();
+            }
         });
         menu.add(delete);
         return menu;

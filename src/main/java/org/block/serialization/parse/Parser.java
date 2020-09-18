@@ -1,6 +1,7 @@
 package org.block.serialization.parse;
 
 import org.block.Blocks;
+import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.serialization.ConfigNode;
 
@@ -16,19 +17,16 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
 
     Parser<String> STRING = new Abstract<>(ConfigNode::setValue, ConfigNode::getString);
     Parser<Integer> INTEGER = new Abstract<>(ConfigNode::setValue, ConfigNode::getInteger);
-    Parser<UUID> UNIQUE_ID = new Abstract((n, t, v) -> n.setValue(t, v.toString()), (n, t) -> {
+    Parser<Long> LONG = new Abstract<>(ConfigNode::setValue, ConfigNode::getLong);
+    Parser<Double> DOUBLE = new Abstract<>(ConfigNode::setValue, ConfigNode::getDouble);
+    Parser<Float> FLOAT = new Abstract<>(ConfigNode::setValue, ConfigNode::getFloat);
+    Parser<UUID> UNIQUE_ID = new Abstract<>((n, t, v) -> n.setValue(t, v.toString()), (n, t) -> {
         Optional<String> opValue = n.getString(t);
-        if(!opValue.isPresent()){
-            return Optional.empty();
-        }
-        return Optional.of(UUID.fromString(opValue.get()));
+        return opValue.map(UUID::fromString);
     });
     Parser<Module> MODULE = new Abstract<>((n, t, v) -> n.setValue(t, v.getId()), (n, t) -> {
         Optional<String> opValue = n.getString(t);
-        if(!opValue.isPresent()){
-            return Optional.empty();
-        }
-        return Blocks.getInstance().getAllEnabledPlugins().getAll(p -> p.getModules()).parallelStream().filter(m -> m.getId().equals(opValue.get())).findAny();
+        return opValue.flatMap(s -> Blocks.getInstance().getAllEnabledPlugins().getAll(PluginContainer::getModules).parallelStream().filter(m -> m.getId().equals(s)).findAny());
     });
     Parser<Rectangle> RECTANGLE = new Abstract<>((n, t, v) -> {
         n.getNode(t).setValue("x", v.x);

@@ -27,10 +27,21 @@ public enum InjectData {
         this.types = types;
     }
 
+    /**
+     * Gets the acceptable class types this implementation takes
+     * @return The acceptable types of classes
+     */
     public Class<?>[] getAcceptableTypes(){
         return this.types;
     }
 
+    /**
+     * Applies the provided value to the provided field
+     * @param holder The holder of the field
+     * @param field The field found within the holder
+     * @param obj the object to set
+     * @throws IllegalAccessException Shouldn't happen
+     */
     public void apply(Object holder, Field field, Object obj) throws IllegalAccessException {
         if(!field.isAnnotationPresent(Inject.class)){
             throw new IllegalArgumentException("Field does not contain @Inject");
