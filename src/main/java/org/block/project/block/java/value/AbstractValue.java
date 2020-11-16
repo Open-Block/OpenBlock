@@ -4,6 +4,7 @@ import org.block.Blocks;
 import org.block.project.block.AbstractBlock;
 import org.block.project.block.Block;
 import org.block.project.block.Shapes;
+import org.block.serialization.FixedTitle;
 
 import java.awt.*;
 import java.util.function.Function;

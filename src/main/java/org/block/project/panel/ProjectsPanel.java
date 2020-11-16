@@ -5,6 +5,8 @@ import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.project.module.project.Project;
 import org.block.project.module.project.UnloadedProject;
+import org.block.project.panel.network.NetworkClientPanel;
+import org.block.serialization.ConfigImplementation;
 import org.block.util.GeneralUntil;
 
 import javax.swing.*;
@@ -106,6 +108,29 @@ public class ProjectsPanel extends JPanel {
 
         private void init(){
             this.add(createNew());
+            this.add(createNetwork());
+        }
+
+        private JMenu createNetwork(){
+            JMenu network = new JMenu("Network");
+            JMenuItem join = new JMenuItem("Join");
+            join.addActionListener((a) -> {
+                JDialog dialog;
+                RootPaneContainer window = Blocks.getInstance().getWindow();
+
+                if(window instanceof Window){
+                    dialog = new JDialog((Window)window, Dialog.ModalityType.APPLICATION_MODAL);
+                }else if(window instanceof Frame){
+                    dialog = new JDialog((Frame)window, Dialog.ModalityType.APPLICATION_MODAL);
+                }else{
+                    dialog = new JDialog();
+                }                NetworkClientPanel panel = new NetworkClientPanel();
+                dialog.setContentPane(panel);
+                dialog.setSize(300, 500);
+                dialog.setVisible(true);
+            });
+            network.add(join);
+            return network;
         }
 
         private JMenu createNew(){
@@ -113,7 +138,7 @@ public class ProjectsPanel extends JPanel {
             Blocks.getInstance().getAllEnabledPlugins().getAll(PluginContainer::getModules).parallelStream().forEach(m -> {
                 JMenuItem item = new JMenuItem(m.getDisplayName());
                 item.addActionListener((a) -> {
-                    JDialog dialog = new JDialog();
+                    JDialog dialog = new JDialog(null, Dialog.ModalityType.APPLICATION_MODAL);
                     dialog.setContentPane(m.createProjectCreator());
                     dialog.pack();
                     dialog.setVisible(true);
@@ -255,7 +280,7 @@ public class ProjectsPanel extends JPanel {
     }
 
     public void loadProject(UnloadedProject project) {
-        Project.Loaded loaded = project.load();
+        Project.Loaded loaded = project.load(ConfigImplementation.JSON);
         Module module = loaded.getModule();
         JFrame frame;
         try {
@@ -274,7 +299,7 @@ public class ProjectsPanel extends JPanel {
         //last thing to do
         SwingUtilities.getWindowAncestor(this).dispose();
         frame.setVisible(true);
-        module.loadBlocks(loaded);
+        module.loadBlocks(loaded, ConfigImplementation.JSON);
         this.searchingThread.stop();
     }
 

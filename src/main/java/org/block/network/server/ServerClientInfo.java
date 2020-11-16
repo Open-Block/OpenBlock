@@ -13,7 +13,6 @@ public class ServerClientInfo extends AbstractConnection {
     public ServerClientInfo(ServerConnection connection, Socket socket) throws IOException {
         super(socket);
         this.connection = connection;
-
     }
 
     public ServerConnection getServer(){

@@ -1,8 +1,10 @@
 package org.block.project.block;
 
-import org.block.project.block.java.operation.MinusOperation;
-import org.block.project.block.java.operation.SumOperation;
-import org.block.project.block.java.start.method.MethodBlock;
+import org.block.project.block.java.method.call.JavaMethodCallBlock;
+import org.block.project.block.java.operation.number.MinusOperation;
+import org.block.project.block.java.operation.number.SumOperation;
+import org.block.project.block.java.specific.ReturnBlock;
+import org.block.project.block.java.method.MethodBlock;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.java.value.number.IntegerBlock;
 import org.block.project.block.java.variable.UseVariableBlock;
@@ -10,6 +12,7 @@ import org.block.project.block.java.variable.VariableBlock;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.parse.Parser;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.UUID;
@@ -26,6 +29,7 @@ public interface BlockType<B extends Block> {
     FixedTitle<UUID> TITLE_UUID = new FixedTitle<>("UUID", Parser.UNIQUE_ID);
     FixedTitle<Integer> TITLE_LAYER = new FixedTitle<>("Layer", Parser.INTEGER);
     FixedTitle.Listable<UUID> TITLE_DEPENDS = new FixedTitle.Listable<>("Depends", Parser.UNIQUE_ID);
+    FixedTitle<String> TITLE_CLASS = new FixedTitle<>("Class", Parser.STRING);
 
     IntegerBlock.IntegerBlockType BLOCK_TYPE_INTEGER = new IntegerBlock.IntegerBlockType();
     StringBlock.StringBlockType BLOCK_TYPE_STRING = new StringBlock.StringBlockType();
@@ -34,6 +38,8 @@ public interface BlockType<B extends Block> {
     VariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE = new VariableBlock.VariableBlockType();
     UseVariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE_USE = new UseVariableBlock.VariableBlockType();
     MethodBlock.MethodBlockType BLOCK_TYPE_METHOD = new MethodBlock.MethodBlockType();
+    ReturnBlock.ReturnBlockType BLOCK_TYPE_RETURN = new ReturnBlock.ReturnBlockType();
+    JavaMethodCallBlock.JavaMethodCallBlockType<Void> BLOCK_TYPE_JAVA_METHOD_CALL = new JavaMethodCallBlock.JavaMethodCallBlockType<>(Void.class);
 
     /**
      * Creates a new instance of a block with the provided position
@@ -69,7 +75,7 @@ public interface BlockType<B extends Block> {
      * @param node The save location
      * @param block The block to save
      */
-    default void write(ConfigNode node, B block){
+    default void write(@NotNull ConfigNode node, @NotNull B block){
         TITLE_X.serialize(node, block.getX());
         TITLE_Y.serialize(node, block.getY());
         TITLE_LAYER.serialize(node, block.getLayer());

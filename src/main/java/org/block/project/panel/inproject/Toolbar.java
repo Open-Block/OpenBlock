@@ -5,13 +5,15 @@ import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.exception.InvalidBlockException;
 import org.block.project.module.project.Project;
+import org.block.project.panel.network.NetworkServerPanel;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.NavigableSet;
+import java.util.List;
 import java.util.Set;
 
 public class Toolbar extends JMenuBar {
@@ -22,6 +24,29 @@ public class Toolbar extends JMenuBar {
 
     private void init(){
         this.add(createFile());
+        this.add(createNetwork());
+    }
+
+    private JMenu createNetwork(){
+        JMenu menu = new JMenu("Network");
+        JMenuItem host = new JMenuItem("Host");
+        RootPaneContainer window = Blocks.getInstance().getWindow();
+        host.addActionListener((a) -> {
+            JDialog dialog = null;
+            if(window instanceof Window){
+                dialog = new JDialog((Window)window, Dialog.ModalityType.APPLICATION_MODAL);
+            }else if(window instanceof Frame){
+                dialog = new JDialog((Frame)window, Dialog.ModalityType.APPLICATION_MODAL);
+            }else{
+                dialog = new JDialog();
+            }
+            NetworkServerPanel panel = new NetworkServerPanel();
+            dialog.setContentPane(panel);
+            dialog.setSize(300, 500);
+            dialog.setVisible(true);
+        });
+        menu.add(host);
+        return menu;
     }
 
     private JMenu createFile(){
@@ -35,9 +60,9 @@ public class Toolbar extends JMenuBar {
         JMenuItem item = new JMenuItem("Save");
         item.addActionListener((e) -> {
             Project.Loaded project = Blocks.getInstance().getLoadedProject().get();
-            NavigableSet<Block> blocks = project.getPanel().getBlockPanel().getBlocks();
+            List<Block> blocks = project.getPanel().getBlocksPanel().getBlocks();
             if(blocks.isEmpty()){
-                blocks = ((MainDisplayPanel)Blocks.getInstance().getWindow().getContentPane()).getBlockPanel().getBlocks();
+                blocks = ((MainDisplayPanel)Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getBlocks();
             }
             blocks.parallelStream().forEach(b -> {
                 try {
@@ -52,8 +77,12 @@ public class Toolbar extends JMenuBar {
 
     private <B extends Block> void saveBlock(B block) throws IOException{
         BlockType<B> type = (BlockType<B>) block.getType();
-        File file = new File(new File(Blocks.getInstance().getLoadedProject().get().getDirectory(), type.saveLocation().getPath()), block.getUniqueId().toString() + ".json");
-        System.out.println("File: " + file.getAbsolutePath());
+        if(type == null){
+            throw new IOException("Block does not specify a type, cannot save (" + block.getClass().getName() + " - " + block.getClass().getSimpleName() + ")");
+        }
+        File directory = Blocks.getInstance().getLoadedProject().get().getDirectory();
+        String savePath = type.saveLocation().getPath();
+        File file = new File(new File(directory, savePath), block.getUniqueId().toString() + ".json");
         if(!file.exists()){
             file.getParentFile().mkdirs();
             file.createNewFile();
@@ -68,8 +97,10 @@ public class Toolbar extends JMenuBar {
         item.addActionListener((e) -> {
             Set<String> code = null;
             try {
-                code = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlockPanel().writeCode();
+                code = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().writeCode();
             } catch (InvalidBlockException invalidBlockException) {
+                JOptionPane.showMessageDialog(this, invalidBlockException.getReason(), "Error", JOptionPane.ERROR_MESSAGE);
+                invalidBlockException.getBlock().setShowingError(true);
                 invalidBlockException.printStackTrace();
                 return;
             }

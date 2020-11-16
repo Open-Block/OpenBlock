@@ -1,6 +1,7 @@
 package org.block.serialization.parse;
 
 import org.block.serialization.ConfigNode;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Base interface for serialization
@@ -14,6 +15,6 @@ public interface Serialize <T> {
      * @param key The key to the location
      * @param value The value to serialize
      */
-    void serialize(ConfigNode node, String key, T value);
+    void serialize(@NotNull ConfigNode node, @NotNull String key, @NotNull T value);
 
 }

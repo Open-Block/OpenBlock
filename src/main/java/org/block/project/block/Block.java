@@ -1,6 +1,9 @@
 package org.block.project.block;
 
 import org.block.Blocks;
+import org.block.project.block.event.value.BlockEditValueEvent;
+import org.block.project.block.java.value.StringBlock;
+import org.block.project.module.project.Project;
 import org.block.project.panel.inproject.BlockDisplayPanel;
 import org.block.project.panel.inproject.MainDisplayPanel;
 import org.block.project.block.assists.BlockList;
@@ -16,6 +19,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
@@ -174,9 +179,13 @@ public interface Block {
                     JMenuItem edit = new JMenuItem("Edit Value");
                     edit.addActionListener((e1) -> {
                         PanelDialog panel = (PanelDialog) this.createDialog();
-                        OpenBlockDialog<? extends Container> dialog = new OpenBlockDialog<>((Window)Blocks.getInstance().getWindow(), panel);
+                        BlockEditValueEvent event2 = ((MainDisplayPanel)Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent().sendEvent(new BlockEditValueEvent(MutableConnectedValueBlock.this, panel));
+                        if(event2.isCancelled()){
+                            return;
+                        }
+                        OpenBlockDialog<? extends Container> dialog = new OpenBlockDialog<>((Window) Blocks.getInstance().getWindow(), event2.getEditPanel());
                         panel.getAcceptButton().addActionListener((e) -> {
-                            this.setValue((V)((ValueDialog<? extends Number>)panel).getOutput());
+                            this.setValue((V)((ValueDialog<?>)panel).getOutput());
                             dialog.dispose();
 
                         });
@@ -195,8 +204,8 @@ public interface Block {
             V getValue();
 
             @Override
-            default Class<V> getExpectedValue(){
-                return (Class<V>)getValue().getClass();
+            default Optional<Class<V>> getExpectedValue(){
+                return Optional.of((Class<V>)getValue().getClass());
             }
         }
 
@@ -204,7 +213,7 @@ public interface Block {
          * Gets the expected value type that the block returns
          * @return The expected class of the code output
          */
-        Class<V> getExpectedValue();
+        Optional<Class<V>> getExpectedValue();
 
     }
 
@@ -436,7 +445,8 @@ public interface Block {
      */
     default void delete(){
         this.removeAttachedTo();
-        BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlockPanel();
+        this.getFile().ifPresent(File::deleteOnExit);
+        BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent();
         panel.unregister(this);
     }
 
@@ -478,6 +488,17 @@ public interface Block {
         getEvents().stream().filter(l -> l.getEventClass().isInstance(event)).forEach(b -> ((EventListener<B>)b).onEvent(event));
     }
 
+    default Optional<File> getFile(){
+        Optional<Project.Loaded> opProject = Blocks.getInstance().getLoadedProject();
+        if(!opProject.isPresent()){
+            return Optional.empty();
+        }
+        String path = new File(this.getType().saveLocation(), this.getUniqueId().toString() + ".json").getPath();
+        System.out.println("Path: " + path);
+        System.out.println("File: " + opProject.get().getFile().getParentFile());
+        return Optional.of(new File(opProject.get().getFile().getParentFile(), path));
+    }
+
     /**
      * Gets the Popup menu options for when the user right clicks
      * @return The JPopupMenu options for when the user right clicks
@@ -488,13 +509,43 @@ public interface Block {
         delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlockPanel();
+                BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent();
                 Block.this.delete();
                 panel.repaint();
                 panel.revalidate();
             }
         });
+        JMenuItem properties = new JMenuItem("Properties");
+        properties.addActionListener(e -> {
+            if(!Desktop.isDesktopSupported()){
+                return;
+            }
+            File file = Block.this.getFile().get();
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (IOException ioException) {
+                JDialog dialog = null;
+                RootPaneContainer container = Blocks.getInstance().getWindow();
+                if(container instanceof Frame){
+                    dialog = new JDialog((Frame)container);
+                }else if(container instanceof Window){
+                    dialog = new JDialog((Window)container);
+                }else{
+                    throw new IllegalStateException("Unknown Window state");
+                }
+                JTextArea area = new JTextArea();
+                area.setEditable(false);
+                area.setBackground(null);
+                dialog.setContentPane(new JScrollPane(area));
+                dialog.setSize(500, 500);
+                delete.setVisible(true);
+            }
+        });
+        if((!Desktop.isDesktopSupported()) || (!Block.this.getFile().isPresent()) || (!Block.this.getFile().get().exists())){
+            properties.setEnabled(false);
+        }
         menu.add(delete);
+        menu.add(properties);
         return menu;
     }
 

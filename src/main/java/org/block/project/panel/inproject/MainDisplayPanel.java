@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class MainDisplayPanel extends JPanel {
 
-    private final BlockDisplayPanel block = new BlockDisplayPanel();
+    private final BlockTabsPanel blocks = new BlockTabsPanel();
     private final ChooserDisplayPanel chooser = new ChooserDisplayPanel();
 
     public MainDisplayPanel(){
@@ -25,7 +25,7 @@ public class MainDisplayPanel extends JPanel {
         c.insets = new Insets(0, 0, 0, 0);
         c.gridx = 1;
         c.weightx = 1.0;
-        this.add(this.block, c);
+        this.add(this.blocks, c);
         this.setBackground(Color.DARK_GRAY);
     }
 
@@ -33,8 +33,8 @@ public class MainDisplayPanel extends JPanel {
      * Gets the BlockDisplayPanel section of this panel
      * @return The BlockDisplayPanel
      */
-    public BlockDisplayPanel getBlockPanel(){
-        return this.block;
+    public BlockTabsPanel getBlocksPanel(){
+        return this.blocks;
     }
 
     public ChooserDisplayPanel getChooserPanel(){

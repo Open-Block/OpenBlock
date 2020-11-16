@@ -8,6 +8,8 @@ import org.block.project.module.Module;
 import org.block.project.module.project.UnloadedProject;
 import org.block.project.panel.inproject.MainDisplayPanel;
 import org.block.project.panel.inproject.Toolbar;
+import org.block.serialization.ConfigImplementation;
+import org.block.serialization.ConfigNode;
 import org.block.util.BlockUtils;
 
 import java.awt.*;
@@ -41,17 +43,17 @@ public final class OpenBlockModule implements Module {
     }
 
     @Override
-    public OpenBlockProject load(UnloadedProject project) {
+    public OpenBlockProject load(UnloadedProject project, ConfigImplementation<? extends ConfigNode> impl) {
         OpenBlockProject project1 = new OpenBlockProject(project);
         return project1;
     }
 
     @Override
-    public void loadBlocks(Project.Loaded project) {
-        BlockUtils.load(project, b -> {
-            project.getPanel().repaint();
-            project.getPanel().revalidate();
+    public void loadBlocks(Project.Loaded project, ConfigImplementation<? extends ConfigNode> impl) {
+        BlockUtils.load(project, impl, b -> {
         });
+        project.getPanel().repaint();
+        project.getPanel().revalidate();
     }
 
     @Override

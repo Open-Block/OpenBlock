@@ -9,6 +9,7 @@ import org.block.network.common.packets.PacketValue;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -20,8 +21,10 @@ public interface Connection {
 
         Socket getTargetSocket();
         void connect();
+        void disconnect();
         BufferedReader getConnectionReader();
         PrintWriter getConnectionWriter();
+        Collection<NetworkListener> getListeners();
 
     }
 
@@ -36,7 +39,7 @@ public interface Connection {
     void sendMessage(Packet.PacketBuilder builder);
     void onReceive(Consumer<String> consumer);
 
-    default <T> Set<T> getPacketValue(Class<T> clazz){
+    default <T extends PacketValue> Set<T> getPacketValue(Class<T> clazz){
         return (Set<T>)this.getPacketValues().parallelStream().filter(p -> clazz.isInstance(p)).collect(Collectors.toSet());
     }
 

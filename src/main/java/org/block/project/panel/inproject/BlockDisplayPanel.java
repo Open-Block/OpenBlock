@@ -4,10 +4,12 @@ import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.project.block.Block;
 import org.block.project.block.assists.BlockList;
+import org.block.project.block.event.BlockEvent;
 import org.block.project.block.event.mouse.BlockMouseClickEvent;
 import org.block.project.context.DragContext;
 import org.block.project.exception.InvalidBlockException;
 import org.block.project.section.SpecificSection;
+import org.block.util.OrderedUniqueList;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +36,7 @@ public class BlockDisplayPanel extends JPanel {
 
         @Override
         public void accept(String s) {
-            BlockList<B> attachment = (BlockList<B>) this.target.getAttachments(s);
+            BlockList<B> attachment = this.target.getAttachments(s);
             int relX = this.e.getX() - this.target.getX();
             int relY = this.e.getY() - this.target.getY();
             try {
@@ -73,12 +75,12 @@ public class BlockDisplayPanel extends JPanel {
                 });
 
 
-                NavigableSet<Block> blocks = BlockDisplayPanel.this.getBlocks(e.getX(), e.getY());
+                OrderedUniqueList<Block> blocks = BlockDisplayPanel.this.getBlocks(e.getX(), e.getY());
                 Block target = null;
-                if(!blocks.isEmpty() && blocks.first().equals(block) && (blocks.size() > 1)) {
-                    target = blocks.higher(block);
-                }else if(!blocks.isEmpty() && !blocks.first().equals(block)) {
-                    target = blocks.first();
+                if(!blocks.isEmpty() && blocks.get(0).equals(block) && (blocks.size() > 1)) {
+                    target = blocks.get(1);
+                }else if(!blocks.isEmpty() && !blocks.get(0).equals(block)) {
+                    target = blocks.get(0);
                 }
                 if (target == null){
                     block.setX(e.getX() + BlockDisplayPanel.this.context.getOffX());
@@ -98,11 +100,11 @@ public class BlockDisplayPanel extends JPanel {
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            BlockDisplayPanel.this.getBlocks().forEach(b -> b.setHighlighted(false));
-            BlockDisplayPanel.this.getBlocks(e.getX(), e.getY()).forEach(b -> b.setHighlighted(true));
+                BlockDisplayPanel.this.getBlocks().forEach(b -> b.setHighlighted(false));
+                BlockDisplayPanel.this.getBlocks(e.getX(), e.getY()).forEach(b -> b.setHighlighted(true));
 
-            BlockDisplayPanel.this.repaint();
-            BlockDisplayPanel.this.revalidate();
+                BlockDisplayPanel.this.repaint();
+                BlockDisplayPanel.this.revalidate();
         }
     }
 
@@ -138,11 +140,11 @@ public class BlockDisplayPanel extends JPanel {
                 }
                 map.forEach((key, value) -> key.setSelected(!value));
             }else if(e.getClickCount() == 1 && e.getButton() == 3){
-                NavigableSet<Block> blocks = BlockDisplayPanel.this.getBlocks(e.getX(), e.getY());
+                OrderedUniqueList<Block> blocks = BlockDisplayPanel.this.getBlocks(e.getX(), e.getY());
                 if(blocks.isEmpty()){
                     return;
                 }
-                blocks.first().getRightClick().show(BlockDisplayPanel.this, e.getX(), e.getY());
+                blocks.get(0).getRightClick().show(BlockDisplayPanel.this, e.getX(), e.getY());
             }else{
                 sendEvent(e);
             }
@@ -150,21 +152,22 @@ public class BlockDisplayPanel extends JPanel {
             BlockDisplayPanel.this.revalidate();
         }
 
-        private void sendEvent(MouseEvent e){
+        public void sendEvent(MouseEvent e){
             BlockDisplayPanel.this.getBlocks(e.getX(), e.getY()).forEach(b -> {
                 BlockMouseClickEvent event = new BlockMouseClickEvent(b, e);
-                b.callEvent(event);
+                BlockDisplayPanel.this.sendEvent(event);
             });
+
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
             BlockDisplayPanel.this.mouseDown = true;
-            NavigableSet<Block> blocks = BlockDisplayPanel.this.getBlocks(e.getX(), e.getY());
+            OrderedUniqueList<Block> blocks = BlockDisplayPanel.this.getBlocks(e.getX(), e.getY());
             if(blocks.isEmpty()){
                 return;
             }
-            Block block = blocks.first();
+            Block block = blocks.get(0);
             BlockDisplayPanel.this.context = new DragContext().setDragging(block).setOffX(block.getX() - e.getX()).setOffY(block.getY() - e.getY());
             for(Block check : BlockDisplayPanel.this.getBlocks()){
                 if(check instanceof Block.AttachableBlock){
@@ -194,7 +197,7 @@ public class BlockDisplayPanel extends JPanel {
         }
     }
 
-    private TreeSet<Block> blocks = new TreeSet<>(Comparator.comparingInt(Block::getLayer));
+    private OrderedUniqueList<Block> blocks = new OrderedUniqueList<>(Comparator.comparingInt(Block::getLayer));
     private boolean mouseDown;
     private DragContext context;
 
@@ -221,7 +224,7 @@ public class BlockDisplayPanel extends JPanel {
         preChanges.accept(map);
         List<Map.Entry<Block, Integer>> entries = new ArrayList<>(map.entrySet());
         entries.sort(Comparator.comparingInt(Map.Entry::getValue));
-        TreeSet<Block> set = new TreeSet<>(Comparator.comparingInt(Block::getLayer));
+        OrderedUniqueList<Block> set = new OrderedUniqueList<>(Comparator.comparingInt(Block::getLayer));
         for(int A = 0; A < entries.size(); A++){
             Map.Entry<Block, Integer> entry = entries.get(A);
             Block block = entry.getKey();
@@ -231,16 +234,24 @@ public class BlockDisplayPanel extends JPanel {
             }
             set.add(block);
         }
+        System.out.println("Resetting blocks");
         this.blocks = set;
     }
 
-    public NavigableSet<Block> getBlocks(){
-        return Collections.unmodifiableNavigableSet(this.blocks);
+    public <E extends BlockEvent> E sendEvent(E event){
+        BlockDisplayPanel.this.getBlocks().forEach(b -> {
+            b.callEvent(event);
+        });
+        return event;
     }
 
-    public NavigableSet<Block> getBlocks(int x, int y){
-        TreeSet<Block> set = new TreeSet<>(Comparator.comparingInt(b -> ((Block)b).getLayer()).reversed());
-        this.blocks.stream().filter(b -> b.contains(x, y)).forEach(set::add);
+    public OrderedUniqueList<Block> getBlocks(){
+        return this.blocks;
+    }
+
+    public OrderedUniqueList<Block> getBlocks(int x, int y){
+        OrderedUniqueList<Block> set = new OrderedUniqueList<>(Comparator.comparingInt(Block::getLayer).reversed());
+        this.getBlocks().stream().filter(b -> b.contains(x, y)).forEach(set::add);
         return set;
     }
 
@@ -262,16 +273,8 @@ public class BlockDisplayPanel extends JPanel {
         this.blocks.remove(block);
     }
 
-    /**
-     * Writes the code from the programming blocks found within the panel
-     * @return The code for each class, class written in each entry
-     * @throws InvalidBlockException Thrown when a block provided on the page is in a invalid state
-     */
-    public Set<String> writeCode() throws InvalidBlockException {
-        Set<String> classes = new HashSet<>();
 
-        //Currently only supports a single class
-
+    public String writeCode(String className) throws InvalidBlockException {
         Set<Block.CalledBlock.CodeStartBlock> set = new HashSet<>();
 
         for(Block block : this.blocks){
@@ -293,7 +296,7 @@ public class BlockDisplayPanel extends JPanel {
                 clazz.append("import ").append(impor).append(";\n");
             }
         }
-        clazz.append("\npublic class Main {\n\n");
+        clazz.append("\npublic class ").append(className).append(" {\n\n");
         int tab = 1;
         for(Block.CalledBlock.CodeStartBlock block : set){
             block.writeBlockCode(tab).entrySet().stream().filter(e -> e.getValue() == Block.CalledBlock.METHOD).forEach(e -> {
@@ -301,8 +304,7 @@ public class BlockDisplayPanel extends JPanel {
             });
         }
         clazz.append("}");
-        classes.add(clazz.toString());
-        return classes;
+        return clazz.toString();
     }
 
     @Override
@@ -310,15 +312,18 @@ public class BlockDisplayPanel extends JPanel {
         if(this.blocks.isEmpty()){
             return super.getPreferredSize();
         }
-        int height = ArrayUtils.getBest(Block::getHeight,(x1, x2) -> x1 > x2 , this.blocks).get().getHeight();
-        int width = ArrayUtils.getBest(Block::getWidth,(x1, x2) -> x1 > x2 , this.blocks).get().getWidth();
-        return new Dimension(width, height);
+
+        Block heightBlock = ArrayUtils.getBest(Block::getHeight,(x1, x2) -> x1 > x2 , this.blocks).get();
+        Block widthBlock = ArrayUtils.getBest(Block::getWidth,(x1, x2) -> x1 > x2 , this.blocks).get();
+        return new Dimension(widthBlock.getX() + widthBlock.getWidth(), heightBlock.getY() + heightBlock.getHeight());
     }
 
     @Override
     public void paint(Graphics graphics){
         super.paint(graphics);
         Graphics2D graphics2D = (Graphics2D)graphics;
-        this.blocks.forEach(b -> b.paint(graphics2D));
+        for(Block block : this.getBlocks()){
+            block.paint(graphics2D);
+        }
     }
 }

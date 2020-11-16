@@ -24,6 +24,7 @@ public abstract class AbstractBlock implements Block {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.id = UUID.randomUUID();
     }
 
     @Override
@@ -119,5 +120,14 @@ public abstract class AbstractBlock implements Block {
     @Override
     public UUID getUniqueId() {
         return this.id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Block)){
+            return false;
+        }
+        Block block = (Block)obj;
+        return this.getUniqueId().equals(block.getUniqueId());
     }
 }

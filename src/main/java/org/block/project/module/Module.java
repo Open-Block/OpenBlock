@@ -5,6 +5,8 @@ import org.block.project.module.project.Project;
 import org.block.project.module.project.UnloadedProject;
 import org.block.project.panel.inproject.MainDisplayPanel;
 import org.block.project.panel.inproject.Toolbar;
+import org.block.serialization.ConfigImplementation;
+import org.block.serialization.ConfigNode;
 
 import java.awt.*;
 
@@ -50,9 +52,9 @@ public interface Module {
      * @return The loaded project
      * @throws IllegalArgumentException If the project does not belong to the module
      */
-    Project.Loaded load(UnloadedProject project);
+    Project.Loaded load(UnloadedProject project, ConfigImplementation<? extends ConfigNode> impl);
 
-    void loadBlocks(Project.Loaded loaded);
+    void loadBlocks(Project.Loaded loaded, ConfigImplementation<? extends ConfigNode> impl);
 
     /**
      * Creates the MainDisplayPanel and loads the project into the panel.

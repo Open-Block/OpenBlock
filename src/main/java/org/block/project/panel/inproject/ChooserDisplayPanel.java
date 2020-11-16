@@ -101,6 +101,7 @@ public class ChooserDisplayPanel extends JPanel {
     public void init(){
         GroupedSection mathSection = new GroupedSection(null, "Math", Collections.singletonList("Mathematics"));
         GroupedSection valueSection = new GroupedSection(null, "Value", Collections.emptyList());
+        GroupedSection testingSection = new GroupedSection(null, "Testing", Collections.emptySet());
 
         GroupedSection storeSection = new GroupedSection(valueSection, "Store", Arrays.asList("Variable", "Save"));
         GroupedSection numberSection = new GroupedSection(valueSection, "Number", Arrays.asList("Whole", "Decimal"));
@@ -108,14 +109,17 @@ public class ChooserDisplayPanel extends JPanel {
         valueSection.register(storeSection);
         valueSection.register(numberSection);
 
+        mathSection.register(new BlockSection(mathSection, BlockType.BLOCK_TYPE_MINUS, "Minus", "Negate", "Take"));
         mathSection.register(new BlockSection(mathSection, BlockType.BLOCK_TYPE_SUM, "Sum", "Plus", "Add"));
         valueSection.register(new BlockSection(valueSection, BlockType.BLOCK_TYPE_STRING, "Text", "String", "Character", "Char"));
         numberSection.register(new BlockSection(numberSection, BlockType.BLOCK_TYPE_INTEGER, "Integer", "Number"));
         storeSection.register(new BlockSection(storeSection, BlockType.BLOCK_TYPE_VARIABLE, "Store", "Variable", "Save"));
         storeSection.register(new BlockSection(storeSection, BlockType.BLOCK_TYPE_METHOD, "Set", "Method", "Call"));
+        testingSection.register(new BlockSection(testingSection, BlockType.BLOCK_TYPE_JAVA_METHOD_CALL, "MethodCall"));
 
         this.sectionList.add(mathSection);
         this.sectionList.add(valueSection);
+        this.sectionList.add(testingSection);
     }
 
     public List<GUISection> getSectionList(){

@@ -12,6 +12,7 @@ import org.block.project.section.GroupedSection;
 import org.block.serialization.ConfigNode;
 import org.block.util.GeneralUntil;
 
+import javax.swing.text.html.Option;
 import java.awt.*;
 import java.io.File;
 import java.util.*;
@@ -105,17 +106,17 @@ public class UseVariableBlock extends AbstractAttachable implements Block.ValueB
     }
 
     @Override
-    public Class<Object> getExpectedValue() {
+    public Optional<Class<Object>> getExpectedValue() {
         if(getLinkedBlock().isPresent()){
             Optional<VariableBlock> opAttached = getVariableBlockList().getAttachment();
             if(opAttached.isPresent()){
                 Optional<ValueBlock<?>> opValue = opAttached.get().getVariableAttachment().getAttachment();
                 if(opValue.isPresent()){
-                    return (Class<Object>)opValue.get().getExpectedValue();
+                    return Optional.of((Class<Object>)opValue.get().getExpectedValue().get());
                 }
             }
         }
-        return Object.class;
+        return Optional.of(Object.class);
     }
 
     @Override

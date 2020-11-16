@@ -4,6 +4,7 @@ import org.block.Blocks;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.serialization.ConfigNode;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Optional;
@@ -49,18 +50,18 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
         private final Serialize<T> serialize;
         private final Deserialize<T> deserialize;
 
-        public Abstract(Serialize<T> serialize, Deserialize<T> deserialize){
+        public Abstract(@NotNull Serialize<T> serialize, @NotNull Deserialize<T> deserialize){
             this.serialize = serialize;
             this.deserialize = deserialize;
         }
 
         @Override
-        public Optional<T> deserialize(ConfigNode node, String title) {
+        public Optional<T> deserialize(@NotNull ConfigNode node, @NotNull String title) {
             return this.deserialize.deserialize(node, title);
         }
 
         @Override
-        public void serialize(ConfigNode node, String title, T value) {
+        public void serialize(@NotNull ConfigNode node, @NotNull String title, @NotNull T value) {
             this.serialize.serialize(node, title, value);
         }
     }

@@ -8,7 +8,9 @@ import org.block.project.block.Block;
 
 import java.time.LocalTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class VerifyConnectionPacketBuilder implements Packet.PacketBuilder {
 
@@ -16,10 +18,12 @@ public class VerifyConnectionPacketBuilder implements Packet.PacketBuilder {
     private int[] version = Blocks.VERSION;
     private Set<String> plugins = Blocks.getInstance().getAllPlugins().get(pc -> pc.getPluginMeta().id());
     private int request;
+    private String id;
 
     public static final String VERSION = "Version";
     public static final String PLUGINS = "Plugins";
     public static final String REQUEST = "Request";
+    public static final String ID = "ID";
 
     public static final int REQUEST_TYPE_INIT = 0;
 
@@ -31,19 +35,35 @@ public class VerifyConnectionPacketBuilder implements Packet.PacketBuilder {
         return this.request;
     }
 
-    public void setRequest(int request){
+    public VerifyConnectionPacketBuilder setRequest(int request){
         this.request = request;
+        return this;
+    }
+
+    public VerifyConnectionPacketBuilder setId(String id){
+        this.id = id;
+        return this;
+    }
+
+    public Optional<String> getId(){
+        return Optional.ofNullable(this.id);
     }
 
     @Override
     public String build(Connection connection) {
-        switch (connection.getMeans()){
-            case CLIENT:
-                return this.time.toString() + "\t" + VERSION + ": " + this.version[0] + "." + this.version[1] + "." + this.version[2] + "." + this.version[3] + "|" + PLUGINS + ": " + ArrayUtils.toString(", ", t -> t, this.plugins);
-            case HOST:
-                return this.time.toString() + "\t" + REQUEST + ": " + this.request;
-            default: throw new IllegalArgumentException("Unknown ConnectionMeans." + connection.getMeans().name());
+        if(this.id == null){
+            throw new IllegalStateException("Unknown ID. Failed to build VerifyConnectionPacketBuilder");
         }
+        if(this.version == null){
+            throw new IllegalStateException("Unknown Version. Failed to build VerifyConnectionPacketBuilder");
+        }
+        if(this.version.length != 4){
+            throw new IllegalStateException("Not a valid version. Failed to build VerifyConnectionPacketBuilder");
+        }
+        if(this.plugins == null){
+            throw new IllegalStateException("Null plugins list. Failed to build VerifyConnectionPacketBuilder");
+        }
+        return this.time.toString() + "\t" + VERSION + ": " + this.version[0] + "." + this.version[1] + "." + this.version[2] + "." + this.version[3] + "|" + ID + ": " + this.id + "|" + PLUGINS + ": " + ArrayUtils.toString(", ", t -> t, this.plugins);
     }
 
     @Override
@@ -52,18 +72,21 @@ public class VerifyConnectionPacketBuilder implements Packet.PacketBuilder {
     }
 
     public static VerifyConnectionPacketBuilder build(String line){
-        String[] split = line.split("\t");
+        String[] split = line.split(Pattern.quote("\t"));
         LocalTime time = LocalTime.parse(split[0]);
-        String[] values = split[1].split("|");
+        String[] values = split[1].split(Pattern.quote("|"));
         VerifyConnectionPacketBuilder builder = new VerifyConnectionPacketBuilder();
         builder.time = time;
         for(String keyValue : values){
-            String[] pair = keyValue.split(": ");
+            String[] pair = keyValue.split(Pattern.quote(": "));
             switch (pair[0]){
                 case VERSION: builder.version = Blocks.parseVersion(pair[1]); break;
                 case PLUGINS: builder.plugins = ArrayUtils.ofSet(pair[1].split(", ")); break;
                 case REQUEST: builder.request = Integer.parseInt(pair[1]); break;
-                default: break;
+                case ID: builder.id = pair[1]; break;
+                default:
+                    System.err.println("VerifyConnectionPacketBuilder: No idea what '" + pair[0] + "' is");
+                    break;
             }
         }
         return builder;

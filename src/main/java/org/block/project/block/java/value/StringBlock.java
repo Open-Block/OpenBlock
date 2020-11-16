@@ -5,9 +5,14 @@ import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.plugin.event.EventListener;
 import org.block.project.block.event.mouse.BlockMouseClickEvent;
+import org.block.project.block.event.value.BlockEditValueEvent;
 import org.block.project.block.input.OpenBlockDialog;
 import org.block.project.block.input.type.StringDialog;
+import org.block.project.panel.inproject.MainDisplayPanel;
 import org.block.serialization.ConfigNode;
+import org.block.serialization.FixedTitle;
+import org.block.serialization.parse.Parser;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.File;
@@ -20,6 +25,8 @@ import java.util.function.Function;
 public class StringBlock extends AbstractValue<String> implements Block.ValueBlock.ConnectedValueBlock.MutableConnectedValueBlock<String>{
 
     public static class StringBlockType implements BlockType<StringBlock> {
+
+        public static final FixedTitle<String> TITLE = new FixedTitle<>("Title", Parser.STRING);
 
         @Override
         public StringBlock buildDefault(int x, int y) {
@@ -52,7 +59,14 @@ public class StringBlock extends AbstractValue<String> implements Block.ValueBlo
             StringBlock block = this.build(opX.get(), opY.get());
             block.setValue(opValue.get());
             block.id = opUUID.get();
+            TITLE.deserialize(node).ifPresent(v -> block.value = v);
             return block;
+        }
+
+        @Override
+        public void write(@NotNull ConfigNode node, @NotNull StringBlock block) {
+            BlockType.super.write(node, block);
+            TITLE.serialize(node, block.getText());
         }
 
         @Override
@@ -75,8 +89,15 @@ public class StringBlock extends AbstractValue<String> implements Block.ValueBlo
 
         @Override
         public void onEvent(BlockMouseClickEvent event) {
+            if(!event.getBlock().equals(StringBlock.this)){
+                return;
+            }
             StringDialog panel = StringBlock.this.createDialog();
-            OpenBlockDialog<? extends Container> dialog = new OpenBlockDialog<>((Window) Blocks.getInstance().getWindow(), panel);
+            BlockEditValueEvent event2 = ((MainDisplayPanel)Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent().sendEvent(new BlockEditValueEvent(StringBlock.this, panel));
+            if(event2.isCancelled()){
+                return;
+            }
+            OpenBlockDialog<? extends Container> dialog = new OpenBlockDialog<>((Window) Blocks.getInstance().getWindow(), event2.getEditPanel());
             panel.getAcceptButton().addActionListener((e) -> {
                 StringBlock.this.setValue(panel.getOutput());
                 dialog.dispose();

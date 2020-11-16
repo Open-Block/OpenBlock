@@ -1,6 +1,7 @@
 package org.block.serialization.parse;
 
 import org.block.serialization.ConfigNode;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -16,6 +17,6 @@ public interface Deserialize<T> {
      * @param key The provided key
      * @return A optional of the value, if the value could not be found or deserialized then will return {@link Optional#empty()}
      */
-    Optional<T> deserialize(ConfigNode node, String key);
+    Optional<T> deserialize(@NotNull ConfigNode node, @NotNull String key);
 
 }

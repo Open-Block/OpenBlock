@@ -1,6 +1,7 @@
 package org.block.serialization;
 
 import org.block.serialization.parse.Parser;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +69,7 @@ public class FixedTitle<N> {
      * @param node The root node
      * @param value The target
      */
-    public void serialize(ConfigNode node, N value){
+    public void serialize(@NotNull ConfigNode node, @NotNull N value){
         ((Parser<N>)this.parser).serialize(node.getNode(this.node), this.title, value);
     }
 
@@ -77,7 +78,7 @@ public class FixedTitle<N> {
      * @param node The root node
      * @return The value from the node
      */
-    public Optional<N> deserialize(ConfigNode node){
+    public Optional<N> deserialize(@NotNull ConfigNode node){
         return ((Parser<N>)this.parser).deserialize(node.getNode(this.node), this.title);
     }
 

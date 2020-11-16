@@ -11,7 +11,7 @@ public interface GeneralUntil {
         Class<?> clazz = null;
         String nested = null;
         do{
-            Class<?> clazz2 = (clazz == null) ? value.getExpectedValue() : clazz.getDeclaringClass();
+            Class<?> clazz2 = (clazz == null) ? value.getExpectedValue().orElse(null) : clazz.getDeclaringClass();
             if(clazz2 == null){
                 break;
             }

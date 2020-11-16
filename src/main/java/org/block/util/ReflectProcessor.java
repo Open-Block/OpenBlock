@@ -4,13 +4,13 @@ import org.block.plugin.Plugin;
 import org.block.plugin.launch.LaunchEvent;
 import org.block.plugin.launch.LaunchListener;
 import org.block.plugin.launch.meta.Dependent;
-import org.block.util.functions.Getter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public interface ReflectProcessor {
@@ -46,7 +46,7 @@ public interface ReflectProcessor {
      * @param after The code to run after the event is fired
      * @param search The class to search
      */
-    static void fireEventsAsynced(Getter<LaunchEvent> getter, Consumer<LaunchEvent> after, Collection<Object> search) {
+    static void fireEventsAsynced(Supplier<LaunchEvent> getter, Consumer<LaunchEvent> after, Collection<Object> search) {
         search.forEach(e -> new Thread(() -> {
             LaunchEvent event = getter.get();
             fireEvent(event, e);

@@ -4,7 +4,6 @@ import org.array.utils.ArrayUtils;
 import org.block.plugin.launch.LaunchEvent;
 import org.block.plugin.launch.LaunchListener;
 import org.block.util.ReflectProcessor;
-import org.block.util.functions.Getter;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -55,7 +55,7 @@ public class PluginContainers extends TreeSet<PluginContainer> {
      * @param getter A getter for a new instance of the LaunchEvent
      * @param consumer Fires after the event is fired
      */
-    public void fireParallelEvent(Getter<LaunchEvent> getter, Consumer<LaunchEvent> consumer){
+    public void fireParallelEvent(Supplier<LaunchEvent> getter, Consumer<LaunchEvent> consumer){
         ReflectProcessor.fireEventsAsynced(getter, consumer, ArrayUtils.convert(p -> p.getPlugin(), this));
     }
 

@@ -23,10 +23,10 @@ public class BlockSection extends JPanel implements GUISection {
             int x = random.nextInt(25) + 25;
             int y = random.nextInt(25) + 25;
             Block block = BlockSection.this.getBlockType().build(x, y);
-            while(panel.getBlockPanel().getBlocks().contains(block)){
+            while(panel.getBlocksPanel().getSelectedComponent().getBlocks().contains(block)){
                 block.setLayer(block.getLayer() + 1);
             }
-            panel.getBlockPanel().register(block);
+            panel.getBlocksPanel().getSelectedComponent().register(block);
             panel.repaint();
             panel.revalidate();
         }

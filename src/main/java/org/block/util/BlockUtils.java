@@ -1,30 +1,29 @@
 package org.block.util;
 
-import org.array.utils.ArrayUtils;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.module.project.Project;
-import org.block.project.panel.inproject.MainDisplayPanel;
+import org.block.project.panel.inproject.BlockDisplayPanel;
+import org.block.project.panel.inproject.BlockTabsPanel;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
 public class BlockUtils {
 
-    public static Set<Block> load(Project.Loaded project, Consumer<Block> loaded){
-        return load(project, project.getDirectory(), loaded);
+    public static Set<Block> load(Project.Loaded project, ConfigImplementation<? extends ConfigNode> impl, Consumer<Block> loaded){
+        return load(project, project.getDirectory(), impl, loaded);
     }
 
-    public static Set<Block> load(Project.Loaded project, File folder, Consumer<Block> loaded){
+    public static Set<Block> load(Project.Loaded project, File folder, ConfigImplementation<? extends ConfigNode> impl, Consumer<Block> loaded){
         List<BlockType<? extends Block>> blockTypes = project.getPanel().getChooserPanel().getBlockTypes();
         Map<File, BlockType<? extends Block>> depends = new HashMap<>();
         Set<Block> load = new HashSet<>();
-        blockTypes.stream().forEach(t -> {
+        blockTypes.forEach(t -> {
             File typeFolder = new File(folder, t.saveLocation().getPath());
             if(!typeFolder.exists()){
                 return;
@@ -36,7 +35,7 @@ public class BlockUtils {
             for(File file : files){
                 ConfigNode node;
                 try {
-                    node = ConfigImplementation.JSON.load(file.toPath());
+                    node = impl.load(file.toPath());
                 } catch (IOException e) {
                     e.printStackTrace();
                     continue;
@@ -46,23 +45,35 @@ public class BlockUtils {
                     depends.put(file, t);
                     continue;
                 }
+                String clazzName = BlockType.TITLE_CLASS.deserialize(node).orElse("Global");
+                if(clazzName.length() == 0){
+                    clazzName = "Global";
+                }
+                final String finalClassName = clazzName;
+                BlockDisplayPanel bdPanel = project.getPanel().getBlocksPanel().getTitledComponent(clazzName).orElseGet(() -> {
+                    BlockDisplayPanel panel = new BlockDisplayPanel();
+                    project.getPanel().getBlocksPanel().register(finalClassName, panel);
+                    project.getPanel().getBlocksPanel().updateTabs();
+                    return panel;
+                });
                 try {
                     Block block = t.build(node);
                     if(block == null){
-                        System.err.println("Could not load '" + file.getName() + "' as a '" + t.getName() + "'");
+                        System.err.println("Could not load '" + file.getName() + "' as a '" + t.getName() + "'. Failed to build. Block build returned null in '" + t.getClass().getName() + "'. This is a generic message, as a developer you should provide more checks for what is going wrong.");
                         continue;
                     }
-                    handle(block, project, load, loaded);
-                }catch (IllegalStateException e){
+                    handle(block, bdPanel, project, load, loaded);
+                }catch (Throwable e){
                     e.printStackTrace();
                 }
             }
         });
+        Set<File> dependsRemove = new HashSet<>();
         while(!depends.isEmpty()){
             for(Map.Entry<File, BlockType<? extends Block>> entry : depends.entrySet()){
                 ConfigNode node;
                 try {
-                    node = ConfigImplementation.JSON.load(entry.getKey().toPath());
+                    node = impl.load(entry.getKey().toPath());
                 } catch (IOException e) {
                     e.printStackTrace();
                     continue;
@@ -71,25 +82,43 @@ public class BlockUtils {
                 if(!dependsOn.stream().allMatch(d -> load.stream().anyMatch(b -> b.getUniqueId().equals(d)))){
                     continue;
                 }
+                String clazzName = BlockType.TITLE_CLASS.deserialize(node).orElse("Global");
+                if(clazzName.length() == 0){
+                    clazzName = "Global";
+                }
+                final String finalClassName = clazzName;
+                BlockDisplayPanel bdPanel = project.getPanel().getBlocksPanel().getTitledComponent(clazzName).orElseGet(() -> {
+                    BlockDisplayPanel panel = new BlockDisplayPanel();
+                    project.getPanel().getBlocksPanel().register(finalClassName, panel);
+                    project.getPanel().getBlocksPanel().updateTabs();
+                    return panel;
+                });
                 try {
                     Block block = entry.getValue().build(node);
-                    handle(block, project, load, loaded);
-                    depends.remove(entry.getKey());
+                    handle(block, bdPanel, project, load, loaded);
+                    dependsRemove.add(entry.getKey());
                 }catch (IllegalStateException e){
+                    bdPanel.getBlocks().forEach(b -> {
+                        System.out.println("Block: " + b.getType().getName() + " UUID: " + b.getUniqueId());
+                    });
                     e.printStackTrace();
                 }
             }
+            dependsRemove.forEach(depends::remove);
+            dependsRemove.clear();
         }
         return load;
     }
 
-    private static void handle(Block block, Project.Loaded project, Set<Block> load, Consumer<Block> loaded){
+    private static void handle(Block block, BlockDisplayPanel panel, Project.Loaded project, Set<Block> load, Consumer<Block> loaded){
         load.add(block);
-        while(project.getPanel().getBlockPanel().getBlocks().contains(block)){
+
+        while(panel.getBlocks().contains(block)){
             block.setLayer(block.getLayer() + 1);
         }
-        System.out.println("Registering block with " + block.getLayer());
-        project.getPanel().getBlockPanel().register(block);
+        //TODO handle all
+
+        panel.register(block);
         loaded.accept(block);
     }
 }

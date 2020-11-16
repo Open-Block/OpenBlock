@@ -1,10 +1,14 @@
 package org.block.network.common;
 
+import org.array.utils.ArrayUtils;
 import org.block.network.common.event.NetEvent;
 import org.block.network.common.event.NetworkEvent;
 import org.block.network.common.event.NetworkListener;
 import org.block.network.common.packets.Packet;
 import org.block.network.common.packets.PacketValue;
+import org.block.network.common.packets.request.RequestPacketValue;
+import org.block.network.common.packets.verify.VerifyConnectionValue;
+import org.block.network.server.ServerClientInfo;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -21,6 +25,7 @@ public abstract class AbstractConnection implements Connection.Direct {
     protected final Set<PacketValue> packetValues = new HashSet<>();
     protected final Set<NetworkListener> networkListeners = new HashSet<>();
     protected Consumer<String> onReceive;
+    protected boolean connection;
 
     public AbstractConnection(Socket socket) throws IOException {
         this.socket = socket;
@@ -28,6 +33,11 @@ public abstract class AbstractConnection implements Connection.Direct {
         InputStream input = socket.getInputStream();
         this.sendToServer = new BufferedReader(new InputStreamReader(input));
         this.printWriter = new PrintWriter(output, true);
+    }
+
+    @Override
+    public Collection<NetworkListener> getListeners() {
+        return this.networkListeners;
     }
 
     @Override
@@ -63,10 +73,16 @@ public abstract class AbstractConnection implements Connection.Direct {
     }
 
     @Override
+    public void disconnect() {
+
+    }
+
+    @Override
     public void connect() {
         try {
+            this.connection = true;
             String fromServer;
-            while ((fromServer = this.sendToServer.readLine()) != null) {
+            while (this.connection && (fromServer = this.sendToServer.readLine()) != null) {
                 if (fromServer.startsWith("Pack: ")){
                     this.onReceive = null;
                     String id = fromServer.substring(6);
@@ -83,7 +99,12 @@ public abstract class AbstractConnection implements Connection.Direct {
                     this.onReceive.accept(fromServer);
                     continue;
                 }
-                System.out.println("From " + this.getClass().getSimpleName() + ": " + fromServer);
+                if(fromServer.equals("end")){
+                    break;
+                }
+            }
+            if(this instanceof ServerClientInfo) {
+                this.sendMessage("end");
             }
         }catch (IOException ignore){
         }
@@ -144,5 +165,21 @@ public abstract class AbstractConnection implements Connection.Direct {
             return this.socket.getInetAddress().equals(((AbstractConnection) object).socket.getInetAddress());
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        for(RequestPacketValue value : getPacketValue(RequestPacketValue.class)){
+            if(value.getUsername() != null){
+                return value.getUsername();
+            }
+        }
+        for (VerifyConnectionValue value : getPacketValue(VerifyConnectionValue.class)){
+            if(value.getBuilder().getId().isPresent()){
+                return value.getBuilder().getId().get();
+            }
+        }
+
+        return super.toString();
     }
 }

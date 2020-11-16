@@ -246,7 +246,7 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
         Class<?> clazz = null;
         String ret = null;
         do{
-            Class<?> clazz2 = clazz == null ? opValueBlock.get().getExpectedValue() : clazz.getDeclaringClass();
+            Class<?> clazz2 = clazz == null ? opValueBlock.get().getExpectedValue().orElse(null) : clazz.getDeclaringClass();
             if(clazz2 == null){
                 break;
             }
@@ -264,7 +264,7 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
         }
         Class<?> clazz = null;
         do{
-            Class<?> clazz2 = (clazz == null) ? opValueBlock.get().getExpectedValue() : clazz.getDeclaringClass();
+            Class<?> clazz2 = (clazz == null) ? opValueBlock.get().getExpectedValue().orElse(null) : clazz.getDeclaringClass();
             if(clazz2 == null){
                 break;
             }

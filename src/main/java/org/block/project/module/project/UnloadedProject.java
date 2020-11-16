@@ -4,6 +4,7 @@ import org.block.Blocks;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.serialization.ConfigImplementation;
+import org.block.serialization.ConfigNode;
 import org.block.serialization.json.JSONConfigNode;
 
 import java.awt.*;
@@ -58,21 +59,21 @@ public final class UnloadedProject implements Project {
         ConfigImplementation.JSON.write(node, getFile().toPath());
     }
 
-    public Project.Loaded load(){
+    public Project.Loaded load(ConfigImplementation<? extends ConfigNode> impl){
         try {
-            return load(this.getExpectedModule());
+            return load(this.getExpectedModule(), impl);
         } catch (IOException e) {
             Set<Module> modules = Blocks.getInstance().getEnabledPlugins().getAll(PluginContainer::getModules);
             Optional<Module> opMod = modules.parallelStream().filter(m -> m.canLoad(this)).findFirst();
             if(opMod.isPresent()){
-                return load(opMod.get());
+                return load(opMod.get(), impl);
             }
         }
         throw new IllegalStateException("No module found to load project");
     }
 
-    public Project.Loaded load(Module module){
-        Project.Loaded loaded = module.load(this);
+    public Project.Loaded load(Module module, ConfigImplementation<? extends ConfigNode> impl){
+        Project.Loaded loaded = module.load(this, impl);
         Blocks.getInstance().setLoadedProject(loaded);
         return loaded;
     }

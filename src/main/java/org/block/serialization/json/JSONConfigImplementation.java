@@ -60,7 +60,6 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
                 continue;
             }
             if(at == ','){
-                System.out.println("At: " + at + " | Before At: " + ((A >= 1) ? singleLined.charAt(A - 1) : '|'));
                 if(A >= 1 && singleLined.charAt(A - 1) == ','){
                     continue;
                 }

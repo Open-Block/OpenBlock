@@ -42,7 +42,7 @@ public abstract class AbstractAttachable extends AbstractBlock implements Block.
     public <B extends Block> BlockList<B> getAttachments(String section) {
         BlockList<? extends Block> list = this.attached.get(section);
         if(list == null){
-            throw new IllegalArgumentException("Invalid section");
+            throw new IllegalArgumentException("Invalid section of '" + section + "' in block " + this.getUniqueId().toString() + " of type '" + this.getType().getName() + "'");
         }
         return (BlockList<B>) list;
     }

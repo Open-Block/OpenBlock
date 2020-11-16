@@ -65,7 +65,7 @@ public class NetworkConfigImplementation implements ConfigImplementation<Network
                     .append(ArrayUtils.toString(".", t -> t, e.getKey()))
                     .append(":")
                     .append(e.getValue())
-                    .append("\n");
+                    .append("\f");
         });
         return builder.toString();
     }

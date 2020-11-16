@@ -5,11 +5,15 @@ import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.plugin.event.EventListener;
 import org.block.project.block.event.mouse.BlockMouseClickEvent;
+import org.block.project.block.event.value.BlockEditValueEvent;
 import org.block.project.block.input.OpenBlockDialog;
 import org.block.project.block.input.PanelDialog;
 import org.block.project.block.input.type.ValueDialog;
 import org.block.project.block.java.value.AbstractValue;
+import org.block.project.block.java.value.StringBlock;
+import org.block.project.panel.inproject.MainDisplayPanel;
 import org.block.serialization.ConfigNode;
+import org.block.serialization.FixedTitle;
 import org.block.serialization.parse.Parser;
 import org.block.util.ClassCompare;
 
@@ -57,7 +61,7 @@ public abstract class NumberBlock<V extends Number> extends AbstractValue<V> imp
             NumberBlock<N> block = this.build(opX.get(), opY.get());
             block.setValue(opValue.get());
             block.id = opUUID.get();
-            block.layer = TITLE_LAYER.deserialize(node).orElse(Blocks.getInstance().getLoadedProject().get().getPanel().getBlockPanel().getBlocks().size());
+            block.layer = TITLE_LAYER.deserialize(node).orElse(Blocks.getInstance().getLoadedProject().get().getPanel().getBlocksPanel().getBlocks().size());
             return block;
         }
 
@@ -88,7 +92,11 @@ public abstract class NumberBlock<V extends Number> extends AbstractValue<V> imp
         @Override
         public void onEvent(BlockMouseClickEvent event) {
             PanelDialog panel = (PanelDialog)NumberBlock.this.createDialog();
-            OpenBlockDialog<? extends Container> dialog = new OpenBlockDialog<>((Window)Blocks.getInstance().getWindow(), panel);
+            BlockEditValueEvent event2 = ((MainDisplayPanel)Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent().sendEvent(new BlockEditValueEvent(NumberBlock.this, panel));
+            if(event2.isCancelled()){
+                return;
+            }
+            OpenBlockDialog<? extends Container> dialog = new OpenBlockDialog<>((Window)Blocks.getInstance().getWindow(), event2.getEditPanel());
             panel.getAcceptButton().addActionListener((e) -> {
                 NumberBlock.this.setValue((V)((ValueDialog<? extends Number>)panel).getOutput());
                 dialog.dispose();
@@ -99,7 +107,7 @@ public abstract class NumberBlock<V extends Number> extends AbstractValue<V> imp
     }
 
     public NumberBlock(int x, int y, V value) {
-        super(x, y, value, (n) -> n.toString());
+        super(x, y, value, Object::toString);
         init();
     }
 
@@ -108,8 +116,8 @@ public abstract class NumberBlock<V extends Number> extends AbstractValue<V> imp
     }
 
     @Override
-    public Class<V> getExpectedValue() {
-        return (Class<V>) ClassCompare.toPrimitive(this.getValue().getClass());
+    public Optional<Class<V>> getExpectedValue() {
+        return Optional.of((Class<V>) ClassCompare.toPrimitive(this.getValue().getClass()));
     }
 
     @Override
