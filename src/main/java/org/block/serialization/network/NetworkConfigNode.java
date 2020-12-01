@@ -61,6 +61,11 @@ public class NetworkConfigNode implements ConfigNode {
     }
 
     @Override
+    public Optional<Boolean> getBoolean(String title) {
+        return this.getValue(title, Parser.BOOLEAN);
+    }
+
+    @Override
     public <T> Optional<T> getValue(String title, Parser<T> parser) {
         Optional<String> opValue = this.getString(title);
         if(!opValue.isPresent()){

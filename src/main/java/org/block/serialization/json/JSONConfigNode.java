@@ -72,6 +72,18 @@ public class JSONConfigNode implements ConfigNode {
     }
 
     @Override
+    public Optional<Boolean> getBoolean(String title) {
+        Object obj = this.path.opt(title);
+        if(obj == null){
+            return Optional.empty();
+        }
+        if(!(obj instanceof Boolean)){
+            return Optional.empty();
+        }
+        return Optional.of((boolean)obj);
+    }
+
+    @Override
     public <T> Optional<T> getValue(String title, Parser<T> parser) {
         try {
             return parser.deserialize(this, title);

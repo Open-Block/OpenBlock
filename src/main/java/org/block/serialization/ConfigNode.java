@@ -50,6 +50,8 @@ public interface ConfigNode {
      */
     Optional<Float> getFloat(String title);
 
+    Optional<Boolean> getBoolean(String title);
+
     /**
      * Gets a none standard value from the provided title
      * @param title The key to the location

@@ -4,6 +4,7 @@ import org.block.serialization.ConfigNode;
 import org.block.serialization.parse.Parser;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -19,11 +20,17 @@ public class JSONArrayConfigNode implements ConfigNode {
 
     @Override
     public ConfigNode getNode(String... path) {
-        if(path.length == 0){
+        if (path.length == 0) {
             return this;
         }
         int entry = Integer.parseInt(path[0]);
-        JSONConfigNode node = new JSONConfigNode(this.path.getJSONObject(entry));
+        JSONConfigNode node;
+        try{
+            node = new JSONConfigNode(this.path.getJSONObject(entry));
+        }catch(JSONException e){
+            this.path.put(entry, new JSONObject());
+            node = new JSONConfigNode(this.path.getJSONObject(entry));
+        }
         String[] newPath = new String[path.length - 1];
         for(int A = 0; A < path.length - 1; A++){
             newPath[A] = path[A + 1];
@@ -62,6 +69,18 @@ public class JSONArrayConfigNode implements ConfigNode {
     @Override
     public Optional<Float> getFloat(String title) {
         return getNumber(title, Number::floatValue);
+    }
+
+    @Override
+    public Optional<Boolean> getBoolean(String title) {
+        Object obj = this.path.opt(Integer.parseInt(title));
+        if(obj == null){
+            return Optional.empty();
+        }
+        if(!(obj instanceof Boolean)){
+            return Optional.empty();
+        }
+        return Optional.of((boolean)obj);
     }
 
     @Override

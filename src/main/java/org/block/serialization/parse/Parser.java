@@ -7,8 +7,11 @@ import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * The interface of both serialize and deserialize in a combined faction
@@ -21,6 +24,7 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
     Parser<Long> LONG = new Abstract<>(ConfigNode::setValue, ConfigNode::getLong);
     Parser<Double> DOUBLE = new Abstract<>(ConfigNode::setValue, ConfigNode::getDouble);
     Parser<Float> FLOAT = new Abstract<>(ConfigNode::setValue, ConfigNode::getFloat);
+    Parser<Boolean> BOOLEAN = new Abstract<>(ConfigNode::setValue, ConfigNode::getBoolean);
     Parser<UUID> UNIQUE_ID = new Abstract<>((n, t, v) -> n.setValue(t, v.toString()), (n, t) -> {
         Optional<String> opValue = n.getString(t);
         return opValue.map(UUID::fromString);
