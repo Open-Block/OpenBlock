@@ -56,6 +56,16 @@ public class JSFClass implements JSFPart<JSFClass> {
             return this;
         }
 
+        public Builder addImplementations(Collection<String> collection){
+            this.implementingClasses.addAll(collection);
+            return this;
+        }
+
+        public Builder addMethods(Collection<JSFMethod> methods){
+            this.methods.addAll(methods);
+            return this;
+        }
+
         @Override
         public JSFClass build() {
             if(this.className == null){

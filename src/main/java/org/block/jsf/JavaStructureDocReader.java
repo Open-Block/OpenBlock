@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class JavaStructureDocReader {
 
@@ -42,7 +43,8 @@ public class JavaStructureDocReader {
         if(classMeta.containsKey(META_EXTENDING)){
             builder.setExtending((String)classMeta.get(META_EXTENDING));
         }
-
+        builder.addImplementations((List<String>)classMeta.getOrDefault(META_IMPLEMENTING, new ArrayList<>()));
+        builder.addMethods(methods);
         return builder.build();
     }
 
@@ -84,24 +86,21 @@ public class JavaStructureDocReader {
                 extending = writeup;
                 writeup = "";
             }
-            if(implementing.length() == 0 && writeup.endsWith("implements")){
+            if(writeup.endsWith("implements")){
                 writeup = "implements";
             }
-            if(implementing.length() == 0 && writeup.startsWith("implements") && writeup.endsWith("</a>")){
-                implementing = writeup;
-                writeup = "";
-            }
         }
-        if(target.contains("class")){
+        implementing = writeup;
+        if(beforeSpan.contains("class")){
             ret.put(META_CLASS_TYPE, JSFClassType.CLASS);
         }
-        if(target.contains("interface")){
+        if(beforeSpan.contains("interface")){
             ret.put(META_CLASS_TYPE, JSFClassType.INTERFACE);
         }
-        if(target.contains("final")){
+        if(beforeSpan.contains("final")){
             ret.put(META_IS_FINAL, true);
         }
-        if(target.contains("public")){
+        if(beforeSpan.contains("public")){
             ret.put(META_VISIBILITY, Visibility.PUBLIC);
         }
         afterSpan = afterSpan.substring(0, afterSpan.length() - 7);
@@ -125,6 +124,26 @@ public class JavaStructureDocReader {
 
     private List<String> createClassesFromImplements(String implementHTML){
         List<String> ret = new ArrayList<>();
+        String[] args = implementHTML.split(", ");
+        for(String link : args){
+            String href = "";
+            for(int A = 0; A < link.length(); A++){
+                char character = link.charAt(A);
+                href = href + character;
+                if(href.endsWith("href=\"")){
+                    href = "";
+                }
+                if(href.startsWith("../../") && href.endsWith("\" title=")){
+                    break;
+                }
+            }
+            if(!href.startsWith("../../")){
+                continue;
+            }
+            href = href.substring(0, href.length() - 13).replaceAll(Pattern.quote("../"), "");
+            href = href.replaceAll("/", ".");
+            ret.add(href);
+        }
         return ret;
     }
 
@@ -160,7 +179,42 @@ public class JavaStructureDocReader {
     }
 
     private JSFMethod getMethod(String html){
-        return null;
+        String returnClass = "";
+        String name = "";
+        String target = "";
+        for(int A = 0; A < html.length(); A++){
+            char character = html.charAt(A);
+            target = target + character;
+            if(target.endsWith("<code>")){
+                target = "<code>";
+            }
+            if(target.endsWith("</code>")){
+                if(returnClass.length() == 0){
+                    returnClass = target;
+                }else if(name.length() == 0){
+                    name = target;
+                }
+                target = "";
+            }
+        }
+
+        String filterName = "";
+        for(int A = name.length() - 1; A >= 0; A--){
+            filterName = name.charAt(A) + filterName;
+            if(filterName.startsWith("</a>")){
+                filterName = "";
+            }
+            if(!filterName.endsWith("</code>") && filterName.startsWith("\">")){
+                filterName = filterName.substring(2);
+                break;
+            }
+        }
+
+        JSFMethod method = new JSFMethod.Builder()
+                .setReturning(returnClass.substring(6, returnClass.length() - 7))
+                .setName(filterName)
+                .build();
+        return method;
     }
 
     private List<JSFMethod> getMethods(){

@@ -22,6 +22,15 @@ public class JSFMethod extends JSFFunction<JSFMethod> {
         private List<JSFGeneric> generics = new ArrayList<>();
         private List<JSFParameter> parameters = new ArrayList<>();
 
+        public String getName(){
+            return this.name;
+        }
+
+        public Builder setName(String name){
+            this.name = name;
+            return this;
+        }
+
         public Visibility getVisibility() {
             return visibility;
         }
