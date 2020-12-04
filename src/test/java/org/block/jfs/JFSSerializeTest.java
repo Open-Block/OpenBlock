@@ -61,7 +61,6 @@ public class JFSSerializeTest {
         }
         if(!output.contains("\"return\":\"java.io.File\"")){
             Assertions.fail("return didn't equal java.io.File or is not present");
-            return;
         }
     }
 

@@ -1,7 +1,6 @@
 package org.block.jsf.data.jsfvalue;
 
 import org.block.jsf.data.JSFPart;
-import org.block.jsf.data.Visibility;
 
 public abstract class JSFValue<V extends JSFValue<?>> implements JSFPart<V> {
 
@@ -25,5 +24,14 @@ public abstract class JSFValue<V extends JSFValue<?>> implements JSFPart<V> {
 
     public boolean isFinal() {
         return isFinal;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!this.getClass().isInstance(obj)){
+            return false;
+        }
+        JSFValue<?> value = (JSFValue<?>) obj;
+        return value.getName().equals(this.getName());
     }
 }

@@ -2,12 +2,11 @@ package org.block.jsf.data.jsffunction;
 
 import org.block.jsf.data.JSFPart;
 import org.block.jsf.data.Visibility;
+import org.block.jsf.data.generic.JSFGeneric;
 import org.block.jsf.data.jsfvalue.JSFParameter;
-import org.block.jsf.data.jsfvalue.JSFValue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
 public abstract class JSFFunction<F extends JSFFunction<?>> implements Comparable<F>, JSFPart<F> {
 
@@ -15,7 +14,7 @@ public abstract class JSFFunction<F extends JSFFunction<?>> implements Comparabl
     private final String returning;
     private final boolean isStatic;
     private final boolean isFinal;
-    private final TreeMap<String, String> generics = new TreeMap<>();
+    private final List<JSFGeneric> generics = new ArrayList<>();
     private final List<JSFParameter> parameters = new ArrayList<>();
 
     public abstract String getName();
@@ -43,11 +42,34 @@ public abstract class JSFFunction<F extends JSFFunction<?>> implements Comparabl
         return isFinal;
     }
 
-    public TreeMap<String, String> getGenerics() {
+    public List<JSFGeneric> getGenerics() {
         return generics;
     }
 
     public List<JSFParameter> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public int compareTo(F o) {
+        List<JSFParameter> parameters = this.getParameters();
+        List<JSFParameter> otherParameters = o.getParameters();
+        if(parameters.isEmpty()){
+            return -1;
+        }
+        if(otherParameters.isEmpty()){
+            return 1;
+        }
+        int similar = 0;
+        int diff = parameters.size() - otherParameters.size();
+        if(diff < 0){
+            diff = -diff;
+        }
+        for(int A = 0; A < Math.min(parameters.size(), otherParameters.size()); A++){
+            if(parameters.get(A).equals(otherParameters.get(A))){
+                similar++;
+            }
+        }
+        return similar - diff;
     }
 }

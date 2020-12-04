@@ -9,15 +9,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class JSFConstructor extends JSFFunction<JSFConstructor> {
+public class JSFMethod extends JSFFunction<JSFMethod> {
 
-    public static class Builder implements JSFPart.Builder<JSFConstructor> {
+    public static class Builder implements JSFPart.Builder<JSFMethod> {
 
         private Visibility visibility = Visibility.PUBLIC;
         private String returning;
+        private String name;
         private boolean isFinal;
-        private final List<JSFGeneric> generics = new ArrayList<>();
-        private final List<JSFParameter> parameters = new ArrayList<>();
+        private boolean isAbstract;
+        private boolean isStatic;
+        private List<JSFGeneric> generics = new ArrayList<>();
+        private List<JSFParameter> parameters = new ArrayList<>();
 
         public Visibility getVisibility() {
             return visibility;
@@ -64,14 +67,17 @@ public class JSFConstructor extends JSFFunction<JSFConstructor> {
         }
 
         @Override
-        public JSFConstructor build() {
+        public JSFMethod build() {
             if(this.visibility == null){
                 throw new IllegalStateException("Visibility cannot be null");
             }
             if(this.returning == null){
                 throw new IllegalStateException("Returning value cannot be null");
             }
-            JSFConstructor cons = new JSFConstructor(this.visibility, this.isFinal, this.returning);
+            if(this.name == null){
+                throw new IllegalStateException("Name value cannot be null");
+            }
+            JSFMethod cons = new JSFMethod(this.visibility, this.isFinal, this.isStatic, this.returning, this.name, this.isAbstract);
             cons.getParameters().addAll(this.parameters);
             cons.getGenerics().addAll(this.generics);
             return cons;
@@ -84,44 +90,78 @@ public class JSFConstructor extends JSFFunction<JSFConstructor> {
             builder.returning = this.returning;
             builder.isFinal = this.isFinal;
             builder.visibility = this.visibility;
+            builder.name = this.name;
+            builder.isAbstract = this.isAbstract;
+            builder.isStatic = this.isStatic;
             builder.generics.addAll(this.generics);
             return builder;
         }
 
         @Override
-        public Optional<JSFConstructor> deserialize(@NotNull ConfigNode node, @NotNull String key) {
+        public Optional<JSFMethod> deserialize(@NotNull ConfigNode node, @NotNull String key) {
+            Builder builder = new Builder();
+            ConfigNode base = node.getNode(key);
+            builder.name = JSFPart.TITLE_NAME.deserialize(base).orElse(this.name);
+            builder.visibility = JSFPart.TITLE_VISIBILITY.deserialize(base).orElse(this.visibility);
+            builder.isAbstract = JSFPart.TITLE_IS_ABSTRACT.deserialize(base).orElse(this.isAbstract);
+            builder.isStatic = JSFPart.TITLE_IS_STATIC.deserialize(base).orElse(this.isStatic);
+            builder.generics = JSFPart.TITLE_GENERICS.deserialize(base).get();
+            builder.parameters = JSFPart.TITLE_PARAMETERS.deserialize(base).get();
             return Optional.empty();
         }
 
         @Override
-        public void serialize(@NotNull ConfigNode node, @NotNull String key, @NotNull JSFConstructor value) {
+        public void serialize(@NotNull ConfigNode node, @NotNull String key, @NotNull JSFMethod value) {
             ConfigNode base = node.getNode(key);
             JSFPart.TITLE_RETURN.serialize(base, value.getReturning());
+            JSFPart.TITLE_NAME.serialize(base, value.getName());
             JSFPart.TITLE_IS_FINAL.serialize(base, value.isFinal());
             JSFPart.TITLE_VISIBILITY.serialize(base, value.getVisibility());
             JSFPart.TITLE_PARAMETERS.serialize(base, value.getParameters());
+            JSFPart.TITLE_IS_STATIC.serialize(base, value.isStatic());
+            JSFPart.TITLE_IS_ABSTRACT.serialize(base, value.isAbstract());
             JSFPart.TITLE_GENERICS.serialize(base, value.getGenerics());
         }
     }
 
-    public JSFConstructor(Visibility visibility, boolean isFinal, String returning) {
-        super(visibility, isFinal, false, returning);
+    private final String name;
+    private final boolean isAbstract;
+
+    public JSFMethod(Visibility visibility, boolean isFinal, boolean isStatic, String returning, String name, boolean isAbstract) {
+        super(visibility, isFinal, isStatic, returning);
+        this.name = name;
+        this.isAbstract = isAbstract;
+    }
+
+    public boolean isAbstract(){
+        return this.isAbstract;
     }
 
     @Override
     public String getName() {
-        return this.getReturning();
+        return this.name;
     }
 
+    @Override
+    public int compareTo(@NotNull JSFMethod o) {
+        int stringCompare = o.getName().compareTo(this.getName());
+        if(stringCompare != 0){
+            return stringCompare;
+        }
+        return super.compareTo(o);
+    }
 
     @Override
-    public Builder toBuilder() {
+    public JSFMethod.Builder toBuilder() {
         Builder builder = new Builder();
         builder.generics.addAll(this.getGenerics());
         builder.isFinal = this.isFinal();
         builder.parameters.addAll(this.getParameters());
         builder.visibility = this.getVisibility();
         builder.returning = this.getReturning();
+        builder.isStatic = this.isStatic();
+        builder.isAbstract = this.isAbstract();
+        builder.name = this.getName();
         return builder;
     }
 }
