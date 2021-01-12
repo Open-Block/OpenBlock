@@ -75,6 +75,7 @@ public interface GeneralUntil {
             for(File file : files){
                 getFiles(file, collection);
             }
+            collection.add(folder);
             return collection;
         }
         System.err.println("No idea what type '" + folder.getAbsolutePath() + "' is");

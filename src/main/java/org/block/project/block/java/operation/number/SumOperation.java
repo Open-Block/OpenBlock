@@ -1,7 +1,7 @@
 package org.block.project.block.java.operation.number;
 
 import org.block.Blocks;
-import org.block.project.panel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.block.assists.BlockList;

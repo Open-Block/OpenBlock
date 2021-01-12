@@ -1,12 +1,13 @@
 package org.block.project.module;
 
+import javafx.scene.Node;
+import javafx.scene.layout.Region;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.project.Project;
 import org.block.project.module.project.UnloadedProject;
-import org.block.project.panel.inproject.MainDisplayPanel;
-import org.block.project.panel.inproject.Toolbar;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
@@ -57,22 +58,16 @@ public interface Module {
     void loadBlocks(Project.Loaded loaded, ConfigImplementation<? extends ConfigNode> impl);
 
     /**
-     * Creates the MainDisplayPanel and loads the project into the panel.
-     * The loading of the project does not need to appear right away, meaning you are able to load the project asynced
-     * @param project The project to load
-     * @return The MainDisplayPanel to insert into the frame
-     * @throws IllegalArgumentException If the project does not belong to the module
+     * Called when a project creator for this module is called. This is typically caused
+     * when the ProjectPanel attempts to create a new project of this module.
      */
-    MainDisplayPanel createPanel(Project project);
+    void onProjectCreator();
 
     /**
-     * Creates the Toolbar to display on the frame
-     * All the options do not need to be loaded right away, meaning you are able to load project specific options asynced
-     * @param project The project to load with the toolbar
-     * @return The toolbar to display
-     * @throws IllegalArgumentException If the project does not belong to the module
+     * Gets the display node for displaying the projects info before the project has loaded.
+     * This does not include the buttons for loading and deleting.
+     * @param project The project to get the info for
+     * @return The node to display
      */
-    Toolbar createToolbar(Project project);
-
-    Container createProjectCreator();
+    @NotNull Region createDisplayInfo(@NotNull UnloadedProject project);
 }

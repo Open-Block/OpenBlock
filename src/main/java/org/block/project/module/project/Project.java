@@ -1,8 +1,8 @@
 package org.block.project.module.project;
 
 import org.block.project.module.Module;
-import org.block.project.panel.inproject.MainDisplayPanel;
-import org.block.project.panel.inproject.Toolbar;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.Toolbar;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.json.JSONConfigNode;

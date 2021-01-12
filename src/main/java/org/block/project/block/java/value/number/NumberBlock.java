@@ -10,10 +10,8 @@ import org.block.project.block.input.OpenBlockDialog;
 import org.block.project.block.input.PanelDialog;
 import org.block.project.block.input.type.ValueDialog;
 import org.block.project.block.java.value.AbstractValue;
-import org.block.project.block.java.value.StringBlock;
-import org.block.project.panel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
 import org.block.serialization.ConfigNode;
-import org.block.serialization.FixedTitle;
 import org.block.serialization.parse.Parser;
 import org.block.util.ClassCompare;
 

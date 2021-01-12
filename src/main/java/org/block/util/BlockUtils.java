@@ -3,8 +3,7 @@ package org.block.util;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.module.project.Project;
-import org.block.project.panel.inproject.BlockDisplayPanel;
-import org.block.project.panel.inproject.BlockTabsPanel;
+import org.block.project.legacypanel.inproject.BlockDisplayPanel;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
 

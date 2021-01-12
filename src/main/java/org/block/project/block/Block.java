@@ -1,17 +1,19 @@
 package org.block.project.block;
 
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import org.block.Blocks;
 import org.block.project.block.event.value.BlockEditValueEvent;
-import org.block.project.block.java.value.StringBlock;
 import org.block.project.module.project.Project;
-import org.block.project.panel.inproject.BlockDisplayPanel;
-import org.block.project.panel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.BlockDisplayPanel;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
 import org.block.project.block.assists.BlockList;
 import org.block.project.block.event.BlockEvent;
 import org.block.plugin.event.EventListener;
 import org.block.project.block.input.OpenBlockDialog;
 import org.block.project.block.input.PanelDialog;
 import org.block.project.block.input.type.ValueDialog;
+import org.block.project.panel.main.BlockRender;
 import org.block.project.section.GUISection;
 import org.block.project.section.GroupedSection;
 
@@ -285,6 +287,12 @@ public interface Block {
 
     }
 
+    BlockGraphics getGraphicShape();
+
+    default BlockRender getGraphicRender(){
+        return new BlockRender(this);
+    }
+
     /**
      * Gets the pixel height of the block.
      * @return Gets the height in pixels
@@ -382,6 +390,7 @@ public interface Block {
      * This draws the block to the provided graphics in a Vector like painting style
      * @param graphics2D The vector rendering local
      */
+    @Deprecated
     void paint(Graphics2D graphics2D);
 
     /**
@@ -503,6 +512,7 @@ public interface Block {
      * Gets the Popup menu options for when the user right clicks
      * @return The JPopupMenu options for when the user right clicks
      */
+    @Deprecated
     default JPopupMenu getRightClick(){
         JPopupMenu menu = new JPopupMenu();
         JMenuItem delete = new JMenuItem("Delete");

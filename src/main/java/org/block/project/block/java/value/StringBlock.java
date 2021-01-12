@@ -8,7 +8,7 @@ import org.block.project.block.event.mouse.BlockMouseClickEvent;
 import org.block.project.block.event.value.BlockEditValueEvent;
 import org.block.project.block.input.OpenBlockDialog;
 import org.block.project.block.input.type.StringDialog;
-import org.block.project.panel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.parse.Parser;

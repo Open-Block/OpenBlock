@@ -209,9 +209,23 @@ public class JavaStructureDocReader {
                 break;
             }
         }
+String returning = returnClass.substring(6, returnClass.length() - 7);
+        if(returning.contains("href")){
+            String ret = "";
+            for(int A = 0; A < returning.length(); A++){
+                ret = ret + returning.charAt(A);
+                if(ret.endsWith("href=\"")){
+                    ret = "href=\"";
+                }
+                if(ret.endsWith("\"") && ret.startsWith("href=\"")){
+                    break;
+                }
+            }
+            returning = ret.substring(6, ret.length() - 1);
+        }
 
         JSFMethod method = new JSFMethod.Builder()
-                .setReturning(returnClass.substring(6, returnClass.length() - 7))
+                .setReturning(returning)
                 .setName(filterName)
                 .build();
         return method;
@@ -228,7 +242,7 @@ public class JavaStructureDocReader {
                 builder = builder.substring(builder.length() - 3);
                 continue;
             }
-            if(builder.endsWith("</tr>") && builder.startsWith("<tr class=")){
+            if(builder.endsWith("</tr>") && builder.startsWith("<tr ")){
                 list.add(getMethod(builder));
                 builder = "";
             }

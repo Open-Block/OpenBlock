@@ -1,7 +1,7 @@
 package org.block;
 
-import org.block.project.panel.inproject.MainDisplayPanel;
-import org.block.project.panel.inproject.Toolbar;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.Toolbar;
 
 import javax.swing.*;
 

@@ -8,7 +8,7 @@ import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractBlockList;
 import org.block.project.block.assists.AbstractSingleBlockList;
 import org.block.project.block.java.value.StringBlock;
-import org.block.project.panel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
 import org.block.project.section.BlockSection;
 import org.block.project.section.GUISection;
 import org.block.project.section.GroupedSection;

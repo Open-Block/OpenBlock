@@ -7,7 +7,7 @@ import org.block.project.block.Shapes;
 import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractSingleBlockList;
 import org.block.project.block.assists.BlockList;
-import org.block.project.panel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
 import org.block.serialization.ConfigNode;
 import org.block.util.OrderedUniqueList;
 import org.jetbrains.annotations.NotNull;

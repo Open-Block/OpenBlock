@@ -1,10 +1,14 @@
 package org.block;
 
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.block.network.client.ClientConnection;
 import org.block.network.server.ServerConnection;
 import org.block.plugin.PluginContainer;
 import org.block.plugin.PluginContainers;
 import org.block.project.module.project.Project;
+import org.block.project.panel.SceneSource;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,11 +21,15 @@ public class Blocks {
 
     private Font font;
     private FontMetrics metrics;
+    @Deprecated
     private RootPaneContainer window;
     private final PluginContainers plugins = new PluginContainers();
     private Project.Loaded loadedProject;
     private ServerConnection server;
     private ClientConnection client;
+
+    private Stage win;
+    private SceneSource source;
 
     public static final int[] VERSION = {0, 0, 0, 1};
 
@@ -49,6 +57,22 @@ public class Blocks {
     }
 
     private static Blocks instance;
+
+    public SceneSource getSceneSource(){
+        return this.source;
+    }
+
+    public void setSceneSource(SceneSource source){
+        this.source = source;
+    }
+
+    public Stage getFXWindow(){
+        return this.win;
+    }
+
+    public void setFXWindow(Stage window){
+        this.win = window;
+    }
 
     public Optional<ClientConnection> getClient(){
         return Optional.ofNullable(this.client);
@@ -87,6 +111,7 @@ public class Blocks {
      * @return The current GUI Window
      * @throws IllegalStateException If no project has loaded, this will be thrown
      */
+    @Deprecated
     public RootPaneContainer getWindow(){
         if(this.window == null){
             throw new IllegalStateException("A project has not loaded yet");
@@ -94,6 +119,7 @@ public class Blocks {
         return this.window;
     }
 
+    @Deprecated
     public void setWindow(RootPaneContainer window){
         this.window = window;
     }

@@ -4,8 +4,8 @@ import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.project.module.project.Project;
 import org.block.project.module.project.UnloadedProject;
-import org.block.project.panel.inproject.MainDisplayPanel;
-import org.block.project.panel.inproject.Toolbar;
+import org.block.project.legacypanel.inproject.MainDisplayPanel;
+import org.block.project.legacypanel.inproject.Toolbar;
 
 import java.io.File;
 
@@ -21,8 +21,8 @@ public class OpenBlockProject implements Project.Loaded {
     }
 
     private void init(){
-        this.panel = getModule().createPanel(this);
-        this.toolbar = getModule().createToolbar(this);
+        this.panel = new MainDisplayPanel();
+        this.toolbar = new Toolbar();
     }
 
     @Override
