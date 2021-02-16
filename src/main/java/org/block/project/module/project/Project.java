@@ -1,14 +1,12 @@
 package org.block.project.module.project;
 
+import javafx.scene.shape.Rectangle;
 import org.block.project.module.Module;
-import org.block.project.legacypanel.inproject.MainDisplayPanel;
-import org.block.project.legacypanel.inproject.Toolbar;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.json.JSONConfigNode;
 import org.block.serialization.parse.Parser;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -29,18 +27,6 @@ public interface Project {
          * @return The module of the project
          */
         Module getModule();
-
-        /**
-         * Gets the panel for the project
-         * @return The Panel for the project
-         */
-        MainDisplayPanel getPanel();
-
-        /**
-         * Gets the toolbar for the project
-         * @return The toolbar to use
-         */
-        Toolbar getToolbar();
     }
 
     /**
@@ -74,21 +60,6 @@ public interface Project {
             return CONFIG_PROJECT_WINDOW_LOCATION.deserialize(json).orElse(new Rectangle(0, 0, 600, 800));
         } catch (IOException e) {
             return new Rectangle(0, 0, 600, 800);
-        }
-    }
-
-    /**
-     * Gets the screen to display the window on
-     * @return The screen to display the window
-     */
-    default GraphicsDevice getPreferredGraphicsDevice(){
-        GraphicsEnvironment local = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        try {
-            JSONConfigNode json = ConfigImplementation.JSON.load(getFile().toPath());
-            int display = CONFIG_PROJECT_WINDOW_DISPLAY.deserialize(json).orElse(0);
-            return local.getScreenDevices()[display];
-        } catch (IOException e) {
-            return local.getDefaultScreenDevice();
         }
     }
 

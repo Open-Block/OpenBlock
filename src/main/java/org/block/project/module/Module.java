@@ -9,8 +9,6 @@ import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-
 public interface Module {
 
     /**

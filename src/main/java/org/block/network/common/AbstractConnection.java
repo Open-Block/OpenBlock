@@ -1,6 +1,5 @@
 package org.block.network.common;
 
-import org.array.utils.ArrayUtils;
 import org.block.network.common.event.NetEvent;
 import org.block.network.common.event.NetworkEvent;
 import org.block.network.common.event.NetworkListener;

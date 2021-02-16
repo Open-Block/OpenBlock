@@ -3,14 +3,13 @@ package org.block.project.block.java.method.call;
 import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.project.block.Block;
+import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.Shapes;
 import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.BlockList;
 import org.block.project.block.java.value.StringBlock;
 import org.block.serialization.ConfigNode;
 
-import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -153,7 +152,6 @@ public class JavaMethodCallBlock<C> extends AbstractAttachable implements Method
                 width = width + opBlock.get().getWidth() + this.marginX;
                 height = Math.max(height, opBlock.get().getHeight());
             }else{
-                width = width + Blocks.getInstance().getMetrics().stringWidth(parameter.getName()) + this.marginX;
             }
         }
         this.width = Math.max(width, methodNameWidth);
@@ -186,43 +184,6 @@ public class JavaMethodCallBlock<C> extends AbstractAttachable implements Method
             }
         }
         return Optional.empty();
-    }
-
-    @Override
-    public void paint(Graphics2D graphics2D) {
-        updateSize();
-        Optional<ConnectedValueBlock<String>> opMethodName = this.getMethodNameBlockList().getAttachment();
-        int methodNameWidth = 40;
-        int methodNameHeight = this.getMethodNameBlockList().getSlotHeight(0);
-        if(opMethodName.isPresent()){
-            methodNameWidth = opMethodName.get().getWidth();
-            methodNameHeight = opMethodName.get().getHeight();
-        }
-        Optional<Method> opMethod = this.getExpectedMethod();
-        graphics2D.fillRoundRect(this.getX(), this.getY(), this.marginX, this.getHeight(), 2, 2);
-        graphics2D.fillRect(this.getX(), this.getY() + methodNameHeight, this.getWidth(), this.marginY);
-        graphics2D.fillRoundRect(this.getX() + this.marginX + methodNameWidth, this.getY(), this.getWidth() - (this.marginX + methodNameWidth), methodNameHeight, 2, 2);
-        Shapes.drawAttachableConnector(this.getX() + this.marginX, this.getY(), Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT);
-        if(!opMethod.isPresent() || opMethod.get().getParameterCount() == 0){
-            graphics2D.fillRoundRect(this.getX(), this.getY() + methodNameHeight, this.getWidth(), this.getHeight() - methodNameHeight, 2, 2);
-            return;
-        }
-        Parameter[] parameters = opMethod.get().getParameters();
-        int startX = this.getX() + this.marginX;
-        int startY = this.getY() + methodNameHeight + this.marginY;
-        for(Parameter parameter : parameters){
-            BlockList<Block> attachment = this.getAttachments(parameter.getName());
-            Optional<Block> opBlock = attachment.getAttachment(0);
-            int width = Blocks.getInstance().getMetrics().stringWidth(parameter.getName());
-            if(opBlock.isPresent()){
-                width = opBlock.get().getWidth();
-            }else{
-                graphics2D.drawString(parameter.getName(), startX, startY);
-            }
-            Shapes.drawAttachableConnector(startX, startY, Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT);
-            startX = startX + width + this.marginX;
-
-        }
     }
 
     @Override

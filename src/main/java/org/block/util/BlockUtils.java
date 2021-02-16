@@ -1,9 +1,10 @@
 package org.block.util;
 
+import org.block.Blocks;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.module.project.Project;
-import org.block.project.legacypanel.inproject.BlockDisplayPanel;
+import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
 
@@ -19,7 +20,8 @@ public class BlockUtils {
     }
 
     public static Set<Block> load(Project.Loaded project, File folder, ConfigImplementation<? extends ConfigNode> impl, Consumer<Block> loaded){
-        List<BlockType<? extends Block>> blockTypes = project.getPanel().getChooserPanel().getBlockTypes();
+        FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+        List<BlockType<? extends Block>> blockTypes = /*project.getPanel().getChooserPanel().getBlockTypes();*/ new ArrayList<>();
         Map<File, BlockType<? extends Block>> depends = new HashMap<>();
         Set<Block> load = new HashSet<>();
         blockTypes.forEach(t -> {
@@ -49,12 +51,9 @@ public class BlockUtils {
                     clazzName = "Global";
                 }
                 final String finalClassName = clazzName;
-                BlockDisplayPanel bdPanel = project.getPanel().getBlocksPanel().getTitledComponent(clazzName).orElseGet(() -> {
-                    BlockDisplayPanel panel = new BlockDisplayPanel();
-                    project.getPanel().getBlocksPanel().register(finalClassName, panel);
-                    project.getPanel().getBlocksPanel().updateTabs();
-                    return panel;
-                });
+                FXMainDisplay bdPanel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+
+
                 try {
                     Block block = t.build(node);
                     if(block == null){
@@ -86,18 +85,14 @@ public class BlockUtils {
                     clazzName = "Global";
                 }
                 final String finalClassName = clazzName;
-                BlockDisplayPanel bdPanel = project.getPanel().getBlocksPanel().getTitledComponent(clazzName).orElseGet(() -> {
-                    BlockDisplayPanel panel = new BlockDisplayPanel();
-                    project.getPanel().getBlocksPanel().register(finalClassName, panel);
-                    project.getPanel().getBlocksPanel().updateTabs();
-                    return panel;
-                });
+                FXMainDisplay bdPanel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+
                 try {
                     Block block = entry.getValue().build(node);
                     handle(block, bdPanel, project, load, loaded);
                     dependsRemove.add(entry.getKey());
                 }catch (IllegalStateException e){
-                    bdPanel.getBlocks().forEach(b -> {
+                    bdPanel.getDisplayingBlocks().forEach(b -> {
                         System.out.println("Block: " + b.getType().getName() + " UUID: " + b.getUniqueId());
                     });
                     e.printStackTrace();
@@ -109,15 +104,15 @@ public class BlockUtils {
         return load;
     }
 
-    private static void handle(Block block, BlockDisplayPanel panel, Project.Loaded project, Set<Block> load, Consumer<Block> loaded){
+    private static void handle(Block block, FXMainDisplay panel, Project.Loaded project, Set<Block> load, Consumer<Block> loaded){
         load.add(block);
 
-        while(panel.getBlocks().contains(block)){
+        while(panel.getDisplayingBlocks().contains(block)){
             block.setLayer(block.getLayer() + 1);
         }
         //TODO handle all
 
-        panel.register(block);
+        panel.getDisplayingBlocks().add(block);
         loaded.accept(block);
     }
 }

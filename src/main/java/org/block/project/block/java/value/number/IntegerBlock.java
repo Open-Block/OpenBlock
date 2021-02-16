@@ -1,7 +1,7 @@
 package org.block.project.block.java.value.number;
 
+import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.input.type.WholeNumberDialog;
 import org.block.serialization.parse.Parser;
 
 public class IntegerBlock extends NumberBlock<Integer> {
@@ -22,9 +22,10 @@ public class IntegerBlock extends NumberBlock<Integer> {
         super(x, y, value);
     }
 
+
     @Override
-    public WholeNumberDialog.IntegerDialog createDialog() {
-        return new WholeNumberDialog.IntegerDialog();
+    public BlockGraphics getGraphicShape() {
+        return null;
     }
 
     @Override

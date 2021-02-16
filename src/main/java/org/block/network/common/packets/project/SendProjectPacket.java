@@ -1,16 +1,19 @@
 package org.block.network.common.packets.project;
 
+import org.block.Blocks;
 import org.block.network.common.Connection;
 import org.block.network.common.packets.Packet;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.module.Module;
 import org.block.project.module.project.Project;
+import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.network.NetworkConfigNode;
 import org.block.util.OrderedUniqueList;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.NavigableSet;
 
 public class SendProjectPacket implements Packet {
@@ -39,7 +42,8 @@ public class SendProjectPacket implements Packet {
         }
         Project.Loaded loadedProject = (Project.Loaded)project;
         //TODO - all classes
-        OrderedUniqueList<Block> blocks = loadedProject.getPanel().getBlocksPanel().getSelectedComponent().getBlocks();
+        FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+        List<Block> blocks = panel.getDisplayingBlocks();
         String first = builder.build(direct);
         direct.sendMessage(first);
         for(Block block : blocks){

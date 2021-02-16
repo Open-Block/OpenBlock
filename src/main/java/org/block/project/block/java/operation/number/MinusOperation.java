@@ -1,10 +1,14 @@
 package org.block.project.block.java.operation.number;
 
+import javafx.scene.canvas.GraphicsContext;
 import org.block.Blocks;
 import org.block.project.block.Block;
+import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 import org.block.project.block.assists.BlockList;
-import org.block.project.legacypanel.inproject.MainDisplayPanel;
+import org.block.project.block.group.BlockGroup;
+import org.block.project.block.group.BlockSector;
+import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.block.util.OrderedUniqueList;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +17,26 @@ import java.io.File;
 import java.util.*;
 
 public class MinusOperation extends AbstractNumberOperation {
+
+    public class MinusBlockGraphic implements BlockGraphics {
+
+        private Block origin = MinusOperation.this.getA
+
+        @Override
+        public void draw(GraphicsContext context) {
+
+        }
+
+        @Override
+        public int getWidth() {
+            return 0;
+        }
+
+        @Override
+        public int getHeight() {
+            return 0;
+        }
+    }
 
     public static class MinusOperationType implements BlockType<MinusOperation> {
 
@@ -24,22 +48,22 @@ public class MinusOperation extends AbstractNumberOperation {
         @Override
         public MinusOperation build(ConfigNode node) {
             Optional<UUID> opUUID = TITLE_UUID.deserialize(node);
-            if(!opUUID.isPresent()){
+            if(opUUID.isEmpty()){
                 throw new IllegalStateException("Unknown Unique Id");
             }
             Optional<Integer> opX = TITLE_X.deserialize(node);
-            if(!opX.isPresent()){
+            if(opX.isEmpty()){
                 throw new IllegalStateException("Unknown X position");
             }
             Optional<Integer> opY = TITLE_Y.deserialize(node);
-            if(!opY.isPresent()){
+            if(opY.isEmpty()){
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
-            MainDisplayPanel panel = Blocks.getInstance().getLoadedProject().get().getPanel();
-            OrderedUniqueList<Block> blocks = panel.getBlocksPanel().getSelectedComponent().getBlocks();
+            FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+            List<Block> blocks = panel.getDisplayingBlocks();
             MinusOperation minusBlock = new MinusOperation(opX.get(), opY.get());
-            BlockList<ValueBlock<? extends Number>> blockList = minusBlock.getAttachments();
+            List<BlockGroup> groups = minusBlock.getGroups();
             minusBlock.id = opUUID.get();
             for(int A = 0; A < connected.size(); A++){
                 UUID uuid = connected.get(A);
@@ -77,6 +101,10 @@ public class MinusOperation extends AbstractNumberOperation {
         }
     }
 
+    private static final String FIRST_PARAMETER = "First";
+    private static final String SECOND_PARAMETER = "Second";
+
+
     /**
      * The constructor for MinusOperator
      *
@@ -85,6 +113,21 @@ public class MinusOperation extends AbstractNumberOperation {
      */
     public MinusOperation(int x, int y) {
         super(x, y, "Minus", "-");
+
+
+    }
+
+    public BlockSector<ValueBlock<? extends Number>> getFirstSector(){
+        return (BlockSector<ValueBlock<? extends Number>>) this.getGroup(FIRST_PARAMETER).get().getSectors().get(0);
+    }
+
+    public BlockSector<ValueBlock<? extends Number>> getSecondarySector(){
+        return (BlockSector<ValueBlock<? extends Number>>) this.getGroup(SECOND_PARAMETER).get().getSectors().get(0);
+    }
+
+    @Override
+    public MinusBlockGraphic getGraphicShape() {
+        return new MinusBlockGraphic();
     }
 
     @Override

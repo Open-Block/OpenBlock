@@ -1,10 +1,6 @@
 package org.block.project.panel.main.selector;
 
-import com.sun.javafx.UnmodifiableArrayList;
-import com.sun.javafx.collections.ObservableListWrapper;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 

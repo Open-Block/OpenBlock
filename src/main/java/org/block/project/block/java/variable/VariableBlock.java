@@ -2,17 +2,13 @@ package org.block.project.block.java.variable;
 
 import org.block.Blocks;
 import org.block.project.block.Block;
+import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.Shapes;
 import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractSingleBlockList;
 import org.block.project.block.java.value.StringBlock;
-import org.block.project.section.BlockSection;
-import org.block.project.section.GUISection;
-import org.block.project.section.GroupedSection;
 import org.block.serialization.ConfigNode;
 
-import java.awt.*;
 import java.io.File;
 import java.util.List;
 import java.util.*;
@@ -70,7 +66,7 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
             if(slot != 0){
                 throw new IndexOutOfBoundsException(slot + " is out of range");
             }
-            return VariableBlock.this.getWidth() - Shapes.ATTACHABLE_WIDTH;
+            return VariableBlock.this.getWidth() - 12;
         }
 
         @Override
@@ -137,7 +133,7 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
             if(slot != 0){
                 throw new IndexOutOfBoundsException(slot + " is out of range");
             }
-            return Math.max((Blocks.getInstance().getFont().getSize() * 2), VariableBlock.this.getNameAttachment().getSlotHeight(0)) + VariableBlock.this.marginY;
+            return Math.max((150 * 2), VariableBlock.this.getNameAttachment().getSlotHeight(0)) + VariableBlock.this.marginY;
 
         }
 
@@ -166,8 +162,8 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
 
     public VariableBlock(int x, int y, StringBlock name, ValueBlock<?> block) {
         super(x, y, 0, 0);
-        this.attached.put(SECTION_NAME, new StringBlockList(Shapes.ATTACHABLE_HEIGHT, name));
-        this.attached.put(SECTION_VALUE, new VariableBlockList(Shapes.ATTACHABLE_HEIGHT, block));
+        this.attached.put(SECTION_NAME, new StringBlockList(12, name));
+        this.attached.put(SECTION_VALUE, new VariableBlockList(12, block));
         updateSize();
     }
 
@@ -180,9 +176,9 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
     }
 
     private void updateSize(){
-        int max = Math.max(Blocks.getInstance().getMetrics().stringWidth("Name"), Blocks.getInstance().getMetrics().stringWidth("Value"));
-        this.width = max + Shapes.ATTACHABLE_WIDTH + (this.marginX * 2);
-        this.height = Math.max((Blocks.getInstance().getFont().getSize() * 2), this.getNameAttachment().getSlotHeight(0)) + (this.marginY * 2);
+        int max = 150;
+        this.width = max + 12 + (this.marginX * 2);
+        this.height = Math.max((12 * 2), this.getNameAttachment().getSlotHeight(0)) + (this.marginY * 2);
         VariableBlockList attachment = this.getVariableAttachment();
         this.height += attachment.getSlotHeight(0);
     }
@@ -210,24 +206,8 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
     }
 
     @Override
-    public List<GUISection> getUniqueSections(GroupedSection section) {
-        List<GUISection> list = new ArrayList<>();
-        list.add(new BlockSection(section, BlockType.BLOCK_TYPE_VARIABLE_USE, "Use"));
-        return list;
-    }
-
-    @Override
-    public void paint(Graphics2D graphics2D) {
-        this.updateSize();
-        graphics2D.setColor(new Color(150, 200, 0));
-        graphics2D.setFont(Blocks.getInstance().getFont());
-        graphics2D.fillRoundRect(getX(), getY(), this.getWidth() - Shapes.ATTACHABLE_WIDTH, this.getHeight() - this.marginY - getVariableAttachment().getSlotHeight(0), 20, 20);
-        graphics2D.fillRect(getX(), getY(), this.marginX, this.getHeight());
-        graphics2D.fillRect(getX(), (getY() + this.getHeight()) - this.marginY, this.getWidth(), this.marginY);
-        graphics2D.fillPolygon(Shapes.drawAttachingConnector(getX() + this.marginX, (this.getY() + this.getHeight()) - this.marginY - this.getVariableAttachment().getSlotHeight(0), Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT));
-        graphics2D.fillPolygon(Shapes.drawAttachingConnector((getX() + this.width) - Shapes.ATTACHABLE_WIDTH, getY() + this.marginY, Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT));
-        graphics2D.setColor(Color.BLACK);
-        graphics2D.drawString("Name", getX() + this.marginX, getY() + this.marginY + Blocks.getInstance().getFont().getSize());
+    public BlockGraphics getGraphicShape() {
+        throw new IllegalStateException("Not Implemented");
     }
 
     @Override

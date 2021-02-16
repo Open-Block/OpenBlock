@@ -3,10 +3,7 @@ package org.block.project.block.java.value;
 import org.block.Blocks;
 import org.block.project.block.AbstractBlock;
 import org.block.project.block.Block;
-import org.block.project.block.Shapes;
-import org.block.serialization.FixedTitle;
-
-import java.awt.*;
+import org.block.project.block.BlockGraphics;
 import java.util.function.Function;
 
 /**
@@ -53,15 +50,17 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Block.Va
     public void setValue(V value){
         this.value = value;
         this.text = this.toString.apply(value);
-        int width = Blocks
-                .getInstance()
-                .getMetrics()
-                .stringWidth(this.text);
-        this.height = Blocks.getInstance().getFont().getSize() + this.marginY;
-        this.width = width + this.marginX + Shapes.ATTACHABLE_WIDTH;
-        if(this.height < Shapes.ATTACHABLE_HEIGHT){
-            this.height = Shapes.ATTACHABLE_HEIGHT;
+        int width = 150;
+        this.height = 12 + this.marginY;
+        this.width = width + this.marginX + 12;
+        if(this.height < 12){
+            this.height = 12;
         }
+    }
+
+    @Override
+    public BlockGraphics getGraphicShape() {
+        return null;
     }
 
     @Override
@@ -87,28 +86,5 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Block.Va
     @Override
     public String getText() {
         return this.text;
-    }
-
-    @Override
-    public void paint(Graphics2D graphics2D) {
-        Polygon attachable = Shapes.drawAttachableConnector(getX(), getY(), Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT);
-        Color outline = null;
-        if(this.isHighlighted() && this.isSelected()){
-            outline = new Color(0, 255, 0);
-        }else if(this.isSelected()){
-            outline = new Color(255, 0, 0);
-        }else if(this.isHighlighted()){
-            outline = new Color(0, 0, 255);
-        }
-        if(outline != null){
-            graphics2D.setColor(outline);
-            graphics2D.fillRect(getX() + Shapes.ATTACHABLE_WIDTH + this.marginX, getY() + this.marginY, (getWidth() + this.marginX), (getHeight() + this.marginY));
-        }
-        graphics2D.setColor(new Color(255, 255, 0));
-        graphics2D.fillPolygon(attachable);
-        graphics2D.fillRect(getX() + Shapes.ATTACHABLE_WIDTH, getY(), getWidth(), getHeight());
-        graphics2D.setColor(new Color(0,0,0));
-        graphics2D.setFont(Blocks.getInstance().getFont());
-        graphics2D.drawString(getText(), getX() + Shapes.ATTACHABLE_WIDTH + this.marginX, (getY() + Blocks.getInstance().getFont().getSize()) - this.marginY);
     }
 }

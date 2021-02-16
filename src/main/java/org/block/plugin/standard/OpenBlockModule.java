@@ -13,7 +13,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import org.block.plugin.PluginContainer;
 import org.block.plugin.standard.panel.FXOpenBlockNewPanel;
-import org.block.plugin.standard.panel.OpenBlockNewPanel;
 import org.block.project.module.project.Project;
 import org.block.project.module.Module;
 import org.block.project.module.project.UnloadedProject;
@@ -62,8 +61,6 @@ public final class OpenBlockModule implements Module {
     public void loadBlocks(Project.Loaded project, ConfigImplementation<? extends ConfigNode> impl) {
         BlockUtils.load(project, impl, b -> {
         });
-        project.getPanel().repaint();
-        project.getPanel().revalidate();
     }
 
     @Override
