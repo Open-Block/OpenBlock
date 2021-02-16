@@ -1,5 +1,6 @@
 package org.block.project.module.project;
 
+import javafx.scene.shape.Rectangle;
 import org.block.Blocks;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
@@ -7,7 +8,6 @@ import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.json.JSONConfigNode;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;

@@ -3,13 +3,11 @@ package org.block.project.block.java.operation.number;
 import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.project.block.Block;
-import org.block.project.block.Shapes;
 import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractBlockList;
 import org.block.project.block.assists.BlockList;
 import org.block.util.ClassCompare;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -23,7 +21,7 @@ public abstract class AbstractNumberOperation extends AbstractAttachable impleme
     public class NumberOperationBlockList extends AbstractBlockList<ValueBlock<? extends Number>>{
 
         public NumberOperationBlockList() {
-            super(-1, Shapes.ATTACHABLE_HEIGHT);
+            super(-1, 12);
         }
 
         @Override
@@ -48,7 +46,7 @@ public abstract class AbstractNumberOperation extends AbstractAttachable impleme
             if(slot > this.getMaxAttachments()){
                 throw new IndexOutOfBoundsException(slot + " is out of range from 0 - " + this.getMaxAttachments());
             }
-            return AbstractNumberOperation.this.getWidth() - Shapes.ATTACHABLE_WIDTH;
+            return AbstractNumberOperation.this.getWidth() - 12;
         }
 
         @Override
@@ -56,7 +54,7 @@ public abstract class AbstractNumberOperation extends AbstractAttachable impleme
             if(slot > this.getMaxAttachments()){
                 throw new IndexOutOfBoundsException(slot + " is out of range from 0 - " + this.getMaxAttachments());
             }
-            int height =  Blocks.getInstance().getFont().getSize() + AbstractNumberOperation.this.marginY;
+            int height =  12 + AbstractNumberOperation.this.marginY;
             for(int A = 0; A < slot; A++){
                 ValueBlock<? extends Number> block = this.getAttachment(A).get();
                 height += block.getHeight();
@@ -97,7 +95,6 @@ public abstract class AbstractNumberOperation extends AbstractAttachable impleme
     private String name;
     private int marginX = 8;
     private int marginY = 8;
-    private Color drawColor = new Color(100, 100, 255);
 
     public static final String PARAMETER_SECTION = "Parameter";
 
@@ -120,12 +117,12 @@ public abstract class AbstractNumberOperation extends AbstractAttachable impleme
     }
 
     public void updateHeight(){
-        AbstractNumberOperation.this.height = Blocks.getInstance().getFont().getSize() + AbstractNumberOperation.this.marginY + Shapes.ATTACHABLE_HEIGHT;
+        AbstractNumberOperation.this.height = 12 + AbstractNumberOperation.this.marginY + 12;
         for(ValueBlock<? extends Number> block1 : AbstractNumberOperation.this.getAttachments()){
             AbstractNumberOperation.this.height += block1.getHeight();
         }
-        if(AbstractNumberOperation.this.height < Shapes.ATTACHABLE_HEIGHT){
-            AbstractNumberOperation.this.height = Shapes.ATTACHABLE_HEIGHT * 2;
+        if(AbstractNumberOperation.this.height < 12){
+            AbstractNumberOperation.this.height = 12 * 2;
         }
     }
 
@@ -140,40 +137,13 @@ public abstract class AbstractNumberOperation extends AbstractAttachable impleme
     @Override
     public void setText(String text) {
         this.name = text;
-        int width = Blocks.getInstance().getMetrics().stringWidth(text);
-        this.width = width + (this.marginX * 2) + (Shapes.ATTACHABLE_WIDTH * 2);
+        this.width = (this.marginX * 2) + (12 * 2);
         AbstractNumberOperation.this.updateHeight();
     }
 
     @Override
     public String getText() {
         return this.name;
-    }
-
-    @Override
-    public void paint(Graphics2D graphics2D) {
-        updateHeight();
-        graphics2D.setColor(this.drawColor);
-        graphics2D.fillPolygon(Shapes.drawAttachableConnector(this.getX(), this.getY(), Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT));
-        graphics2D.fillRect(getX() + Shapes.ATTACHABLE_WIDTH, getY(), 20, 20);
-        graphics2D.fillRoundRect(getX() + Shapes.ATTACHABLE_WIDTH, getY(), getWidth() - (Shapes.ATTACHABLE_WIDTH * 2), getHeight(), 20, 20);
-        graphics2D.drawRect((getX() + getWidth()) - 30, (getY() + getHeight()) - 2, 20, 1);
-        graphics2D.setColor(Color.BLACK);
-        graphics2D.setFont(Blocks.getInstance().getFont());
-        graphics2D.drawString(this.getText(), getX() + Shapes.ATTACHABLE_WIDTH + this.marginX, getY() + Blocks.getInstance().getFont().getSize());
-
-        int amount = this.getAttachments().getMaxAttachments();
-        BlockList<ValueBlock<? extends Number>> attachments = this.getAttachments();
-        for(int A = 0; A < amount; A++){
-            int posX = this.getX() + attachments.getXPosition(A);
-            int posY = this.getY() + attachments.getYPosition(A);
-            graphics2D.setColor(this.drawColor);
-            graphics2D.fillPolygon(Shapes.drawAttachingConnector(posX, posY, Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT));
-            graphics2D.setColor(Color.BLACK);
-            if(A != 0) {
-                graphics2D.drawString(this.operator, this.getX() + (this.marginX * 2), posY + (Blocks.getInstance().getFont().getSize() / 2));
-            }
-        }
     }
 
     @Override

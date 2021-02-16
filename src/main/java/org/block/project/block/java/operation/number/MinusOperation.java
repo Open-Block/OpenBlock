@@ -2,9 +2,10 @@ package org.block.project.block.java.operation.number;
 
 import org.block.Blocks;
 import org.block.project.block.Block;
+import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 import org.block.project.block.assists.BlockList;
-import org.block.project.legacypanel.inproject.MainDisplayPanel;
+import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.block.util.OrderedUniqueList;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +37,8 @@ public class MinusOperation extends AbstractNumberOperation {
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
-            MainDisplayPanel panel = Blocks.getInstance().getLoadedProject().get().getPanel();
-            OrderedUniqueList<Block> blocks = panel.getBlocksPanel().getSelectedComponent().getBlocks();
+            FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+            List<Block> blocks = panel.getDisplayingBlocks();
             MinusOperation minusBlock = new MinusOperation(opX.get(), opY.get());
             BlockList<ValueBlock<? extends Number>> blockList = minusBlock.getAttachments();
             minusBlock.id = opUUID.get();
@@ -85,6 +86,11 @@ public class MinusOperation extends AbstractNumberOperation {
      */
     public MinusOperation(int x, int y) {
         super(x, y, "Minus", "-");
+    }
+
+    @Override
+    public BlockGraphics getGraphicShape() {
+        throw new IllegalStateException("Not implemented");
     }
 
     @Override

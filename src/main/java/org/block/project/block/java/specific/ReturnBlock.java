@@ -2,17 +2,16 @@ package org.block.project.block.java.specific;
 
 import org.block.Blocks;
 import org.block.project.block.Block;
+import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.Shapes;
 import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractSingleBlockList;
 import org.block.project.block.assists.BlockList;
-import org.block.project.legacypanel.inproject.MainDisplayPanel;
+import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.block.util.OrderedUniqueList;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.io.File;
 import java.util.*;
 import java.util.List;
@@ -41,8 +40,8 @@ public class ReturnBlock extends AbstractAttachable implements Block.AttachableB
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
-            MainDisplayPanel panel = Blocks.getInstance().getLoadedProject().get().getPanel();
-            OrderedUniqueList<Block> blocks = panel.getBlocksPanel().getSelectedComponent().getBlocks();
+            FXMainDisplay panel = ((FXMainDisplay)Blocks.getInstance().getSceneSource());
+            List<Block> blocks = panel.getDisplayingBlocks();
             ReturnBlock methodBlock = new ReturnBlock(opX.get(), opY.get());
             ReturnAttacher blockList = methodBlock.getReturnBlockList();
             methodBlock.id = opUUID.get();
@@ -129,9 +128,9 @@ public class ReturnBlock extends AbstractAttachable implements Block.AttachableB
     }
 
     public void updateSize(){
-        int max = Blocks.getInstance().getMetrics().stringWidth("Return");
-        this.width = max + Shapes.ATTACHABLE_WIDTH + (this.marginX * 2);
-        int textHeight = Blocks.getInstance().getFont().getSize();
+        int max = 150;
+        this.width = max + 12 + (this.marginX * 2);
+        int textHeight = 12;
         int slotHeight = this.getReturnBlockList().getSlotHeight(0);
         this.height = Math.max(textHeight, slotHeight) + (this.marginY * 2);
     }
@@ -146,12 +145,8 @@ public class ReturnBlock extends AbstractAttachable implements Block.AttachableB
     }
 
     @Override
-    public void paint(Graphics2D graphics2D) {
-        updateSize();
-        graphics2D.setColor(new Color(50, 55, 50));
-        graphics2D.drawRect(this.x, this.y, this.width, this.height);
-        System.out.println("Y: " + this.getY() + " Width: " + this.getWidth() + " Font: " + (Blocks.getInstance().getFont().getSize() / 2) + " Total: " + ((this.getY() + this.getWidth()) - (Blocks.getInstance().getFont().getSize()/2)));
-        graphics2D.drawString("Return", this.x + this.marginX, (this.getY() - this.getWidth()) + (Blocks.getInstance().getFont().getSize()/2));
+    public BlockGraphics getGraphicShape() {
+        return null;
     }
 
     @Override

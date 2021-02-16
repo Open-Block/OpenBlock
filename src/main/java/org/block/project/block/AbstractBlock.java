@@ -1,8 +1,5 @@
 package org.block.project.block;
 
-import org.block.plugin.event.EventListener;
-import org.block.project.block.event.BlockEvent;
-
 import java.util.*;
 
 public abstract class AbstractBlock implements Block {
@@ -14,7 +11,6 @@ public abstract class AbstractBlock implements Block {
     protected boolean selected;
     protected boolean highlighted;
     protected boolean error;
-    protected Set<EventListener<? extends BlockEvent>> events = new HashSet<>();
     protected UUID id;
     protected AttachableBlock attachedTo;
     protected int layer;
@@ -85,16 +81,6 @@ public abstract class AbstractBlock implements Block {
     @Override
     public void setShowingError(boolean error) {
         this.error = error;
-    }
-
-    @Override
-    public Collection<EventListener<? extends BlockEvent>> getEvents() {
-        return Collections.unmodifiableCollection(this.events);
-    }
-
-    @Override
-    public void registerEventListener(EventListener<? extends BlockEvent> event) {
-        this.events.add(event);
     }
 
     @Override

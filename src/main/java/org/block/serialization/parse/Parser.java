@@ -1,17 +1,14 @@
 package org.block.serialization.parse;
 
+import javafx.scene.shape.Rectangle;
 import org.block.Blocks;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-import java.util.AbstractMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 /**
  * The interface of both serialize and deserialize in a combined faction
@@ -34,10 +31,10 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
         return opValue.flatMap(s -> Blocks.getInstance().getAllEnabledPlugins().getAll(PluginContainer::getModules).parallelStream().filter(m -> m.getId().equals(s)).findAny());
     });
     Parser<Rectangle> RECTANGLE = new Abstract<>((n, t, v) -> {
-        n.getNode(t).setValue("x", v.x);
-        n.getNode(t).setValue("y", v.y);
-        n.getNode(t).setValue("width", v.width);
-        n.getNode(t).setValue("height", v.height);
+        n.getNode(t).setValue("x", v.getX());
+        n.getNode(t).setValue("y", v.getY());
+        n.getNode(t).setValue("width", v.getWidth());
+        n.getNode(t).setValue("height", v.getHeight());
     }, (n, t) -> {
         Optional<Integer> opX = n.getNode(t).getInteger("x");
         Optional<Integer> opY = n.getNode(t).getInteger("y");

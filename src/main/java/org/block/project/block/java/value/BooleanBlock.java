@@ -1,5 +1,6 @@
 package org.block.project.block.java.value;
 
+import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 
 import java.util.Collection;

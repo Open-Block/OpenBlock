@@ -3,24 +3,10 @@ package org.block.project.block;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import org.block.Blocks;
-import org.block.project.block.event.value.BlockEditValueEvent;
 import org.block.project.module.project.Project;
-import org.block.project.legacypanel.inproject.BlockDisplayPanel;
-import org.block.project.legacypanel.inproject.MainDisplayPanel;
 import org.block.project.block.assists.BlockList;
-import org.block.project.block.event.BlockEvent;
-import org.block.plugin.event.EventListener;
-import org.block.project.block.input.OpenBlockDialog;
-import org.block.project.block.input.PanelDialog;
-import org.block.project.block.input.type.ValueDialog;
 import org.block.project.panel.main.BlockRender;
-import org.block.project.section.GUISection;
-import org.block.project.section.GroupedSection;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -164,38 +150,10 @@ public interface Block {
             interface MutableConnectedValueBlock<V> extends ConnectedValueBlock<V>{
 
                 /**
-                 * Creates the dialog to change this value
-                 * @return The value dialog to change this value
-                 */
-                ValueDialog<V> createDialog();
-
-                /**
                  * Sets the provided value
                  * @param value The new value
                  */
                 void setValue(V value);
-
-                @Override
-                default JPopupMenu getRightClick(){
-                    JPopupMenu menu = ConnectedValueBlock.super.getRightClick();
-                    JMenuItem edit = new JMenuItem("Edit Value");
-                    edit.addActionListener((e1) -> {
-                        PanelDialog panel = (PanelDialog) this.createDialog();
-                        BlockEditValueEvent event2 = ((MainDisplayPanel)Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent().sendEvent(new BlockEditValueEvent(MutableConnectedValueBlock.this, panel));
-                        if(event2.isCancelled()){
-                            return;
-                        }
-                        OpenBlockDialog<? extends Container> dialog = new OpenBlockDialog<>((Window) Blocks.getInstance().getWindow(), event2.getEditPanel());
-                        panel.getAcceptButton().addActionListener((e) -> {
-                            this.setValue((V)((ValueDialog<?>)panel).getOutput());
-                            dialog.dispose();
-
-                        });
-                        dialog.setVisible(true);
-                    });
-                    menu.add(edit);
-                    return menu;
-                }
 
             }
 
@@ -279,11 +237,6 @@ public interface Block {
      */
     interface SpecificSectionBlock extends Block {
 
-        /**
-         * Gets a list of the sections.
-         * @return A unmodifiable list of sections
-         */
-        List<GUISection> getUniqueSections(GroupedSection child);
 
     }
 
@@ -367,31 +320,12 @@ public interface Block {
     void setShowingError(boolean error);
 
     /**
-     * Gets the attached events
-     * @return Gets a unordered unmodifiable list of BlockEvent
-     */
-    Collection<EventListener<? extends BlockEvent>> getEvents();
-
-    /**
-     * Register a event to the block. Note that these are not saved by default, implementations may save some
-     * @param event The new event to register
-     */
-    void registerEventListener(EventListener<? extends BlockEvent> event);
-
-    /**
      * Gets a unique id for the block.
      * This is used for checking if the block is equal as well as used for dependents when saving and loading.
      * When loaded/unloaded the block will maintain its ID
      * @return The unique id
      */
     UUID getUniqueId();
-
-    /**
-     * This draws the block to the provided graphics in a Vector like painting style
-     * @param graphics2D The vector rendering local
-     */
-    @Deprecated
-    void paint(Graphics2D graphics2D);
 
     /**
      * This writes the calling/in line code for the block.
@@ -437,7 +371,7 @@ public interface Block {
     /**
      * Sets the layer to show on the panel, the higher the layer then the more blocks this block will appear ontop of.
      * Note. This value should not be changed while the block is on the BlockDisplayPanel as the layer is what is
-     * compared using the TreeSet. Use {@link BlockDisplayPanel#updateBlockPosition(Consumer)} to update the layer.
+     * compared using the TreeSet.
      * @param layer The new layer.
      */
     void setLayer(int layer);
@@ -455,8 +389,8 @@ public interface Block {
     default void delete(){
         this.removeAttachedTo();
         this.getFile().ifPresent(File::deleteOnExit);
-        BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent();
-        panel.unregister(this);
+        /*BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent();
+        panel.unregister(this);*/
     }
 
     /**
@@ -488,15 +422,6 @@ public interface Block {
         return y <= (getY() + getHeight());
     }
 
-    /**
-     * Sends a BlockEvent to the block, all listeners which react to the provided event will be fired
-     * @param event The event to fire
-     * @param <B> The event type
-     */
-    default <B extends BlockEvent> void callEvent(B event){
-        getEvents().stream().filter(l -> l.getEventClass().isInstance(event)).forEach(b -> ((EventListener<B>)b).onEvent(event));
-    }
-
     default Optional<File> getFile(){
         Optional<Project.Loaded> opProject = Blocks.getInstance().getLoadedProject();
         if(!opProject.isPresent()){
@@ -506,57 +431,6 @@ public interface Block {
         System.out.println("Path: " + path);
         System.out.println("File: " + opProject.get().getFile().getParentFile());
         return Optional.of(new File(opProject.get().getFile().getParentFile(), path));
-    }
-
-    /**
-     * Gets the Popup menu options for when the user right clicks
-     * @return The JPopupMenu options for when the user right clicks
-     */
-    @Deprecated
-    default JPopupMenu getRightClick(){
-        JPopupMenu menu = new JPopupMenu();
-        JMenuItem delete = new JMenuItem("Delete");
-        delete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent();
-                Block.this.delete();
-                panel.repaint();
-                panel.revalidate();
-            }
-        });
-        JMenuItem properties = new JMenuItem("Properties");
-        properties.addActionListener(e -> {
-            if(!Desktop.isDesktopSupported()){
-                return;
-            }
-            File file = Block.this.getFile().get();
-            try {
-                Desktop.getDesktop().open(file);
-            } catch (IOException ioException) {
-                JDialog dialog = null;
-                RootPaneContainer container = Blocks.getInstance().getWindow();
-                if(container instanceof Frame){
-                    dialog = new JDialog((Frame)container);
-                }else if(container instanceof Window){
-                    dialog = new JDialog((Window)container);
-                }else{
-                    throw new IllegalStateException("Unknown Window state");
-                }
-                JTextArea area = new JTextArea();
-                area.setEditable(false);
-                area.setBackground(null);
-                dialog.setContentPane(new JScrollPane(area));
-                dialog.setSize(500, 500);
-                delete.setVisible(true);
-            }
-        });
-        if((!Desktop.isDesktopSupported()) || (!Block.this.getFile().isPresent()) || (!Block.this.getFile().get().exists())){
-            properties.setEnabled(false);
-        }
-        menu.add(delete);
-        menu.add(properties);
-        return menu;
     }
 
     /**

@@ -10,8 +10,6 @@ import org.block.plugin.PluginContainers;
 import org.block.project.module.project.Project;
 import org.block.project.panel.SceneSource;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -19,10 +17,6 @@ import java.util.stream.Collectors;
 
 public class Blocks {
 
-    private Font font;
-    private FontMetrics metrics;
-    @Deprecated
-    private RootPaneContainer window;
     private final PluginContainers plugins = new PluginContainers();
     private Project.Loaded loadedProject;
     private ServerConnection server;
@@ -32,29 +26,6 @@ public class Blocks {
     private SceneSource source;
 
     public static final int[] VERSION = {0, 0, 0, 1};
-
-    /**
-     * Init a Blocks object with default values. <br>
-     * Font: SANS_SERIF<br>
-     * Font Size: <br>
-     * FontMetrics: Default
-     */
-    public Blocks(){
-        this(new Font(Font.SANS_SERIF, Font.PLAIN, 14));
-    }
-
-    /**
-     * Init a Blocks object with specified font
-     * @param font The font that all applicable text follows
-     */
-    public Blocks(Font font){
-        this(font, new Canvas().getFontMetrics(font));
-    }
-
-    public Blocks(Font font, FontMetrics metrics){
-        this.font = font;
-        this.metrics = metrics;
-    }
 
     private static Blocks instance;
 
@@ -96,40 +67,6 @@ public class Blocks {
 
     public void setLoadedProject(Project.Loaded loaded){
         this.loadedProject = loaded;
-    }
-
-    public Font getFont(){
-        return this.font;
-    }
-
-    public void setFont(Font font){
-        this.font = font;
-    }
-
-    /**
-     * Gets the current GUI window. This maybe NULL if you attempt to get the Window before its init
-     * @return The current GUI Window
-     * @throws IllegalStateException If no project has loaded, this will be thrown
-     */
-    @Deprecated
-    public RootPaneContainer getWindow(){
-        if(this.window == null){
-            throw new IllegalStateException("A project has not loaded yet");
-        }
-        return this.window;
-    }
-
-    @Deprecated
-    public void setWindow(RootPaneContainer window){
-        this.window = window;
-    }
-
-    public FontMetrics getMetrics(){
-        return this.metrics;
-    }
-
-    public void setMetrics(FontMetrics metrics){
-        this.metrics = metrics;
     }
 
     public PluginContainers getPlugins(){

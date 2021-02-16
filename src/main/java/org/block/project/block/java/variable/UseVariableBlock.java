@@ -1,19 +1,11 @@
 package org.block.project.block.java.variable;
 
-import org.block.project.block.AbstractBlock;
-import org.block.project.block.Block;
-import org.block.project.block.BlockType;
-import org.block.project.block.Shapes;
+import org.block.project.block.*;
 import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractSingleBlockList;
-import org.block.project.block.assists.BlockList;
-import org.block.project.section.GUISection;
-import org.block.project.section.GroupedSection;
 import org.block.serialization.ConfigNode;
 import org.block.util.GeneralUntil;
 
-import javax.swing.text.html.Option;
-import java.awt.*;
 import java.io.File;
 import java.util.*;
 import java.util.List;
@@ -46,7 +38,7 @@ public class UseVariableBlock extends AbstractAttachable implements Block.ValueB
     public class VariableLinkBlockList extends AbstractSingleBlockList<VariableBlock>{
 
         public VariableLinkBlockList() {
-            super(Shapes.ATTACHABLE_HEIGHT);
+            super(12);
         }
 
         @Override
@@ -92,7 +84,7 @@ public class UseVariableBlock extends AbstractAttachable implements Block.ValueB
 
     public void updateSize(){
         this.height = this.getVariableBlockList().getSlotHeight(0);
-        this.width = Shapes.ATTACHABLE_WIDTH;
+        this.width = 12;
     }
 
     @Override
@@ -120,25 +112,8 @@ public class UseVariableBlock extends AbstractAttachable implements Block.ValueB
     }
 
     @Override
-    public List<GUISection> getUniqueSections(GroupedSection section) {
-        if(getLinkedBlock().isPresent()){
-            Optional<VariableBlock> opAttached = getVariableBlockList().getAttachment();
-            if(opAttached.isPresent()){
-                Optional<ValueBlock<?>> opValue = opAttached.get().getVariableAttachment().getAttachment();
-                if(opValue.isPresent()){
-                    if(opValue.get() instanceof Block.SpecificSectionBlock){
-                        return ((Block.SpecificSectionBlock)opValue.get()).getUniqueSections(section);
-                    }
-                }
-            }
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public void paint(Graphics2D graphics2D) {
-        this.updateSize();
-        graphics2D.fillRect(0, 0, this.width, this.height);
+    public BlockGraphics getGraphicShape() {
+        return null;
     }
 
     @Override

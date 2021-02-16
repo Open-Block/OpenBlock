@@ -2,16 +2,13 @@ package org.block.project.block.java.method;
 
 import org.block.Blocks;
 import org.block.project.block.Block;
+import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.Shapes;
 import org.block.project.block.assists.AbstractAttachable;
 import org.block.project.block.assists.AbstractBlockList;
 import org.block.project.block.assists.AbstractSingleBlockList;
 import org.block.project.block.java.value.StringBlock;
-import org.block.project.legacypanel.inproject.MainDisplayPanel;
-import org.block.project.section.BlockSection;
-import org.block.project.section.GUISection;
-import org.block.project.section.GroupedSection;
+import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.parse.Parser;
@@ -19,7 +16,6 @@ import org.block.util.GeneralUntil;
 import org.block.util.OrderedUniqueList;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.io.File;
 import java.util.List;
 import java.util.*;
@@ -50,8 +46,8 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
-            MainDisplayPanel panel = Blocks.getInstance().getLoadedProject().get().getPanel();
-            OrderedUniqueList<Block> blocks = panel.getBlocksPanel().getSelectedComponent().getBlocks();
+            FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+            List<Block> blocks = panel.getDisplayingBlocks();
             MethodBlock methodBlock = new MethodBlock(opX.get(), opY.get());
             VariableBlockList blockList = methodBlock.getVariableAttachment();
             methodBlock.id = opUUID.get();
@@ -126,7 +122,7 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
             if(slot != 0){
                 throw new IndexOutOfBoundsException(slot + " is out of range");
             }
-            return MethodBlock.this.getWidth() - Shapes.ATTACHABLE_WIDTH;
+            return MethodBlock.this.getWidth() - 12;
         }
 
         @Override
@@ -139,10 +135,6 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
 
         @Override
         public int getSlot(int x, int y) {
-            int end = Math.max((Blocks.getInstance().getFont().getSize() * 2), this.getSlotHeight(0)) + MethodBlock.this.marginY;
-            if(y >= 0 && end > y) {
-                return 0;
-            }
             throw new IllegalArgumentException("Position could not be found");
         }
     }
@@ -150,7 +142,7 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
     public class VariableBlockList extends AbstractBlockList<Block> {
 
         public VariableBlockList() {
-            super(-1, Shapes.ATTACHABLE_HEIGHT);
+            super(-1, 12);
         }
 
         @Override
@@ -186,14 +178,7 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
 
         @Override
         public int getYPosition(int slot) {
-            if(slot > this.getMaxAttachments()){
-                throw new IndexOutOfBoundsException(slot + " is out of range");
-            }
-            int start = Math.max((Blocks.getInstance().getFont().getSize() * 2), MethodBlock.this.getNameAttachment().getSlotHeight(0)) + MethodBlock.this.marginY;
-            for(int A = 0; A < slot; A++){
-                start += this.getSlotHeight(A);
-            }
-            return start;
+throw new IllegalStateException("Not implemented");
         }
 
         @Override
@@ -222,19 +207,13 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
 
     public MethodBlock(int x, int y, StringBlock name) {
         super(x, y, 0, 0);
-        this.attached.put(SECTION_NAME, new MethodBlock.StringBlockList(Shapes.ATTACHABLE_HEIGHT, name));
+        this.attached.put(SECTION_NAME, new MethodBlock.StringBlockList(12, name));
         this.attached.put(SECTION_VALUE, new MethodBlock.VariableBlockList());
         updateSize();
     }
 
     private void updateSize(){
-        int max = Math.max(Blocks.getInstance().getMetrics().stringWidth("Name"), Blocks.getInstance().getMetrics().stringWidth("Value"));
-        this.width = max + Shapes.ATTACHABLE_WIDTH + (this.marginX * 2);
-        this.height = Math.max((Blocks.getInstance().getFont().getSize() * 2), this.getNameAttachment().getSlotHeight(0)) + (this.marginY * 2);
-        VariableBlockList attachment = this.getVariableAttachment();
-        for(int A = 0; A < this.getVariableAttachment().getMaxAttachments(); A++){
-            this.height += attachment.getSlotHeight(A);
-        }
+        throw new IllegalStateException("Not implemented");
     }
 
     public StringBlockList getNameAttachment(){
@@ -260,29 +239,8 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
     }
 
     @Override
-    public List<GUISection> getUniqueSections(GroupedSection section) {
-        List<GUISection> list = new ArrayList<>();
-        GroupedSection controlSection = new GroupedSection(section, "Control", Collections.emptySet());
-        controlSection.register(new BlockSection(controlSection, BlockType.BLOCK_TYPE_RETURN, "Return"));
-        list.add(controlSection);
-        return list;
-    }
-
-    @Override
-    public void paint(Graphics2D graphics2D) {
-        this.updateSize();
-        int lineHeight = 0;
-        for(int A = 0; A < this.getVariableAttachment().getMaxAttachments(); A++){
-            lineHeight += this.getVariableAttachment().getSlotHeight(A);
-        }
-        graphics2D.setColor(new Color(50, 55, 50));
-        graphics2D.setFont(Blocks.getInstance().getFont());
-        graphics2D.fillRoundRect(getX(), getY(), this.getWidth() - Shapes.ATTACHABLE_WIDTH, this.getHeight() - this.marginY - lineHeight, 20, 20);
-        graphics2D.fillRect(getX(), getY(), this.marginX, this.getHeight());
-        graphics2D.fillRect(getX(), (getY() + this.getHeight()) - this.marginY, this.getWidth(), this.marginY);
-        graphics2D.fillPolygon(Shapes.drawAttachingConnector((getX() + this.width) - Shapes.ATTACHABLE_WIDTH, getY() + this.marginY, Shapes.ATTACHABLE_WIDTH, Shapes.ATTACHABLE_HEIGHT));
-        graphics2D.setColor(Color.WHITE);
-        graphics2D.drawString("Name", getX() + this.marginX, getY() + this.marginY + (Blocks.getInstance().getFont().getSize() / 2));
+    public BlockGraphics getGraphicShape() {
+        throw new IllegalStateException("Not implemented");
     }
 
     @Override
