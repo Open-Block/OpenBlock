@@ -31,22 +31,6 @@ jobs:
       - name: Install libraries
         run: sudo apt install libasound2-dev libavcodec-dev libavformat-dev libavutil-dev libgl-dev libgtk-3-dev libpango1.0-dev libxtst-dev
 
-
-      # Setup the Android keystore, based on a repo secret. See the section 'Setup Android Keystore' below.
-      - name: Setup Android Keystore
-        id: android_keystore_file
-        uses: timheuer/base64-to-file@v1
-        with:
-          fileName: 'my.keystore'
-          encodedString: ${{ secrets.GLUON_ANDROID_KEYSTORE_BASE64 }}
-
-      # Install the Gluon License (optional)
-      # Using this step requires you to set a GLUON_LICENSE secret in the secret configuration of your repo. Have a look at https://gluonhq.com/products/mobile/buy for more information about obtaining a license.
-      - name: Gluon License
-        uses: gluonhq/gluon-build-license@v1
-        with:
-          gluon-license: ${{ secrets.GLUON_LICENSE }}
-
       # Build your project using Maven
       # The android profile is used, which means a native build will be created for the client target android.
       # This step also uses some env variables taken from the repo secrets. See the section 'Setup Android Keystore' below.
