@@ -1,5 +1,7 @@
 package org.block.project.block;
 
+import org.block.project.block.type.called.CodeStartBlock;
+
 import java.util.*;
 
 public abstract class AbstractBlock implements Block {
@@ -12,8 +14,8 @@ public abstract class AbstractBlock implements Block {
     protected boolean highlighted;
     protected boolean error;
     protected UUID id;
-    protected AttachableBlock attachedTo;
     protected int layer;
+    protected CodeStartBlock codeStartBlock;
 
     public AbstractBlock(int x, int y, int width, int height){
         this.x = x;
@@ -84,16 +86,6 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public Optional<AttachableBlock> getAttachedTo() {
-        return Optional.ofNullable(this.attachedTo);
-    }
-
-    @Override
-    public void setAttachedTo(AttachableBlock block) {
-        this.attachedTo = block;
-    }
-
-    @Override
     public int getLayer() {
         return this.layer;
     }
@@ -106,6 +98,16 @@ public abstract class AbstractBlock implements Block {
     @Override
     public UUID getUniqueId() {
         return this.id;
+    }
+
+    @Override
+    public Optional<CodeStartBlock> getParent() {
+        return Optional.ofNullable(this.codeStartBlock);
+    }
+
+    @Override
+    public void setParent(CodeStartBlock block) {
+this.codeStartBlock = block;
     }
 
     @Override

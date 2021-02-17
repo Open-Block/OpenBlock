@@ -6,6 +6,7 @@ import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 import org.block.project.block.group.AbstractBlockGroup;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
+import org.block.project.block.type.value.ValueBlock;
 import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +42,7 @@ public class ReturnBlock extends AbstractAttachableBlock {
             FXMainDisplay panel = ((FXMainDisplay)Blocks.getInstance().getSceneSource());
             List<Block> blocks = panel.getDisplayingBlocks();
             ReturnBlock methodBlock = new ReturnBlock(opX.get(), opY.get());
-            ReturnAttacher blockList = methodBlock.getReturnBlockList();
+            ReturnBlockGroup returnBlockGroup = methodBlock.getReturnBlockList();
             methodBlock.id = opUUID.get();
             for (UUID uuid : connected) {
                 Optional<Block> opBlock = blocks.stream().filter(b -> b.getUniqueId().equals(uuid)).findAny();
@@ -51,7 +52,7 @@ public class ReturnBlock extends AbstractAttachableBlock {
                 if (!(opBlock.get() instanceof ValueBlock)) {
                     throw new IllegalStateException("Attached block was not a value block");
                 }
-                blockList.setAttachment((ValueBlock<?>) opBlock.get());
+                returnBlockGroup.getSector().setAttachedBlock(opBlock.get());
             }
             return methodBlock;
         }
@@ -59,7 +60,7 @@ public class ReturnBlock extends AbstractAttachableBlock {
         @Override
         public void write(@NotNull ConfigNode node, @NotNull ReturnBlock block) {
             BlockType.super.write(node, block);
-            block.getReturnBlockList().getAttachment().ifPresent(v -> TITLE_DEPENDS.serialize(node, Collections.singletonList(v.getUniqueId())));
+            block.getReturnBlockList().getSector().getAttachedBlock().ifPresent(v -> TITLE_DEPENDS.serialize(node, Collections.singletonList(v.getUniqueId())));
         }
 
         @Override
@@ -73,40 +74,45 @@ public class ReturnBlock extends AbstractAttachableBlock {
         }
     }
 
-    public class ReturnBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<>
+    public class ReturnBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<ValueBlock<Object>>{
+
+        public ReturnBlockGroup() {
+            super(RETURN_BLOCK, "Return", 0);
+        }
+    }
 
     private int marginX = 2;
     private int marginY = 4;
 
+    public static final String RETURN_BLOCK = "return:value";
+
     public ReturnBlock(int x, int y) {
         super(x, y, 0, 0);
-        ReturnAttacher r = new ReturnAttacher(0);
-        this.attached.put("Return", r);
+        this.blockGroups.add(new ReturnBlockGroup());
     }
 
-    public ReturnAttacher getReturnBlockList(){
-        return (ReturnAttacher) (Object) this.getAttachments("Return");
+    public ReturnBlockGroup getReturnBlockList(){
+        return (ReturnBlockGroup) this.getGroup("Return").get();
     }
 
     @Override
     public BlockGraphics getGraphicShape() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     @Override
     public String writeCode(int tabs) {
-        if(this.getReturnBlockList().getAttachment().isPresent()){
-            ValueBlock<?> ret = this.getReturnBlockList().getAttachment().get();
-            return "return " + ret.writeCode(0);
-        }
+        /*
+        Find attached method
+         */
         return "return;";
     }
 
     @Override
     public Collection<String> getCodeImports() {
-        if(this.getReturnBlockList().getAttachment().isPresent()){
-            ValueBlock<?> ret = this.getReturnBlockList().getAttachment().get();
-            return ret.getCodeImports();
+        Optional<ValueBlock<Object>> opReturn = this.getReturnBlockList().getSector().getAttachedBlock();
+        if(opReturn.isPresent()){
+            return opReturn.get().getCodeImports();
         }
         return Collections.emptySet();
     }

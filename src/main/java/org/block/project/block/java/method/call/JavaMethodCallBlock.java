@@ -6,6 +6,7 @@ import org.block.project.block.BlockType;
 import org.block.project.block.group.BlockSector;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
+import org.block.project.block.type.value.ValueBlock;
 import org.block.serialization.ConfigNode;
 
 import java.io.File;

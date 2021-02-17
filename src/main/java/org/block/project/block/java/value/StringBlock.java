@@ -1,10 +1,8 @@
 package org.block.project.block.java.value;
 
-import org.block.Blocks;
-import org.block.project.block.Block;
 import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.plugin.event.EventListener;
+import org.block.project.block.type.value.MutableConnectedValueBlock;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.parse.Parser;
@@ -15,10 +13,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class StringBlock extends AbstractValue<String> implements Block.ValueBlock.ConnectedValueBlock.MutableConnectedValueBlock<String>{
-
+public class StringBlock extends AbstractValue<String> implements MutableConnectedValueBlock<String> {
 
     public static class StringBlockType implements BlockType<StringBlock> {
 
@@ -97,8 +95,13 @@ public class StringBlock extends AbstractValue<String> implements Block.ValueBlo
     }
 
     @Override
+    public void showValueDialog(Consumer<String> consumer) {
+
+    }
+
+    @Override
     public Collection<String> getCodeImports() {
-        return Collections.unmodifiableList(Collections.emptyList());
+        return Collections.emptyList();
     }
 
     @Override

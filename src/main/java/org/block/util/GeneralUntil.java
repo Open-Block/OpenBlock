@@ -1,13 +1,14 @@
 package org.block.util;
 
-import org.block.project.block.Block;
+
+import org.block.project.block.type.value.ValueBlock;
 
 import java.io.File;
 import java.util.*;
 
 public interface GeneralUntil {
 
-    static String[] getImport(Block.ValueBlock<?> value){
+    static String[] getImport(ValueBlock<?> value){
         Class<?> clazz = null;
         String nested = null;
         do{

@@ -4,16 +4,18 @@ import org.block.Blocks;
 import org.block.project.block.Block;
 import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.assists.AbstractAttachable;
-import org.block.project.block.assists.AbstractSingleBlockList;
+import org.block.project.block.group.AbstractBlockGroup;
+import org.block.project.block.java.value.AbstractValue;
 import org.block.project.block.java.value.StringBlock;
+import org.block.project.block.type.attachable.AbstractAttachableBlock;
+import org.block.project.block.type.value.ValueBlock;
 import org.block.serialization.ConfigNode;
 
 import java.io.File;
 import java.util.List;
 import java.util.*;
 
-public class VariableBlock extends AbstractAttachable implements Block.SpecificSectionBlock {
+public class VariableBlock extends AbstractAttachableBlock {
 
     public static class VariableBlockType implements BlockType<VariableBlock>{
 
@@ -38,120 +40,22 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
         }
     }
 
-    public class StringBlockList extends AbstractSingleBlockList<StringBlock> {
+    public static class NameBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
 
-        public StringBlockList(int height) {
-            super(height);
-        }
-
-        public StringBlockList(int height, StringBlock value) {
-            super(height, value);
-        }
-
-        @Override
-        public boolean canAcceptAttachment(Block block) {
-            if(!(block instanceof StringBlock)){
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public AttachableBlock getParent() {
-            return VariableBlock.this;
-        }
-
-        @Override
-        public int getXPosition(int slot) {
-            if(slot != 0){
-                throw new IndexOutOfBoundsException(slot + " is out of range");
-            }
-            return VariableBlock.this.getWidth() - 12;
-        }
-
-        @Override
-        public int getYPosition(int slot) {
-            if(slot != 0){
-                throw new IndexOutOfBoundsException(slot + " is out of range");
-            }
-            return VariableBlock.this.marginY;
-        }
-
-        @Override
-        public int getSlot(int x, int y) {
-            if(y >= 0 && getSlotHeight(0) > y) {
-                return 0;
-            }
-            throw new IllegalArgumentException("Position could not be found");
+        public NameBlockGroup(int relativeY) {
+            super(SECTION_NAME, "Name", relativeY);
         }
     }
 
-    public class VariableBlockList extends AbstractSingleBlockList<ValueBlock<? extends Object>> {
+    public static class BodyBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<ValueBlock<?>>{
 
-        public VariableBlockList(int height) {
-            super(height);
-        }
-
-        public VariableBlockList(int height, ValueBlock<?> value) {
-            super(height, value);
-        }
-
-        @Override
-        public boolean canAcceptAttachment(Block block) {
-            if(block instanceof ValueBlock){
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public AttachableBlock getParent() {
-            return VariableBlock.this;
-        }
-
-
-        @Override
-        public int getSlot(int x, int y) {
-            int top = VariableBlock.this.marginY + VariableBlock.this.getNameAttachment().getSlotHeight(0);
-            int bottom = VariableBlock.this.getHeight();
-            if(top <= y && bottom >= y){
-                return 0;
-            }
-            throw new IllegalArgumentException("Position could not be found");
-        }
-
-        @Override
-        public int getXPosition(int slot) {
-            if(slot != 0){
-                throw new IndexOutOfBoundsException(slot + " is out of range");
-            }
-            return VariableBlock.this.marginX;
-        }
-
-        @Override
-        public int getYPosition(int slot) {
-            if(slot != 0){
-                throw new IndexOutOfBoundsException(slot + " is out of range");
-            }
-            return Math.max((150 * 2), VariableBlock.this.getNameAttachment().getSlotHeight(0)) + VariableBlock.this.marginY;
-
-        }
-
-        @Override
-        public void addAttachment(ValueBlock<? extends Object> block) {
-            super.addAttachment(block);
-            VariableBlock.this.updateSize();
-        }
-
-        @Override
-        public void removeAttachment(Block block) {
-            super.removeAttachment(block);
-            VariableBlock.this.updateSize();
+        public BodyBlockGroup(int relativeY) {
+            super(SECTION_BODY, "Body", relativeY);
         }
     }
 
-    public static final String SECTION_VALUE = "Section";
-    public static final String SECTION_NAME = "Name";
+    public static final String SECTION_BODY = "variable:body";
+    public static final String SECTION_NAME = "variable:name";
 
     private int marginX = 8;
     private int marginY = 8;
@@ -162,47 +66,20 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
 
     public VariableBlock(int x, int y, StringBlock name, ValueBlock<?> block) {
         super(x, y, 0, 0);
-        this.attached.put(SECTION_NAME, new StringBlockList(12, name));
-        this.attached.put(SECTION_VALUE, new VariableBlockList(12, block));
-        updateSize();
+        this.blockGroups.add(new NameBlockGroup(0));
+        this.blockGroups.add(new BodyBlockGroup(0));
     }
 
-    public Optional<String> getName(){
-        Optional<StringBlock> opBlock = this.getNameAttachment().getAttachment();
-        if(opBlock.isPresent()){
-            return Optional.of(opBlock.get().getValue());
-        }
-        return Optional.empty();
+    public BodyBlockGroup getBodyBlockGroup(){
+        return (BodyBlockGroup) this.getGroup(SECTION_BODY).get();
     }
 
-    private void updateSize(){
-        int max = 150;
-        this.width = max + 12 + (this.marginX * 2);
-        this.height = Math.max((12 * 2), this.getNameAttachment().getSlotHeight(0)) + (this.marginY * 2);
-        VariableBlockList attachment = this.getVariableAttachment();
-        this.height += attachment.getSlotHeight(0);
+    public NameBlockGroup getNameBlockGroup(){
+        return (NameBlockGroup) this.getGroup(SECTION_NAME).get();
     }
 
-    public StringBlockList getNameAttachment(){
-        return (StringBlockList)(Object) this.getAttachments(SECTION_NAME);
-    }
-
-    public VariableBlockList getVariableAttachment(){
-        return (VariableBlockList)(Object) this.getAttachments(SECTION_VALUE);
-    }
-
-    @Override
-    public Optional<String> containsSection(int x, int y) {
-        int relX = x - this.getX();
-        int relY = y - this.getY();
-        for(String section : this.getSections()){
-            try{
-                this.getAttachments(section).getSlot(relX, relY);
-                return Optional.of(section);
-            }catch (IllegalArgumentException e){
-            }
-        }
-        return Optional.empty();
+    public Optional<String> getName() {
+        return this.getNameBlockGroup().getSector().getAttachedBlock().map(AbstractValue::getValue);
     }
 
     @Override
@@ -212,12 +89,12 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
 
     @Override
     public String writeCode(int tab) {
-        Optional<ValueBlock<?>> opValueBlock = this.getVariableAttachment().getAttachment();
-        if(!opValueBlock.isPresent()){
+        Optional<ValueBlock<?>> opValueBlock = this.getBodyBlockGroup().getSector().getAttachedBlock();
+        if(opValueBlock.isEmpty()){
             throw new IllegalStateException("Could not find the type specified. Does it have a value?");
         }
-        Optional<StringBlock> opStringBlock = this.getNameAttachment().getAttachment();
-        if(!opStringBlock.isPresent()){
+        Optional<StringBlock> opStringBlock = this.getNameBlockGroup().getSector().getAttachedBlock();
+        if(opStringBlock.isEmpty()){
             throw new IllegalStateException("Could not find the name specified. Does it have a name?");
         }
         if(opStringBlock.get().getValue().length() == 0){
@@ -233,13 +110,20 @@ public class VariableBlock extends AbstractAttachable implements Block.SpecificS
             clazz = clazz2;
             ret = clazz.getSimpleName() + ((ret == null) ? "" :  "." + ret);
         }while(true);
-        return (ret.startsWith(".") ? ret.substring(1) : ret) + " " + opStringBlock.get().getValue() + " = " + opValueBlock.get().writeCode(tab + 1);
+        if(ret == null){
+            throw new IllegalStateException("Unknown class");
+        }
+        if(ret.startsWith(".")){
+            ret = ret.substring(1);
+        }
+
+        return ret + " " + opStringBlock.get().getValue() + " = " + opValueBlock.get().writeCode(tab + 1);
     }
 
     @Override
     public Collection<String> getCodeImports() {
-        Optional<ValueBlock<?>> opValueBlock = this.getVariableAttachment().getAttachment();
-        if(!opValueBlock.isPresent()){
+        Optional<ValueBlock<?>> opValueBlock = this.getBodyBlockGroup().getSector().getAttachedBlock();
+        if(opValueBlock.isEmpty()){
             throw new IllegalStateException("Could not find the type specified. Does it have a value?");
         }
         Class<?> clazz = null;

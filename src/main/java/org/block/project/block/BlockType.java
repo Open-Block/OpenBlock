@@ -6,7 +6,7 @@ import org.block.project.block.java.specific.ReturnBlock;
 import org.block.project.block.java.method.MethodBlock;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.java.value.number.IntegerBlock;
-import org.block.project.block.java.variable.UseVariableBlock;
+import org.block.project.block.java.variable.CallVariableBlock;
 import org.block.project.block.java.variable.VariableBlock;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
@@ -32,10 +32,9 @@ public interface BlockType<B extends Block> {
 
     IntegerBlock.IntegerBlockType BLOCK_TYPE_INTEGER = new IntegerBlock.IntegerBlockType();
     StringBlock.StringBlockType BLOCK_TYPE_STRING = new StringBlock.StringBlockType();
-    SumOperation.SumOperationType BLOCK_TYPE_SUM = new SumOperation.SumOperationType();
     MinusOperation.MinusOperationType BLOCK_TYPE_MINUS = new MinusOperation.MinusOperationType();
     VariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE = new VariableBlock.VariableBlockType();
-    UseVariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE_USE = new UseVariableBlock.VariableBlockType();
+    CallVariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE_USE = new CallVariableBlock.VariableBlockType();
     MethodBlock.MethodBlockType BLOCK_TYPE_METHOD = new MethodBlock.MethodBlockType();
     ReturnBlock.ReturnBlockType BLOCK_TYPE_RETURN = new ReturnBlock.ReturnBlockType();
     JavaMethodCallBlock.JavaMethodCallBlockType<Void> BLOCK_TYPE_JAVA_METHOD_CALL = new JavaMethodCallBlock.JavaMethodCallBlockType<>(Void.class);

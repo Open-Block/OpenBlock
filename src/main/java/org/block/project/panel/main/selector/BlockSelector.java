@@ -22,6 +22,7 @@ public class BlockSelector extends Parent implements Selector {
     public BlockSelector(Block block, String... search){
         this(block.getGraphicRender(), search);
     }
+
     public BlockSelector(BlockRender render, String... search){
         this.render = render;
         Label label = new Label(render.getBlock().getType().getName());

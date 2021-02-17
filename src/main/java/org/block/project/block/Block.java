@@ -2,6 +2,7 @@ package org.block.project.block;
 
 import org.block.Blocks;
 import org.block.project.block.type.attachable.AttachableBlock;
+import org.block.project.block.type.called.CodeStartBlock;
 import org.block.project.module.project.Project;
 import org.block.project.panel.main.BlockRender;
 
@@ -14,125 +15,7 @@ import java.util.*;
  */
 public interface Block {
 
-    /**
-     * If a block is directly affected by another block then the former should implement this.
-     */
-    interface LinkedBlock extends Block {
-
-        /**
-         * Gets the linked block
-         * @return A optional of the linked block, if no link is defined then {@link Optional#empty()} will be returned
-         */
-        Optional<Block> getLinkedBlock();
-
-    }
-
-    /**
-     * If the block has a output value, then this should be implemented which will allow the Block to be added as a parameter.
-     * @param <V> The expected class type of the outputted value. This can be {@link Object} if unknown and {@link Void} if no value
-     */
-    interface ValueBlock<V> extends Block {
-
-        interface ConnectedValueBlock<V> extends ValueBlock<V> {
-
-            interface MutableConnectedValueBlock<V> extends ConnectedValueBlock<V>{
-
-                /**
-                 * Sets the provided value
-                 * @param value The new value
-                 */
-                void setValue(V value);
-
-            }
-
-            /**
-             * Gets the value of the block
-             * @return The actual value of the block
-             */
-            V getValue();
-
-            @Override
-            default Optional<Class<V>> getExpectedValue(){
-                return Optional.of((Class<V>)getValue().getClass());
-            }
-        }
-
-        /**
-         * Gets the expected value type that the block returns
-         * @return The expected class of the code output
-         */
-        Optional<Class<V>> getExpectedValue();
-
-    }
-
-    /**
-     * If the Block has some text to be shown then this should be implemented
-     * Most blocks will implement this
-     */
-    interface TextBlock extends Block {
-
-        /**
-         * Gets the text that is being shown.
-         * @return The text in string form
-         */
-        String getText();
-
-        /**
-         * Sets the text that is being shown. Please note that the panel needs to be repainted for changes to take affect
-         * @param text The text to show
-         */
-        void setText(String text);
-
-    }
-
-    /**
-     * If your code requires calls to be added into the output code project, then this should be implemented.
-     *
-     * Please note, if two callables are found to have the same name with the same parameters/location then
-     * an exception will be thrown when outputting the code (This is not a good thing)
-     */
-    interface CalledBlock extends Block {
-
-        int FIELD = 0;
-        int METHOD = 1;
-        int CONSTRUCTOR = 2;
-        int CLASS = 3;
-
-        /**
-         * If the code provided is a method, constructor
-         */
-        interface CodeStartBlock extends CalledBlock {
-
-            @Override
-            default String writeCode(int tab){
-                return "";
-            }
-        }
-
-        /**
-         * Provides the callable
-         * The map should provide the code as the key with one of the provided Integer keys as its value
-         * The first line should not include the tab indent however if it has more lines, then they should have the tab indent
-         * @param tab The amount of space to indent
-         * @return A map of all none caller code to insert
-         */
-        Map<String, Integer> writeBlockCode(int tab);
-
-    }
-
-    /**
-     * If the block has specific sections to add to the chooser, then it requires to implement this.
-     */
-    interface SpecificSectionBlock extends Block {
-
-
-    }
-
     BlockGraphics getGraphicShape();
-
-    default BlockRender getGraphicRender(){
-        return new BlockRender(this);
-    }
 
     /**
      * Gets the pixel height of the block.
@@ -252,11 +135,18 @@ public interface Block {
      */
     void setLayer(int layer);
 
+    Optional<CodeStartBlock> getParent();
+    void setParent(CodeStartBlock block);
+
     /**
      * Updates the block and all things connected to the block
      * by default, this updates the layer on the panel
      */
     default void update(){
+    }
+
+    default BlockRender getGraphicRender(){
+        return new BlockRender(this);
     }
 
     /**
@@ -293,8 +183,6 @@ public interface Block {
             return Optional.empty();
         }
         String path = new File(this.getType().saveLocation(), this.getUniqueId().toString() + ".json").getPath();
-        System.out.println("Path: " + path);
-        System.out.println("File: " + opProject.get().getFile().getParentFile());
         return Optional.of(new File(opProject.get().getFile().getParentFile(), path));
     }
 

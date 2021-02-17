@@ -5,6 +5,8 @@ import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.plugin.event.EventListener;
 import org.block.project.block.java.value.AbstractValue;
+import org.block.project.block.type.value.MutableConnectedValueBlock;
+import org.block.project.block.type.value.ValueBlock;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.parse.Parser;
 import org.block.util.ClassCompare;
@@ -18,10 +20,10 @@ import java.util.UUID;
 /**
  * The generic {@link Block} to display a pre-defended number value
  * Note that in its current form, the expected value is not in its primitive form.
- * This needs to be worked on ... might need a overhaul to {@link Block.ValueBlock} as generics can not accept primitives
+ * This needs to be worked on ... might need a overhaul to {@link ValueBlock} as generics can not accept primitives
  * @param <V> The expected value
  */
-public abstract class NumberBlock<V extends Number> extends AbstractValue<V> implements Block.ValueBlock.ConnectedValueBlock.MutableConnectedValueBlock<V> {
+public abstract class NumberBlock<V extends Number> extends AbstractValue<V> implements MutableConnectedValueBlock<V> {
 
     public abstract static class NumberBlockType<N extends Number> implements BlockType<NumberBlock<N>>{
 

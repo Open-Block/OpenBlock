@@ -4,6 +4,8 @@ import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 import org.block.serialization.parse.Parser;
 
+import java.util.function.Consumer;
+
 public class IntegerBlock extends NumberBlock<Integer> {
 
     public static class IntegerBlockType extends NumberBlockType<Integer>{
@@ -25,7 +27,12 @@ public class IntegerBlock extends NumberBlock<Integer> {
 
     @Override
     public BlockGraphics getGraphicShape() {
-        return null;
+        throw new IllegalStateException("Not implemented");
+    }
+
+    @Override
+    public void showValueDialog(Consumer<Integer> consumer) {
+
     }
 
     @Override

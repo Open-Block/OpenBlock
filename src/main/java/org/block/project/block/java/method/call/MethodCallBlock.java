@@ -1,15 +1,15 @@
 package org.block.project.block.java.method.call;
 
-import org.block.project.block.Block;
 import org.block.project.block.BlockGraphics;
 import org.block.project.block.group.AbstractBlockGroup;
 import org.block.project.block.group.BlockGroup;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.type.attachable.AttachableBlock;
+import org.block.project.block.type.value.ValueBlock;
 
 import java.util.Optional;
 
-public interface MethodCallBlock extends AttachableBlock, Block.ValueBlock<Object> {
+public interface MethodCallBlock extends AttachableBlock, ValueBlock<Object> {
 
     String METHOD_NAME_BLOCK_GROUP = "method_call:name";
     String METHOD_PARAMETERS_BLOCK_GROUP = "method_call:parameters";

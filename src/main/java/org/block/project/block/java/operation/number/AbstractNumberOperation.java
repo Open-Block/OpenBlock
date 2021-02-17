@@ -6,6 +6,7 @@ import org.block.project.block.group.BlockGroup;
 import org.block.project.block.group.BlockSector;
 import org.block.project.block.type.TextBlock;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
+import org.block.project.block.type.value.ValueBlock;
 import org.block.util.ClassCompare;
 
 import java.util.*;
@@ -16,12 +17,12 @@ import java.util.List;
  * All methods are implemented for block including code and paint.
  * All attachments must be of {@link Number}
  */
-public abstract class AbstractNumberOperation extends AbstractAttachableBlock implements Block.ValueBlock<Number>, TextBlock {
+public abstract class AbstractNumberOperation extends AbstractAttachableBlock implements ValueBlock<Number>, TextBlock {
 
     private final String operator;
     private String name;
-    private int marginX = 8;
-    private int marginY = 8;
+    protected int marginX = 8;
+    protected int marginY = 8;
 
     /**
      * The constructor for abstract number operations

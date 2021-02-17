@@ -10,6 +10,9 @@ import org.block.project.block.group.BlockSector;
 import org.block.project.block.group.UnlimitedBlockGroup;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
+import org.block.project.block.type.called.CalledBlock;
+import org.block.project.block.type.called.CodeStartBlock;
+import org.block.project.block.type.value.ValueBlock;
 import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
@@ -22,7 +25,7 @@ import java.io.File;
 import java.util.List;
 import java.util.*;
 
-public class MethodBlock extends AbstractAttachableBlock implements Block.SpecificSectionBlock, Block.CalledBlock.CodeStartBlock {
+public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlock {
 
     public static class MethodBlockType implements BlockType<MethodBlock> {
 

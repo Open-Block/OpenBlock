@@ -1,9 +1,10 @@
 package org.block.project.block.java.value;
 
-import org.block.Blocks;
 import org.block.project.block.AbstractBlock;
-import org.block.project.block.Block;
 import org.block.project.block.BlockGraphics;
+import org.block.project.block.type.TextBlock;
+import org.block.project.block.type.value.ConnectedValueBlock;
+
 import java.util.function.Function;
 
 /**
@@ -11,7 +12,7 @@ import java.util.function.Function;
  * affect this block in terms of it being attached to another block.
  * @param <V> The expected output type of the value
  */
-public abstract class AbstractValue<V> extends AbstractBlock implements Block.ValueBlock.ConnectedValueBlock<V>, Block.TextBlock {
+public abstract class AbstractValue<V> extends AbstractBlock implements ConnectedValueBlock<V>, TextBlock {
 
     protected final Function<V, String> toString;
     protected V value;

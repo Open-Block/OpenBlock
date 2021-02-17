@@ -1,6 +1,8 @@
 package org.block.project.block.java.operation.number;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import org.block.Blocks;
 import org.block.project.block.Block;
 import org.block.project.block.BlockGraphics;
@@ -9,6 +11,7 @@ import org.block.project.block.group.AbstractBlockGroup;
 import org.block.project.block.group.AbstractBlockSector;
 import org.block.project.block.group.BlockGroup;
 import org.block.project.block.group.BlockSector;
+import org.block.project.block.type.value.ValueBlock;
 import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
@@ -27,25 +30,45 @@ public class MinusOperation extends AbstractNumberOperation {
 
         @Override
         public void draw(GraphicsContext context) {
+            Text text = new Text(MinusOperation.this.getText());
 
+            double textLength = text.getLayoutBounds().getWidth();
+            int width = this.getWidth();
+            int height = this.getHeight();
+
+            context.setFill(new Color(0, 0, 0, 1));
+            context.fillRect(0, 0, MinusOperation.this.marginX, height);
+            context.fillRect(width - MinusOperation.this.marginX, 0, MinusOperation.this.marginX, height);
+            context.fillRect(0, 0, width, MinusOperation.this.marginY);
+            context.fillRect((width / 2) - (textLength / 2), MinusOperation.this.marginY, textLength, this.getHeight() - MinusOperation.this.marginY);
+            context.setFill(new Color(1, 1, 1, 1));
+            context.fillText(MinusOperation.this.getText(), (width / 2) - (textLength / 2), (height - text.getLayoutBounds().getHeight()) - MinusOperation.this.marginY);
         }
 
         @Override
         public int getWidth() {
-            int width = 15;
+            int width = 0;
+
             for (BlockGroup group : MinusOperation.this.getGroups()) {
-                width = Math.max(width, group.getWidth());
+                width = width + group.getWidth();
             }
-            return width + this.marginX;
+
+            if(width == 0){
+                width = 50;
+            }
+            return width + (this.marginX*2) + (int)new Text(MinusOperation.this.getText()).getLayoutBounds().getWidth();
         }
 
         @Override
         public int getHeight() {
             int height = 0;
             for (BlockGroup group : MinusOperation.this.getGroups()) {
-                height = height + group.getHeight();
+                height = Math.max(height, group.getHeight());
             }
-            return height + this.marginY;
+            if(height == 0){
+                height = 25;
+            }
+            return height + (this.marginY * 2);
         }
     }
 
