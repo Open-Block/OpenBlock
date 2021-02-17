@@ -38,6 +38,8 @@ public interface BlockGroup {
      */
     int getRelativeYPosition();
 
+    void setRelativeYPosition(int pos);
+
     boolean removeSector(Block block);
 
     default int getHeight(){

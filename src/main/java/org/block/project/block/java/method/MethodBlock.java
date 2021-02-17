@@ -4,23 +4,25 @@ import org.block.Blocks;
 import org.block.project.block.Block;
 import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.assists.AbstractAttachable;
-import org.block.project.block.assists.AbstractBlockList;
-import org.block.project.block.assists.AbstractSingleBlockList;
+import org.block.project.block.group.AbstractBlockGroup;
+import org.block.project.block.group.AbstractBlockSector;
+import org.block.project.block.group.BlockSector;
+import org.block.project.block.group.UnlimitedBlockGroup;
 import org.block.project.block.java.value.StringBlock;
+import org.block.project.block.type.attachable.AbstractAttachableBlock;
 import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.parse.Parser;
 import org.block.util.GeneralUntil;
-import org.block.util.OrderedUniqueList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
 import java.util.*;
 
-public class MethodBlock extends AbstractAttachable implements Block.SpecificSectionBlock, Block.CalledBlock.CodeStartBlock {
+public class MethodBlock extends AbstractAttachableBlock implements Block.SpecificSectionBlock, Block.CalledBlock.CodeStartBlock {
 
     public static class MethodBlockType implements BlockType<MethodBlock> {
 
@@ -34,33 +36,35 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
         @Override
         public MethodBlock build(ConfigNode node) {
             Optional<UUID> opUUID = TITLE_UUID.deserialize(node);
-            if(!opUUID.isPresent()){
+            if(opUUID.isEmpty()){
                 throw new IllegalStateException("Unknown Unique Id");
             }
             Optional<Integer> opX = TITLE_X.deserialize(node);
-            if(!opX.isPresent()){
+            if(opX.isEmpty()){
                 throw new IllegalStateException("Unknown X position");
             }
             Optional<Integer> opY = TITLE_Y.deserialize(node);
-            if(!opY.isPresent()){
+            if(opY.isEmpty()){
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
             FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
             List<Block> blocks = panel.getDisplayingBlocks();
             MethodBlock methodBlock = new MethodBlock(opX.get(), opY.get());
-            VariableBlockList blockList = methodBlock.getVariableAttachment();
             methodBlock.id = opUUID.get();
+
+
+            BodyBlockGroup bodyBlockGroup = methodBlock.getBodyBlockGroup();
             for(int A = 0; A < connected.size(); A++){
                 UUID uuid = connected.get(A);
                 Optional<Block> opBlock = blocks.stream().filter(b -> b.getUniqueId().equals(uuid)).findAny();
-                if(!opBlock.isPresent()){
+                if(opBlock.isEmpty()){
                     throw new IllegalStateException("Unable to find dependency of " + uuid.toString());
                 }
                 if(!(opBlock.get() instanceof ValueBlock)){
                     throw new IllegalStateException("Attached block was not a value block");
                 }
-                blockList.setAttachment(A, opBlock.get());
+                bodyBlockGroup.addSector(opBlock.get(), A);
             }
 
             TITLE.deserialize(node)
@@ -69,21 +73,22 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
                             .filter(b -> b.getUniqueId().equals(uuid))
                             .findAny())
                     .ifPresent(block -> methodBlock
-                            .getNameAttachment()
-                            .setAttachment((StringBlock) block));
+                            .getNameBlockGroup()
+                            .getSector().setAttachedBlock(block));
             return methodBlock;
         }
 
         @Override
         public void write(@NotNull ConfigNode node, @NotNull MethodBlock block) {
             BlockType.super.write(node, block);
-            List<UUID> list = new ArrayList<>();
-            VariableBlockList blockList = block.getVariableAttachment();
-            for(int A = 0; A < blockList.getMaxAttachments(); A++){
-                blockList.getAttachment(A).ifPresent(b -> list.add(b.getUniqueId()));
+            List<UUID> bodyBlocks = new ArrayList<>();
+
+            BodyBlockGroup bodyBlockGroup = block.getBodyBlockGroup();
+            for(BlockSector<?> sector : bodyBlockGroup.getSectors()){
+                sector.getAttachedBlock().ifPresent(b -> bodyBlocks.add(b.getUniqueId()));
             }
-            TITLE_DEPENDS.serialize(node, list);
-            block.getNameAttachment().getAttachment().ifPresent(b -> TITLE.serialize(node, b.getUniqueId()));
+            TITLE_DEPENDS.serialize(node, bodyBlocks);
+            block.getNameBlockGroup().getSector().getAttachedBlock().ifPresent(b -> TITLE.serialize(node, b.getUniqueId()));
         }
 
         @Override
@@ -97,106 +102,39 @@ public class MethodBlock extends AbstractAttachable implements Block.SpecificSec
         }
     }
 
-    public class StringBlockList extends AbstractSingleBlockList<StringBlock> {
+    public class NameBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
 
-        public StringBlockList(int height) {
-            super(height);
-        }
-
-        public StringBlockList(int height, StringBlock value) {
-            super(height, value);
-        }
-
-        @Override
-        public boolean canAcceptAttachment(Block block) {
-            return block instanceof StringBlock;
-        }
-
-        @Override
-        public AttachableBlock getParent() {
-            return MethodBlock.this;
-        }
-
-        @Override
-        public int getXPosition(int slot) {
-            if(slot != 0){
-                throw new IndexOutOfBoundsException(slot + " is out of range");
-            }
-            return MethodBlock.this.getWidth() - 12;
-        }
-
-        @Override
-        public int getYPosition(int slot) {
-            if(slot != 0){
-                throw new IndexOutOfBoundsException(slot + " is out of range");
-            }
-            return MethodBlock.this.marginY;
-        }
-
-        @Override
-        public int getSlot(int x, int y) {
-            throw new IllegalArgumentException("Position could not be found");
+        public NameBlockGroup(String id, String name, @Nullable StringBlock block) {
+            super(id, name, MethodBlock.this.marginY);
+            this.sector = new AbstractBlockSector<>(this, StringBlock.class, block);
         }
     }
 
-    public class VariableBlockList extends AbstractBlockList<Block> {
+    public class BodyBlockGroup extends AbstractBlockGroup.AbstractListBlockGroup implements UnlimitedBlockGroup {
 
-        public VariableBlockList() {
-            super(-1, 12);
+        public BodyBlockGroup(String id, String name, int relativeY) {
+            super(id, name, relativeY);
         }
 
         @Override
-        public boolean canAcceptAttachment(int slot, Block block) {
+        public boolean canAccept(Block block) {
             return true;
         }
 
         @Override
-        public AttachableBlock getParent() {
-            return MethodBlock.this;
-        }
-
-
-        @Override
-        public int getSlot(int x, int y) {
-            for(int A = 0; A < this.getMaxAttachments(); A++){
-                int height = this.getSlotHeight(A);
-                int posY = this.getYPosition(A);
-                if(posY <= y && y < (posY + ((A == (this.getMaxAttachments() - 1) ? (this.getParent().getHeight() - posY) : height)))){
-                    return A;
-                }
+        public boolean addSector(Block block, int pos) {
+            if(block == null){
+                return false;
             }
-            throw new IllegalArgumentException("Position could not be found");
-        }
-
-        @Override
-        public int getXPosition(int slot) {
-            if(slot > this.getMaxAttachments()){
-                throw new IndexOutOfBoundsException(slot + " is out of range");
-            }
-            return MethodBlock.this.marginX;
-        }
-
-        @Override
-        public int getYPosition(int slot) {
-throw new IllegalStateException("Not implemented");
-        }
-
-        @Override
-        public void addAttachment(Block block) {
-            super.addAttachment(block);
-            MethodBlock.this.updateSize();
-        }
-
-        @Override
-        public void removeAttachment(Block block) {
-            super.removeAttachment(block);
-            MethodBlock.this.updateSize();
+            AbstractBlockSector<Block> sector = new AbstractBlockSector<>(this, Block.class, block);
+            this.blockSectors.add(pos, sector);
+            return true;
         }
     }
 
-    public static final String SECTION_VALUE = "Section";
-    public static final String SECTION_PARAMETER = "Parameter";
-    public static final String SECTION_NAME = "Name";
+    public static final String SECTION_BODY = "method:body";
+    public static final String SECTION_PARAMETER = "method:parameter";
+    public static final String SECTION_NAME = "method:name";
 
     private int marginX = 8;
     private int marginY = 8;
@@ -205,37 +143,19 @@ throw new IllegalStateException("Not implemented");
         this(x, y, null);
     }
 
-    public MethodBlock(int x, int y, StringBlock name) {
+    public MethodBlock(int x, int y, StringBlock block) {
         super(x, y, 0, 0);
-        this.attached.put(SECTION_NAME, new MethodBlock.StringBlockList(12, name));
-        this.attached.put(SECTION_VALUE, new MethodBlock.VariableBlockList());
-        updateSize();
+        this.blockGroups.add(new MethodBlock.NameBlockGroup(SECTION_NAME, "Name", block));
+        /*this.attached.put(SECTION_NAME, "Name", new MethodBlock.StringBlockList(12, name));
+        this.attached.put(SECTION_VALUE, "Value", new MethodBlock.VariableBlockList());*/
     }
 
-    private void updateSize(){
-        throw new IllegalStateException("Not implemented");
+    public BodyBlockGroup getBodyBlockGroup(){
+        return (BodyBlockGroup) this.getGroup(SECTION_BODY).get();
     }
 
-    public StringBlockList getNameAttachment(){
-        return (StringBlockList)(Object) this.getAttachments(SECTION_NAME);
-    }
-
-    public VariableBlockList getVariableAttachment(){
-        return (VariableBlockList) this.getAttachments(SECTION_VALUE);
-    }
-
-    @Override
-    public Optional<String> containsSection(int x, int y) {
-        int relX = x - this.getX();
-        int relY = y - this.getY();
-        for(String section : this.getSections()){
-            try{
-                this.getAttachments(section).getSlot(relX, relY);
-                return Optional.of(section);
-            }catch (IllegalArgumentException ignore){
-            }
-        }
-        return Optional.empty();
+    public NameBlockGroup getNameBlockGroup(){
+        return (NameBlockGroup) this.getGroup(SECTION_NAME).get();
     }
 
     @Override
@@ -250,16 +170,19 @@ throw new IllegalStateException("Not implemented");
 
     @Override
     public Map<String, Integer> writeBlockCode(int tab) {
-        Optional<StringBlock> opStringBlock = this.getNameAttachment().getAttachment();
-        if(!opStringBlock.isPresent()){
+        Optional<StringBlock> opStringBlock = this.getNameBlockGroup().getSector().getAttachedBlock();
+        if(opStringBlock.isEmpty()){
             throw new IllegalStateException("Could not find the name specified. Does it have a name?");
         }
         if(opStringBlock.get().getValue().length() == 0){
             throw new IllegalStateException("Could not find the name specified. Provide one in the block");
         }
         String retur = "public static void " + GeneralUntil.formatToMethodName(opStringBlock.get().getValue()) + " () {\n";
-        for (Block attachment : this.getVariableAttachment()) {
-            retur += Block.tab(tab + 1) + attachment.writeCode(tab) + "\n";
+        for (BlockSector<?> sector : this.getBodyBlockGroup().getSectors()) {
+            if(sector.getAttachedBlock().isEmpty()){
+                continue;
+            }
+            retur += Block.tab(tab + 1) + sector.getAttachedBlock().get().writeCode(tab) + "\n";
         }
         retur += Block.tab(tab) + "}";
         Map<String, Integer> methodMap = new HashMap<>();
@@ -269,18 +192,21 @@ throw new IllegalStateException("Not implemented");
 
     @Override
     public Collection<String> getCodeImports() {
-        Optional<StringBlock> opStringBlock = this.getNameAttachment().getAttachment();
-        if(!opStringBlock.isPresent()){
+        Optional<StringBlock> opStringBlock = this.getNameBlockGroup().getSector().getAttachedBlock();
+        if(opStringBlock.isEmpty()){
             throw new IllegalStateException("Could not find the name specified. Does it have a name?");
         }
         if(opStringBlock.get().getValue().length() == 0){
             throw new IllegalStateException("Could not find the name specified. Provide one in the block");
         }
-        List<String> list = new ArrayList<>();
-        for (Block attachment : this.getVariableAttachment()) {
-            list.addAll(attachment.getCodeImports());
+        List<String> imports = new ArrayList<>();
+        for (BlockSector<?> sector : this.getBodyBlockGroup().getSectors()) {
+            if(sector.getAttachedBlock().isEmpty()){
+                continue;
+            }
+            imports.addAll(sector.getAttachedBlock().get().getCodeImports());
         }
-        return Collections.unmodifiableCollection(list);
+        return Collections.unmodifiableCollection(imports);
     }
 
     @Override

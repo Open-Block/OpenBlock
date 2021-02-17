@@ -2,31 +2,56 @@ package org.block.project.block.java.method.call;
 
 import org.block.project.block.Block;
 import org.block.project.block.BlockGraphics;
-import org.block.project.block.assists.AbstractBlockList;
-import org.block.project.block.assists.AbstractSingleBlockList;
-import org.block.project.block.assists.BlockList;
+import org.block.project.block.group.AbstractBlockGroup;
+import org.block.project.block.group.BlockGroup;
+import org.block.project.block.java.value.StringBlock;
+import org.block.project.block.type.attachable.AttachableBlock;
 
-public interface MethodCallBlock extends Block.AttachableBlock, Block.ValueBlock<Object> {
+import java.util.Optional;
 
-    String METHOD_BLOCK_LIST = "Method_Name";
+public interface MethodCallBlock extends AttachableBlock, Block.ValueBlock<Object> {
 
-    abstract class AbstractMethodNameBlockList extends AbstractSingleBlockList<ConnectedValueBlock<String>> {
+    String METHOD_NAME_BLOCK_GROUP = "method_call:name";
+    String METHOD_PARAMETERS_BLOCK_GROUP = "method_call:parameters";
 
-        public AbstractMethodNameBlockList(int height) {
-            super(height);
-        }
 
-        public AbstractMethodNameBlockList(int height, ConnectedValueBlock<String> value) {
-            super(height, value);
+    class MethodNameBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
+
+        public MethodNameBlockGroup(int relativeY) {
+            super(METHOD_NAME_BLOCK_GROUP, "Name", relativeY);
         }
     }
 
-    default AbstractMethodNameBlockList getMethodNameBlockList() {
-        return (AbstractMethodNameBlockList) (Object) this.getAttachments(METHOD_BLOCK_LIST);
+    abstract class MethodParameterBlockGroup extends AbstractBlockGroup.AbstractListBlockGroup {
+
+        public MethodParameterBlockGroup(String id, String name, int relativeY) {
+            super(id, name, relativeY);
+        }
+
+        public abstract void update();
+
+    }
+
+    default MethodNameBlockGroup getNameBlockGroup() {
+        Optional<BlockGroup> opBlockGroup = this.getGroup(METHOD_NAME_BLOCK_GROUP);
+        if(opBlockGroup.isEmpty()){
+            throw new IllegalStateException("This object has not registered the block group of '" + METHOD_NAME_BLOCK_GROUP + "'");
+        }
+
+        return (MethodNameBlockGroup) opBlockGroup.get();
+    }
+
+    default MethodParameterBlockGroup getParametersBlockGroup() {
+        Optional<BlockGroup> opBlockGroup = this.getGroup(METHOD_NAME_BLOCK_GROUP);
+        if(opBlockGroup.isEmpty()){
+            throw new IllegalStateException("This object has not registered the block group of '" + METHOD_PARAMETERS_BLOCK_GROUP + "'");
+        }
+
+        return (MethodParameterBlockGroup) opBlockGroup.get();
     }
 
     @Override
     default BlockGraphics getGraphicShape() {
-        return null;
+        throw new IllegalStateException("Not Implemented");
     }
 }

@@ -6,7 +6,6 @@ import org.block.project.block.group.BlockGroup;
 import org.block.project.block.group.BlockSector;
 import org.block.project.block.type.TextBlock;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
-import org.block.project.block.type.attachable.AttachableBlock;
 import org.block.util.ClassCompare;
 
 import java.util.*;

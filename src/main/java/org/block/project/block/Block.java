@@ -1,17 +1,12 @@
 package org.block.project.block;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import org.block.Blocks;
+import org.block.project.block.type.attachable.AttachableBlock;
 import org.block.project.module.project.Project;
-import org.block.project.block.assists.BlockList;
 import org.block.project.panel.main.BlockRender;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * A Block is a shape that can have specific functions with code attached to it.
@@ -30,113 +25,6 @@ public interface Block {
          */
         Optional<Block> getLinkedBlock();
 
-    }
-
-    /**
-     * If the Block requires additional information to function properly that is in code form, then it should implement Attachable.
-     * This allows users to add blocks directly to this block
-     */
-    interface AttachableBlock extends Block {
-
-        interface StatementBlock extends AttachableBlock {
-
-        }
-
-        /**
-         * Gets all attached block of the the provided section
-         * @param section The section to get
-         * @return The block list
-         * @throws IllegalArgumentException thrown if section does not exist
-         */
-        <B extends Block> BlockList<B> getAttachments(String section);
-
-        /**
-         * Gets all sections supported by the block
-         * @return A unmodifiable collection of sections
-         */
-        Collection<String> getSections();
-
-        /**
-         * Gets the section based upon the provided X and Y
-         * @param x The X position
-         * @param y The Y position
-         * @return The section, if no section can be found will return {@link Optional#empty()}
-         */
-        Optional<String> containsSection(int x, int y);
-
-        /**
-         * Checks all sections to see if the block is attached
-         * @param block The block to check
-         * @return if the block is attached
-         */
-        default boolean containsAttachment(Block block){
-            for(String section : this.getSections()){
-                if(this.getAttachments(section).containsAttachment(block)){
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Checks if the provided block can be attached to this block in any way
-         * @param block The block to check
-         * @return All possible BlockList's the block can attach to
-         */
-        default Collection<BlockList<? extends Block>> canAttach(Block block){
-            Set<BlockList<? extends Block>> set = new HashSet<>();
-            for(String section : this.getSections()){
-                BlockList<? extends Block> list = this.getAttachments(section);
-                for(int A = 0; A < list.getMaxAttachments(); A++){
-                    if(list.canAcceptAttachment(A, block)){
-                        set.add(list);
-                        break;
-                    }
-                }
-            }
-            return Collections.unmodifiableCollection(set);
-        }
-
-        /**
-         * Removes a block from all attached list
-         * @param block The block to remove
-         */
-        default void removeAttachment(Block block){
-            for(String section : this.getSections()){
-                this.getAttachments(section).removeAttachment(block);
-            }
-        }
-
-        @Override
-        default void delete() {
-            Block.super.delete();
-            for(String section : this.getSections()){
-                BlockList<? extends Block> list = this.getAttachments(section);
-                for(int A = 0; A < list.getMaxAttachments(); A++){
-                    list.getAttachment(A).ifPresent(Block::delete);
-                }
-            }
-        }
-
-        @Override
-        default void update() {
-            int x = this.getX();
-            int y = this.getY();
-            for(String section : this.getSections()) {
-                BlockList<? extends Block> b = this.getAttachments(section);
-                for (int A = 0; A < b.getMaxAttachments(); A++) {
-                    final int B = A;
-                    b.getAttachment(A).ifPresent(block -> {
-                        block.setX(x + b.getXPosition(B));
-                        block.setY(y + b.getYPosition(B));
-                        block.setLayer(this.getLayer() + 1);
-                        block.update();
-                    });
-                }
-            }
-
-            Block.super.update();
-        }
     }
 
     /**
@@ -342,18 +230,6 @@ public interface Block {
     Collection<String> getCodeImports();
 
     /**
-     * Gets the block that this block is attached to
-     * @return The block this is attached to, if none then {@link Optional#empty} will be returned
-     */
-    Optional<AttachableBlock> getAttachedTo();
-
-    /**
-     * Sets the block that this is attached to, to remove the block it is currently attached to provide 'null' (however it is prefered to use {@link Block#removeAttachedTo()} just in case this changes)
-     * @param block The block that is attaching this
-     */
-    void setAttachedTo(AttachableBlock block);
-
-    /**
      * Gets the BlockType for this block, it may not be the block type that was used to create the block, however it will be of the same type.
      * @return The BlockType for the block
      */
@@ -387,20 +263,9 @@ public interface Block {
      * Deletes the block from the panel, does all the checks to remove everything correctly
      */
     default void delete(){
-        this.removeAttachedTo();
         this.getFile().ifPresent(File::deleteOnExit);
         /*BlockDisplayPanel panel = ((MainDisplayPanel) Blocks.getInstance().getWindow().getContentPane()).getBlocksPanel().getSelectedComponent();
         panel.unregister(this);*/
-    }
-
-    /**
-     * Removes the definition of this block being attached to another
-     */
-    default void removeAttachedTo(){
-        this.getAttachedTo().ifPresent(a -> {
-            a.removeAttachment(this);
-        });
-        this.setAttachedTo(null);
     }
 
     /**
@@ -424,7 +289,7 @@ public interface Block {
 
     default Optional<File> getFile(){
         Optional<Project.Loaded> opProject = Blocks.getInstance().getLoadedProject();
-        if(!opProject.isPresent()){
+        if(opProject.isEmpty()){
             return Optional.empty();
         }
         String path = new File(this.getType().saveLocation(), this.getUniqueId().toString() + ".json").getPath();

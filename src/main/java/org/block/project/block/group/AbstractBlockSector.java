@@ -11,7 +11,7 @@ public class AbstractBlockSector<B extends Block> implements BlockSector<B> {
     private B block;
     private final Class<B> generic;
     private final BlockGroup parent;
-    private final Predicate<Block> acceptable;
+    private final Predicate<B> acceptable;
 
     public AbstractBlockSector(BlockGroup parent, Class<B> clazz){
         this(parent, clazz, null);
@@ -21,7 +21,7 @@ public class AbstractBlockSector<B extends Block> implements BlockSector<B> {
         this(parent, clazz, block, t -> true);
     }
 
-    public AbstractBlockSector(BlockGroup parent, Class<B> clazz, @Nullable B block, Predicate<Block> acceptable){
+    public AbstractBlockSector(BlockGroup parent, Class<B> clazz, @Nullable B block, Predicate<B> acceptable){
         this.block = block;
         this.parent = parent;
         this.generic = clazz;

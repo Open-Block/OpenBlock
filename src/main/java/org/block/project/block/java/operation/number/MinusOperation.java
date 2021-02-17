@@ -5,22 +5,25 @@ import org.block.Blocks;
 import org.block.project.block.Block;
 import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.assists.BlockList;
+import org.block.project.block.group.AbstractBlockGroup;
+import org.block.project.block.group.AbstractBlockSector;
 import org.block.project.block.group.BlockGroup;
 import org.block.project.block.group.BlockSector;
 import org.block.project.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
-import org.block.util.OrderedUniqueList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class MinusOperation extends AbstractNumberOperation {
 
     public class MinusBlockGraphic implements BlockGraphics {
 
-        private Block origin = MinusOperation.this.getA
+        private final int marginX = 5;
+        private final int marginY = 5;
 
         @Override
         public void draw(GraphicsContext context) {
@@ -29,12 +32,31 @@ public class MinusOperation extends AbstractNumberOperation {
 
         @Override
         public int getWidth() {
-            return 0;
+            int width = 15;
+            for (BlockGroup group : MinusOperation.this.getGroups()) {
+                width = Math.max(width, group.getWidth());
+            }
+            return width + this.marginX;
         }
 
         @Override
         public int getHeight() {
-            return 0;
+            int height = 0;
+            for (BlockGroup group : MinusOperation.this.getGroups()) {
+                height = height + group.getHeight();
+            }
+            return height + this.marginY;
+        }
+    }
+
+    public static class MinusBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<ValueBlock<? extends Number>> {
+
+        public MinusBlockGroup(String id, String name, ValueBlock<? extends Number> block) {
+            super(id, name, 25);
+            this.sector = new AbstractBlockSector<>(this,
+                    (Class<ValueBlock<? extends Number>>)(Object) ValueBlock.class,
+                    block,
+                    b -> b.getExpectedValue().isPresent());
         }
     }
 
@@ -68,13 +90,13 @@ public class MinusOperation extends AbstractNumberOperation {
             for(int A = 0; A < connected.size(); A++){
                 UUID uuid = connected.get(A);
                 Optional<Block> opBlock = blocks.stream().filter(b -> b.getUniqueId().equals(uuid)).findAny();
-                if(!opBlock.isPresent()){
+                if(opBlock.isEmpty()){
                     throw new IllegalStateException("Unable to find dependency of " + uuid.toString());
                 }
                 if(!(opBlock.get() instanceof ValueBlock)){
                     throw new IllegalStateException("Attached block was not a value block");
                 }
-                blockList.setAttachment(A, (ValueBlock<? extends Number>) opBlock.get());
+                groups.add(A, new MinusBlockGroup("minus:index" + A, "index " + A, opBlock.map(b -> (ValueBlock<? extends Number>)b).get()));
             }
             return minusBlock;
         }
@@ -83,9 +105,9 @@ public class MinusOperation extends AbstractNumberOperation {
         public void write(@NotNull ConfigNode node, @NotNull MinusOperation block) {
             BlockType.super.write(node, block);
             List<UUID> list = new ArrayList<>();
-            BlockList<ValueBlock<? extends Number>> blockList = block.getAttachments();
-            for(int A = 0; A < blockList.getMaxAttachments(); A++){
-                blockList.getAttachment(A).ifPresent(b -> list.add(b.getUniqueId()));
+            List<BlockGroup> blockLists = block.getGroups();
+            for (BlockGroup blockList : blockLists) {
+                blockList.getSectors().get(0).getAttachedBlock().ifPresent(b -> list.add(b.getUniqueId()));
             }
             TITLE_DEPENDS.serialize(node, list);
         }
@@ -101,10 +123,6 @@ public class MinusOperation extends AbstractNumberOperation {
         }
     }
 
-    private static final String FIRST_PARAMETER = "First";
-    private static final String SECOND_PARAMETER = "Second";
-
-
     /**
      * The constructor for MinusOperator
      *
@@ -113,16 +131,6 @@ public class MinusOperation extends AbstractNumberOperation {
      */
     public MinusOperation(int x, int y) {
         super(x, y, "Minus", "-");
-
-
-    }
-
-    public BlockSector<ValueBlock<? extends Number>> getFirstSector(){
-        return (BlockSector<ValueBlock<? extends Number>>) this.getGroup(FIRST_PARAMETER).get().getSectors().get(0);
-    }
-
-    public BlockSector<ValueBlock<? extends Number>> getSecondarySector(){
-        return (BlockSector<ValueBlock<? extends Number>>) this.getGroup(SECOND_PARAMETER).get().getSectors().get(0);
     }
 
     @Override
