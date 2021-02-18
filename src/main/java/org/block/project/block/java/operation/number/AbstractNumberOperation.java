@@ -32,17 +32,9 @@ public abstract class AbstractNumberOperation extends AbstractAttachableBlock im
      * @param operator The Java maths operator
      */
     public AbstractNumberOperation(int x, int y, String text, String operator) {
-        super(x, y, 0, 0);
+        super(x, y);
         this.operator = operator;
         setText(text);
-    }
-
-    public void updateHeight(){
-        int height = 15;
-        for(BlockGroup group : this.getGroups()) {
-            height = Math.max(height, group.getHeight());
-        }
-        this.height = height;
     }
 
     public List<ValueBlock<? extends Number>> getAttached(){
@@ -60,8 +52,6 @@ public abstract class AbstractNumberOperation extends AbstractAttachableBlock im
     @Override
     public void setText(String text) {
         this.name = text;
-        this.width = (this.marginX * 2) + (12 * 2);
-        AbstractNumberOperation.this.updateHeight();
     }
 
     @Override

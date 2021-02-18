@@ -12,8 +12,8 @@ import javafx.stage.Stage;
 import org.block.Blocks;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.project.UnloadedProject;
-import org.block.project.panel.launch.FXProjectsPanel;
-import org.block.project.panel.SceneSource;
+import org.block.panel.launch.FXProjectsPanel;
+import org.block.panel.SceneSource;
 import org.block.util.ToStringWrapper;
 
 import java.io.File;

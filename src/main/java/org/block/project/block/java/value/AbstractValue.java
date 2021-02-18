@@ -39,7 +39,7 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Connecte
      * @param toString The generic convection of the value to a String
      */
     public AbstractValue(int x, int y, V value, Function<V, String> toString) {
-        super(x, y, 10, 10);
+        super(x, y);
         this.toString = toString;
         this.setValue(value);
     }
@@ -51,17 +51,11 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Connecte
     public void setValue(V value){
         this.value = value;
         this.text = this.toString.apply(value);
-        int width = 150;
-        this.height = 12 + this.marginY;
-        this.width = width + this.marginX + 12;
-        if(this.height < 12){
-            this.height = 12;
-        }
     }
 
     @Override
     public BlockGraphics getGraphicShape() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     @Override

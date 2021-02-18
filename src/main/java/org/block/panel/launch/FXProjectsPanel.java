@@ -1,4 +1,4 @@
-package org.block.project.panel.launch;
+package org.block.panel.launch;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -6,26 +6,32 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.block.Blocks;
+import org.block.panel.SceneSource;
+import org.block.panel.common.navigation.NavigationBar;
+import org.block.panel.common.navigation.NavigationOption;
+import org.block.panel.common.navigation.TabbedNavigationBar;
+import org.block.panel.main.FXMainDisplay;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.project.module.project.UnloadedProject;
-import org.block.project.panel.SceneSource;
-import org.block.project.panel.main.FXMainDisplay;
 import org.block.util.GeneralUntil;
 import org.block.util.ToStringWrapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class FXProjectsPanel implements SceneSource {
 
     private final ListView<ToStringWrapper<UnloadedProject>> projectListView = new ListView<>();
     private final File projectsDirectory;
     private final SplitPane splitPane = new SplitPane();
-    private final MenuBar navBar = new MenuBar();
+    private final TabbedNavigationBar navBar = new TabbedNavigationBar();
 
     public FXProjectsPanel(@NotNull File projectsDirectory) {
         this.projectsDirectory = projectsDirectory;
@@ -131,28 +137,30 @@ public class FXProjectsPanel implements SceneSource {
         return area;
     }
 
-    private MenuBar createNavBar() {
-        Menu addMenu = new Menu("+");
+    private TabbedNavigationBar createNavBar() {
+        List<NavigationOption> createMenuNavigation = new ArrayList<>();
         Blocks.getInstance().getAllEnabledPlugins().getAll(PluginContainer::getModules).parallelStream().forEach(m -> {
-            MenuItem item = new MenuItem(m.getDisplayName());
+            NavigationOption item = new NavigationOption(m.getDisplayName());
             item.setOnAction(e -> m.onProjectCreator());
-            addMenu.getItems().add(item);
+            createMenuNavigation.add(item);
         });
-        addMenu.getItems().sort(Comparator.comparing(MenuItem::getText));
-        this.navBar.getMenus().add(addMenu);
+        createMenuNavigation.sort(Comparator.comparing(n -> n.getText().getText()));
+        NavigationBar createMenu = new NavigationBar();
+        createMenu.getChildren().addAll(createMenuNavigation);
+        this.navBar.getTabs().add(new Tab("Create", createMenu));
 
-        Menu networkMenu = new Menu("Network");
-        MenuItem joinItem = new MenuItem("Join");
-        //join panel
-        networkMenu.getItems().add(joinItem);
-        this.navBar.getMenus().add(networkMenu);
+        NavigationOption joinNetworkOption = new NavigationOption("Join");
+        //TODO JOIN
+        NavigationBar networkBar = new NavigationBar(joinNetworkOption);
+
+        this.navBar.getTabs().add(new Tab("Network", networkBar));
 
         return this.navBar;
     }
 
     @Override
     public Scene build() {
-        MenuBar navBar = this.createNavBar();
+        TabbedNavigationBar navBar = this.createNavBar();
         ListView<ToStringWrapper<UnloadedProject>> projects = this.createProjectList();
         Pane blankProjectPane = new Pane();
         this.splitPane.getItems().add(projects);

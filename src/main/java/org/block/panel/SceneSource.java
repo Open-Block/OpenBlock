@@ -1,4 +1,4 @@
-package org.block.project.panel;
+package org.block.panel;
 
 import javafx.scene.Scene;
 

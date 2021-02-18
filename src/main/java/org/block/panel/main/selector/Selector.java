@@ -1,4 +1,4 @@
-package org.block.project.panel.main.selector;
+package org.block.panel.main.selector;
 
 import java.util.Set;
 

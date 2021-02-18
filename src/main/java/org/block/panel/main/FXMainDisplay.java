@@ -1,6 +1,5 @@
-package org.block.project.panel.main;
+package org.block.panel.main;
 
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -9,12 +8,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.array.utils.ArrayUtils;
+import org.block.panel.main.selector.BlockSelector;
+import org.block.panel.main.selector.GroupSelector;
+import org.block.panel.main.selector.Selector;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
-import org.block.project.panel.SceneSource;
-import org.block.project.panel.main.selector.BlockSelector;
-import org.block.project.panel.main.selector.GroupSelector;
-import org.block.project.panel.main.selector.Selector;
+import org.block.panel.SceneSource;
 
 import java.util.List;
 import java.util.stream.Collectors;

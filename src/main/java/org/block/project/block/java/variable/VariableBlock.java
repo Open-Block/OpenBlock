@@ -65,7 +65,7 @@ public class VariableBlock extends AbstractAttachableBlock {
     }
 
     public VariableBlock(int x, int y, StringBlock name, ValueBlock<?> block) {
-        super(x, y, 0, 0);
+        super(x, y);
         this.blockGroups.add(new NameBlockGroup(0));
         this.blockGroups.add(new BodyBlockGroup(0));
     }

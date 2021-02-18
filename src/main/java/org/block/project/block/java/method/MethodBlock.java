@@ -13,7 +13,7 @@ import org.block.project.block.type.attachable.AbstractAttachableBlock;
 import org.block.project.block.type.called.CalledBlock;
 import org.block.project.block.type.called.CodeStartBlock;
 import org.block.project.block.type.value.ValueBlock;
-import org.block.project.panel.main.FXMainDisplay;
+import org.block.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.parse.Parser;
@@ -147,7 +147,7 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
     }
 
     public MethodBlock(int x, int y, StringBlock block) {
-        super(x, y, 0, 0);
+        super(x, y);
         this.blockGroups.add(new MethodBlock.NameBlockGroup(SECTION_NAME, "Name", block));
         /*this.attached.put(SECTION_NAME, "Name", new MethodBlock.StringBlockList(12, name));
         this.attached.put(SECTION_VALUE, "Value", new MethodBlock.VariableBlockList());*/

@@ -3,8 +3,8 @@ package org.temp;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.block.Blocks;
-import org.block.project.panel.SceneSource;
-import org.block.project.panel.scene.SourceBuilder;
+import org.block.panel.SceneSource;
+import org.block.panel.scene.SourceBuilder;
 
 public class FXProjectsPanelTest extends Application {
     @Override

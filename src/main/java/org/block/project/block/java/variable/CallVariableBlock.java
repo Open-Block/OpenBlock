@@ -48,7 +48,7 @@ public class CallVariableBlock extends AbstractAttachableBlock implements ValueB
     public static final String VARIABLE_SECTION = "call:variable";
 
     public CallVariableBlock(int x, int y) {
-        super(x, y, 1, 1);
+        super(x, y);
         this.blockGroups.add(new VariableLinkBlockGroup(0));
     }
 

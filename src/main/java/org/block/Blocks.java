@@ -1,14 +1,12 @@
 package org.block;
 
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.block.network.client.ClientConnection;
 import org.block.network.server.ServerConnection;
 import org.block.plugin.PluginContainer;
 import org.block.plugin.PluginContainers;
 import org.block.project.module.project.Project;
-import org.block.project.panel.SceneSource;
+import org.block.panel.SceneSource;
 
 import java.util.HashSet;
 import java.util.Optional;

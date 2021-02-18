@@ -1,7 +1,6 @@
-package org.block.project.panel.scene;
+package org.block.panel.scene;
 
-import javafx.scene.Scene;
-import org.block.project.panel.SceneSource;
+import org.block.panel.SceneSource;
 
 public interface SourceBuilder {
 

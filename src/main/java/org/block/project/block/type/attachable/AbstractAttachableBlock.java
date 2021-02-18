@@ -10,8 +10,8 @@ public abstract class AbstractAttachableBlock extends AbstractBlock implements A
 
     protected List<BlockGroup> blockGroups = new ArrayList<>();
 
-    public AbstractAttachableBlock(int x, int y, int width, int height) {
-        super(x, y, width, height);
+    public AbstractAttachableBlock(int x, int y) {
+        super(x, y);
     }
 
     @Override

@@ -6,5 +6,7 @@ module Blocks {
     requires java.xml;
     requires annotations;
     requires org.json;
+    exports org.temp;
+    exports org.block.panel.common.navigation;
 
 }

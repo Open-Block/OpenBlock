@@ -1,4 +1,4 @@
-package org.block.project.panel.main;
+package org.block.panel.main;
 
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;

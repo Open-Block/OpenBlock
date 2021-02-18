@@ -1,6 +1,6 @@
-package org.block.project.panel.scene;
+package org.block.panel.scene;
 
-import org.block.project.panel.launch.FXProjectsPanel;
+import org.block.panel.launch.FXProjectsPanel;
 
 import java.io.File;
 

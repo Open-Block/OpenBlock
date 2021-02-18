@@ -52,7 +52,7 @@ public class JavaMethodCallBlock<C> extends AbstractAttachableBlock implements M
     private final int marginY = 3;
 
     public JavaMethodCallBlock(int x, int y, JavaMethodCallBlock.JavaMethodCallBlockType<C> type) {
-        super(x, y, 30, 30);
+        super(x, y);
         this.type = type;
 
         //this.attached.put(MethodCallBlock.METHOD_BLOCK_GROUP, new JavaMethodNameBlockList(5));

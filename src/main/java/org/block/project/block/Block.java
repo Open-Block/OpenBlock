@@ -1,10 +1,9 @@
 package org.block.project.block;
 
 import org.block.Blocks;
-import org.block.project.block.type.attachable.AttachableBlock;
 import org.block.project.block.type.called.CodeStartBlock;
 import org.block.project.module.project.Project;
-import org.block.project.panel.main.BlockRender;
+import org.block.panel.main.BlockRender;
 
 import java.io.File;
 import java.util.*;
@@ -16,18 +15,6 @@ import java.util.*;
 public interface Block {
 
     BlockGraphics getGraphicShape();
-
-    /**
-     * Gets the pixel height of the block.
-     * @return Gets the height in pixels
-     */
-    int getHeight();
-
-    /**
-     * Gets the pixel width of the block
-     * @return Gets the width in pixels
-     */
-    int getWidth();
 
     /**
      * Gets the X position on the panel
@@ -144,6 +131,23 @@ public interface Block {
      */
     default void update(){
     }
+
+    /**
+     * Gets the pixel height of the block.
+     * @return Gets the height in pixels
+     */
+    default int getHeight(){
+        return this.getGraphicShape().getHeight();
+    }
+
+    /**
+     * Gets the pixel width of the block
+     * @return Gets the width in pixels
+     */
+    default int getWidth(){
+        return this.getGraphicShape().getWidth();
+    }
+
 
     default BlockRender getGraphicRender(){
         return new BlockRender(this);

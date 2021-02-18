@@ -1,14 +1,11 @@
-package org.block.project.panel.main.selector;
+package org.block.panel.main.selector;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import org.block.project.block.Block;
-import org.block.project.panel.main.BlockRender;
+import org.block.panel.main.BlockRender;
 
 import java.util.Arrays;
 import java.util.HashSet;

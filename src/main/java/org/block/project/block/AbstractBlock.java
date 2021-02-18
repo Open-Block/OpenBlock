@@ -6,8 +6,6 @@ import java.util.*;
 
 public abstract class AbstractBlock implements Block {
 
-    protected int height;
-    protected int width;
     protected int x;
     protected int y;
     protected boolean selected;
@@ -17,22 +15,10 @@ public abstract class AbstractBlock implements Block {
     protected int layer;
     protected CodeStartBlock codeStartBlock;
 
-    public AbstractBlock(int x, int y, int width, int height){
+    public AbstractBlock(int x, int y){
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
         this.id = UUID.randomUUID();
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
-    }
-
-    @Override
-    public int getWidth() {
-        return this.width;
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.block.project.block.BlockType;
 import org.block.project.block.group.AbstractBlockGroup;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
 import org.block.project.block.type.value.ValueBlock;
-import org.block.project.panel.main.FXMainDisplay;
+import org.block.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
 
@@ -87,7 +87,7 @@ public class ReturnBlock extends AbstractAttachableBlock {
     public static final String RETURN_BLOCK = "return:value";
 
     public ReturnBlock(int x, int y) {
-        super(x, y, 0, 0);
+        super(x, y);
         this.blockGroups.add(new ReturnBlockGroup());
     }
 

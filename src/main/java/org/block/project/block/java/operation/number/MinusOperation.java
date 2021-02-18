@@ -10,16 +10,13 @@ import org.block.project.block.BlockType;
 import org.block.project.block.group.AbstractBlockGroup;
 import org.block.project.block.group.AbstractBlockSector;
 import org.block.project.block.group.BlockGroup;
-import org.block.project.block.group.BlockSector;
 import org.block.project.block.type.value.ValueBlock;
-import org.block.project.panel.main.FXMainDisplay;
+import org.block.panel.main.FXMainDisplay;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Predicate;
 
 public class MinusOperation extends AbstractNumberOperation {
 
