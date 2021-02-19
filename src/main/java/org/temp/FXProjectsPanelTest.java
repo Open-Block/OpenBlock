@@ -5,10 +5,12 @@ import javafx.stage.Stage;
 import org.block.Blocks;
 import org.block.panel.SceneSource;
 import org.block.panel.scene.SourceBuilder;
+import org.util.print.ShinyOutputStream;
 
 public class FXProjectsPanelTest extends Application {
     @Override
     public void start(Stage stage) {
+        ShinyOutputStream.createDefault();
         Blocks.setInstance(new Blocks());
         stage.setTitle("Test");
         SceneSource sceneSource = SourceBuilder.projectPanel().build();

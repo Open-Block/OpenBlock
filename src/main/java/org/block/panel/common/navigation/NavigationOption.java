@@ -16,7 +16,6 @@ import javafx.scene.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public class NavigationOption extends VBox {
 

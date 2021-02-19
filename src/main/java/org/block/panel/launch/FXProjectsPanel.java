@@ -11,6 +11,7 @@ import org.block.panel.common.navigation.NavigationBar;
 import org.block.panel.common.navigation.NavigationOption;
 import org.block.panel.common.navigation.TabbedNavigationBar;
 import org.block.panel.main.FXMainDisplay;
+import org.block.panel.settings.GeneralSettings;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.project.module.project.UnloadedProject;
@@ -154,6 +155,18 @@ public class FXProjectsPanel implements SceneSource {
         NavigationBar networkBar = new NavigationBar(joinNetworkOption);
 
         this.navBar.getTabs().add(new Tab("Network", networkBar));
+
+        NavigationOption generalSettingsBar = new NavigationOption("General Settings");
+        generalSettingsBar.setOnAction(e -> {
+            var stage = Blocks.getInstance().getFXWindow();
+            var settings = new GeneralSettings(false);
+            stage.setScene(settings.build());
+        });
+
+
+        NavigationBar settingsBar = new NavigationBar(generalSettingsBar);
+        this.navBar.getTabs().add(new Tab("Settings", settingsBar));
+
 
         return this.navBar;
     }
