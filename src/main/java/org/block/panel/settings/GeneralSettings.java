@@ -5,7 +5,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.block.Blocks;
 import org.block.panel.SceneSource;
 
@@ -14,22 +15,13 @@ import java.util.stream.Collectors;
 
 public class GeneralSettings implements SceneSource {
 
-    private Scene goBackToScene;
-    private SceneSource goBackToSource;
-    private boolean useProjectSpecific;
+    private final Scene goBackToScene;
+    private final SceneSource goBackToSource;
+    private final boolean useProjectSpecific;
 
-    private ToolBar settingSections = createSettingSections();
-    private Button backButton = createBackButton();
-
-
-    public static final Set<SettingsSector> GENERAL_SETTINGS;
-    public static final Set<SettingsSector> PROJECT_SETTINGS;
-
-
-    static {
-        GENERAL_SETTINGS = new HashSet<>();
-        PROJECT_SETTINGS = new HashSet<>();
-    }
+    private final GridPane display = new GridPane();
+    private final ToolBar settingSections = createSettingSections();
+    private final Button backButton = createBackButton();
 
     public GeneralSettings(boolean useProjectSpecific){
         this(Blocks.getInstance().getFXWindow().getScene(), Blocks.getInstance().getSceneSource(), useProjectSpecific);
@@ -51,14 +43,28 @@ public class GeneralSettings implements SceneSource {
     }
 
     private ToolBar createSettingSections() {
-        ToolBar bar = new ToolBar();
-        Set<SettingsSector> settings = new HashSet<>(GENERAL_SETTINGS);
+        var bar = new ToolBar();
+        var background = new Background(new BackgroundFill(Color.LIGHTGRAY, null, null));
+        bar.setBackground(background);
+        Set<SettingsSector> settings = new HashSet<>(Settings.GENERAL_SETTINGS);
         if(this.useProjectSpecific){
-            settings.addAll(PROJECT_SETTINGS);
+            settings.addAll(Settings.PROJECT_SETTINGS);
         }
+        var grid = GeneralSettings.this.display;
+        grid.setBackground(background);
+        grid.setGridLinesVisible(false);
+        grid.getColumnConstraints().clear();
+        grid.getColumnConstraints().add(new ColumnConstraints());
+        var constraints = new ColumnConstraints();
+        constraints.setFillWidth(true);
+        constraints.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().add(constraints);
         List<Node> names = settings.parallelStream().map(s -> {
             Button button = new Button(s.getName());
-
+            button.setOnAction(e -> {
+                grid.getChildren().clear();
+                s.getSettings().forEach((t, v) -> grid.addRow(grid.getRowCount(), t, v));
+            });
             return button;
         }).sorted((b1, b2) -> b1.getText().compareToIgnoreCase(b2.getText())).collect(Collectors.toList());
         bar.getItems().addAll(names);
@@ -69,7 +75,11 @@ public class GeneralSettings implements SceneSource {
 
     @Override
     public Scene build() {
-        Scene scene = new Scene(new VBox(createBackButton(), createSettingSections()));
-        return scene;
+        var vbox = new VBox(this.backButton, this.settingSections);
+        VBox.setVgrow(this.settingSections, Priority.ALWAYS);
+        var hbox = new HBox(vbox, this.display);
+        hbox.setSpacing(5.0);
+        HBox.setHgrow(this.display, Priority.ALWAYS);
+        return new Scene(hbox);
     }
 }
