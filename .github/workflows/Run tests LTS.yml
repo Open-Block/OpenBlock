@@ -1,4 +1,4 @@
-name: tests
+name: Run Tests - Lowest LTS
 on: push
 jobs:
   run_tests:
@@ -6,7 +6,7 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
-      - name: Set up JDK 14
+      - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 11
