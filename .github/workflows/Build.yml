@@ -60,7 +60,7 @@ jobs:
       env:
         GRAALVM_HOME: ${{ env.JAVA_HOME }}
     - name: Copy native client to staging
-      run: cp -r target/client/x86_64-darwin/Resistor* staging
+      run: cp -r target/client/x86_64-darwin/Open* staging
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
@@ -89,7 +89,7 @@ jobs:
         env:
           GRAALVM_HOME: ${{ env.JAVA_HOME }}    
       - name: Copy native client to staging
-        run: cp -r target/client/x86_64-linux/Resistor* staging
+        run: cp -r target/client/x86_64-linux/Open* staging
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
