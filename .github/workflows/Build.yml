@@ -64,7 +64,7 @@ jobs:
     - name: Making directory
       run: mkdir staging/macos
     - name: Copy native client to staging
-      run: cp target/client/x86_64-darwin/* staging/macos/
+      run: cp -r target/client/x86_64-darwin/* staging/macos/
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
@@ -95,7 +95,7 @@ jobs:
       - name: Making directory
         run: mkdir staging/linux
       - name: Copy native client to staging
-        run: cp target/client/x86_64-linux/* staging/linux/
+        run: cp -r target/client/x86_64-linux/* staging/linux/
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
