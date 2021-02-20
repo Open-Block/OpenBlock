@@ -36,7 +36,7 @@ jobs:
           env:
             GRAALVM_HOME: ${{ env.JAVA_HOME }}
         - name: Copy native client to staging
-          run: cp -r target/client/x86_64-windows/*.exe staging/windows/Blocks.exe
+          run: cp -r target/client/x86_64-windows/*.exe staging/windows/
         - name: Upload
           uses: actions/upload-artifact@v2
           with:
@@ -60,7 +60,7 @@ jobs:
       env:
         GRAALVM_HOME: ${{ env.JAVA_HOME }}
     - name: Copy native client to staging
-      run: cp target/client/x86_64-darwin/Blocks staging/macos/Blocks
+      run: cp target/client/x86_64-darwin/* staging/macos/
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
@@ -89,7 +89,7 @@ jobs:
         env:
           GRAALVM_HOME: ${{ env.JAVA_HOME }}    
       - name: Copy native client to staging
-        run: cp target/client/x86_64-linux/Blocks staging/linux/Blocks
+        run: cp target/client/x86_64-linux/* staging/linux/
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
@@ -116,7 +116,7 @@ jobs:
       - name: Make staging directory
         run: mkdir staging
       - name: Copy native clients to staging
-        run: cp -r target/client/aarch64-android/gvm/*.apk staging/android/Blocks.apk
+        run: cp -r target/client/aarch64-android/gvm/*.apk staging/android/
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
