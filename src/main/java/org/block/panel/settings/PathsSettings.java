@@ -3,10 +3,8 @@ package org.block.panel.settings;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.block.Blocks;
@@ -17,10 +15,16 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LogFileSettings implements SettingsSector {
+import com.gluonhq.attach.util.Services;
+import com.gluonhq.attach.storage.StorageService;
 
-    private HBox createPathNode(){
-        var textField = new TextField();
+public class PathsSettings implements SettingsSector {
+
+    public final TextField projectPath = new TextField(Services.get(StorageService.class).flatMap(storage -> storage.getPrivateStorage().map(f -> new File(f, "/projects"))).orElse(new File("projects")).getAbsolutePath());
+    public final TextField logPath = new TextField("logs/simple.txt");
+    public final TextField debugPath = new TextField("logs/debug.text");
+
+    private HBox createPathNode(TextField textField){
         var searchButton = new Button("...");
         var box = new HBox(textField, searchButton);
         HBox.setHgrow(textField, Priority.ALWAYS);
@@ -51,13 +55,16 @@ public class LogFileSettings implements SettingsSector {
 
     @Override
     public String getName() {
-        return "Log";
+        return "Path";
     }
 
     @Override
     public Map<Text, Node> getSettings() {
         Map<Text, Node> map = new HashMap<>();
-        map.put(new Text("Simple"), createPathNode());
+        map.put(new Text("Log"), createPathNode(this.logPath));
+        map.put(new Text("Debug"), createPathNode(this.debugPath));
+        map.put(new Text("Project"), createPathNode(this.projectPath));
+
         return map;
     }
 }

@@ -10,8 +10,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClassName>org.temp.FXProjectsPanelTest</mainClassName>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>gluon</id>
+            <name>Gluon</name>
+            <url>http://nexus.gluonhq.com/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
@@ -20,7 +27,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.5</version>
                 <configuration>
-                    <mainClass>${mainClassName}</mainClass>
+                    <mainClass>${client.mainClassName}</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -35,7 +42,7 @@
                         <list>statusbar</list>
                         <list>storage</list>
                     </attachList>
-                    <mainClass>${mainClassName}</mainClass>
+                    <mainClass>${client.mainClassName}</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -52,15 +59,33 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>3.2.4</version>
-            <scope>test</scope>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>16.0.2</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>15.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-glisten</artifactId>
+            <version>6.0.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>util</artifactId>
+            <version>4.0.9</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>storage</artifactId>
+            <version>4.0.9</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -76,9 +101,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>16.0.2</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.2.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>util</artifactId>
+            <version>4.0.9</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -90,12 +121,15 @@
             </activation>
             <properties>
                 <client.target>host</client.target>
+                <client.mainClassName>org.temp.FXProjectsPanelTest</client.mainClassName>
             </properties>
         </profile>
         <profile>
             <id>android</id>
             <properties>
                 <client.target>android</client.target>
+                <client.mainClassName>org.temp.FXProjectsPanelsAndroid</client.mainClassName>
+
             </properties>
         </profile>
     </profiles>
