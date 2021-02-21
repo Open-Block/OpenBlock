@@ -128,8 +128,7 @@
             <id>android</id>
             <properties>
                 <client.target>android</client.target>
-                <client.mainClassName>org.temp.FXProjectsPanelsAndroid</client.mainClassName>
-
+                <client.mainClassName>org.temp.FXProjectsPanelTest</client.mainClassName>
             </properties>
         </profile>
     </profiles>
