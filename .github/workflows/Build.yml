@@ -103,6 +103,7 @@ jobs:
           path: staging
   build_android:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - name: Setup GraalVM environment
