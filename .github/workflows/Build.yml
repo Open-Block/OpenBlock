@@ -132,7 +132,7 @@ jobs:
           path: staging
       - name: Making directory
         if: ${{ failure() }}
-        run: mkdir staging/android
+        run: mkdir -p staging/android
       - name: Failed pt2
         if: ${{ failure() }}
         run: cp -r target/client/aarch64-android/gvm/* staging/android/
