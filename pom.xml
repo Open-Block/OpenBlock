@@ -95,6 +95,13 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>display</artifactId>
+            <version>4.0.6</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.gluonhq</groupId>
             <artifactId>charm-down-core</artifactId>
             <version>3.8.0</version>
