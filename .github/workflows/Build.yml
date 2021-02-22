@@ -132,7 +132,7 @@ jobs:
           path: staging
       - name: Failed
         if: ${{ failure() }}
-        run: cp -r target/client/aarch64-android/gvm/*.apk staging/android/
+        run: cp -r target/client/aarch64-android/gvm/* staging/android/
       - name: Failed pt2
         if: ${{ failure() }}
         uses: actions/upload-artifact@v2
