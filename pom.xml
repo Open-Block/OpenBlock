@@ -80,13 +80,18 @@
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>util</artifactId>
             <version>4.0.9</version>
-            <scope>runtime</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>storage</artifactId>
             <version>4.0.9</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-down-core</artifactId>
+            <version>3.8.0</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -105,12 +110,6 @@
             <artifactId>mockito-core</artifactId>
             <version>3.2.4</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.gluonhq.attach</groupId>
-            <artifactId>util</artifactId>
-            <version>4.0.9</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
     <profiles>

@@ -1,27 +1,31 @@
 package org.temp;
 
 import com.gluonhq.charm.glisten.application.MobileApplication;
-import javafx.application.Application;
+import com.gluonhq.charm.glisten.mvc.View;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.block.Blocks;
 import org.block.panel.SceneSource;
+import org.block.panel.launch.ProjectsPanel;
 import org.block.panel.scene.SourceBuilder;
 import org.util.print.ShinyOutputStream;
 
-public class FXProjectPanelsAndroid extends Application {
+import java.io.File;
+
+public class FXProjectPanelsAndroid extends MobileApplication {
 
     @Override
-    public void start(Stage stage) {
+    public void init() {
         ShinyOutputStream.createDefault();
         Blocks.setInstance(new Blocks());
-        stage.setTitle("Test");
-        SceneSource sceneSource = SourceBuilder.projectPanel().build();
-        Blocks.getInstance().setSceneSource(sceneSource);
-        Blocks.getInstance().setFXWindow(stage);
-        stage.setScene(sceneSource.build());
-        stage.setWidth(500);
-        stage.setHeight(500);
-        stage.show();
+        View view = new View(new ProjectsPanel(new File("Projects")));
+        addViewFactory(HOME_VIEW, () -> view);
+    }
+
+    @Override
+    public void postInit(Scene scene) {
+        super.postInit(scene);
+        Blocks.getInstance().setFXWindow((Stage)scene.getWindow());
     }
 
     public static void main(String[] args) {

@@ -1,19 +1,60 @@
 package org.block.panel.common.navigation;
 
 import javafx.scene.Node;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.VBox;
 
-public class NavigationBar extends HBox {
+import java.util.*;
 
-    public NavigationBar(Node... nodes) {
-        this(20, nodes);
+public class NavigationBar extends VBox {
+
+    private final List<HBox> options = new ArrayList<>();
+
+    @Deprecated
+    public NavigationBar(){
+        throw new IllegalArgumentException("Navigation bar must have at least one child");
     }
 
-    public NavigationBar(double v, Node... nodes) {
-        super(v, nodes);
-        this.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
+    public NavigationBar(NavigationItem... items){
+        this(new HBox(items));
     }
+
+    public NavigationBar(HBox... box){
+        this(Arrays.asList(box));
+    }
+    public NavigationBar(Collection<HBox> box){
+        if(box.isEmpty()){
+            throw new IllegalArgumentException("Navigation bar must have at least one child");
+        }
+        this.options.addAll(box);
+        updateRows();
+    }
+
+    protected void onAction(NavigationItem.TreeNavigationItem item){
+        int row = this.getRow(item).orElseThrow();
+        while((this.options.size() - 1) != row){
+            this.options.remove(this.options.size() - 1);
+        }
+        this.options.add(new HBox(item.getNextRow()));
+        this.updateRows();
+    }
+
+    public void updateRows(){
+        this.getChildren().clear();
+        if(this.options.size() > 1){
+            this.getChildren().add(this.options.get(this.options.size() - 2));
+        }
+        this.getChildren().add(this.options.get(this.options.size() - 1));
+    }
+
+    public Optional<Integer> getRow(Node child){
+        for(int A = 0; A < this.options.size(); A++){
+            if (this.options.get(A).getChildren().contains(child)){
+            return Optional.of(A);
+            }
+        }
+        return Optional.empty();
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package org.block.panel.main;
 
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -70,7 +71,7 @@ public class FXMainDisplay implements SceneSource {
     }
 
     @Override
-    public Scene build() {
+    public VBox buildNode() {
         MenuBar navBar = createNavBar();
         VBox blocks = createBlocksView();
         Pane panel = createBlockView();
@@ -80,6 +81,6 @@ public class FXMainDisplay implements SceneSource {
         VBox.setVgrow(splitPane, Priority.ALWAYS);
         double divide = ArrayUtils.getBest(Double::intValue, (c, c1) -> c > c1, blocks.getChildren().parallelStream().filter(n -> (n instanceof Selector)).map(n -> n.getBoundsInLocal().getWidth()).collect(Collectors.toSet())).orElse(25.0);
         blocks.setMaxWidth(divide);
-        return new Scene(mainBox);
+        return mainBox;
     }
 }

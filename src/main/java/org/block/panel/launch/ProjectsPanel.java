@@ -1,15 +1,14 @@
 package org.block.panel.launch;
 
+import com.gluonhq.charm.glisten.control.NavigationDrawer;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.block.Blocks;
-import org.block.panel.SceneSource;
 import org.block.panel.common.navigation.NavigationBar;
-import org.block.panel.common.navigation.NavigationOption;
-import org.block.panel.common.navigation.TabbedNavigationBar;
+import org.block.panel.common.navigation.NavigationItem;
 import org.block.panel.main.FXMainDisplay;
 import org.block.panel.settings.GeneralSettings;
 import org.block.plugin.PluginContainer;
@@ -25,17 +24,29 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public class FXProjectsPanel implements SceneSource {
+public class ProjectsPanel extends VBox {
 
-    private final ListView<ToStringWrapper<UnloadedProject>> projectListView = new ListView<>();
     private final File projectsDirectory;
     private final SplitPane splitPane = new SplitPane();
-    private final TabbedNavigationBar navBar = new TabbedNavigationBar();
+    private final NavigationBar navBar;
+    private final ListView<ToStringWrapper<UnloadedProject>> projectListView;
 
-    public FXProjectsPanel(@NotNull File projectsDirectory) {
+    public ProjectsPanel(@NotNull File projectsDirectory) {
         this.projectsDirectory = projectsDirectory;
+        this.navBar = createNavBar();
+        this.projectListView = createProjectList();
+        init();
+    }
+
+    private void init(){
+        this.splitPane.getItems().add(this.projectListView);
+        this.splitPane.getItems().add(new Pane());
+        this.splitPane.setDividerPosition(0, this.splitPane.getDividerPositions()[0] / 2);
+        VBox.setVgrow(this.splitPane, Priority.ALWAYS);
+        this.getChildren().addAll(this.navBar, this.splitPane);
+        new Thread(this::searchForProjects).start();
+
     }
 
     public ListView<ToStringWrapper<UnloadedProject>> getProjectListView(){
@@ -50,8 +61,10 @@ public class FXProjectsPanel implements SceneSource {
         return this.splitPane;
     }
 
+
     private void searchForProjects(){
-        File[] files = FXProjectsPanel.this.projectsDirectory.listFiles(File::isDirectory);
+        System.out.println("ProjectDir: " + this.projectsDirectory);
+        File[] files = this.projectsDirectory.listFiles(File::isDirectory);
         if (files == null) {
             return;
         }
@@ -61,7 +74,7 @@ public class FXProjectsPanel implements SceneSource {
                 System.err.println("Invalid folder found: " + openBlockFile.getAbsolutePath());
                 continue;
             }
-            ObservableList<ToStringWrapper<UnloadedProject>> projects = FXProjectsPanel.this.projectListView.getItems();
+            ObservableList<ToStringWrapper<UnloadedProject>> projects = this.projectListView.getItems();
             if (projects.parallelStream().anyMatch(p -> p.getValue().getDirectory().equals(folder))) {
                 continue;
             }
@@ -76,11 +89,11 @@ public class FXProjectsPanel implements SceneSource {
     }
 
     private ListView<ToStringWrapper<UnloadedProject>> createProjectList() {
-        new Thread(this::searchForProjects).start();
-        this.projectListView.setOnMouseClicked((event) -> {
+        ListView<ToStringWrapper<UnloadedProject>> projectListView = new ListView<>();
+        projectListView.setOnMouseClicked((event) -> {
             ObservableList<Node> splitItems = this.splitPane.getItems();
             try {
-                ToStringWrapper<UnloadedProject> wrapper = this.projectListView.getSelectionModel().getSelectedItem();
+                ToStringWrapper<UnloadedProject> wrapper = projectListView.getSelectionModel().getSelectedItem();
                 if(wrapper == null){
                     return;
                 }
@@ -93,18 +106,14 @@ public class FXProjectsPanel implements SceneSource {
                 splitItems.add(wrapped);
                 this.splitPane.setDividerPositions(pos);
 
-                wrapped.prefWidthProperty().bind(this.projectListView.prefWidthProperty());
+                wrapped.prefWidthProperty().bind(projectListView.prefWidthProperty());
             } catch (IOException e) {
                 e.printStackTrace();
                 event.consume();
             }
         });
-        this.projectListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        return this.projectListView;
-    }
-
-    private Pane createBlankProjectInfo() {
-        return new Pane();
+        projectListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        return projectListView;
     }
 
     private VBox createProjectInfo(UnloadedProject project, Region region){
@@ -119,7 +128,7 @@ public class FXProjectsPanel implements SceneSource {
             GeneralUntil.getFiles(project.getDirectory()).parallelStream().forEach(File::delete);
 
             Optional<ToStringWrapper<UnloadedProject>> opWrapper = this.projectListView.getItems().parallelStream().filter(w -> w.getValue().equals(project)).findFirst();
-            if(!opWrapper.isPresent()){
+            if(opWrapper.isEmpty()){
                 return;
             }
             this.projectListView.getItems().remove(opWrapper.get());
@@ -138,49 +147,25 @@ public class FXProjectsPanel implements SceneSource {
         return area;
     }
 
-    private TabbedNavigationBar createNavBar() {
-        List<NavigationOption> createMenuNavigation = new ArrayList<>();
-        Blocks.getInstance().getAllEnabledPlugins().getAll(PluginContainer::getModules).parallelStream().forEach(m -> {
-            NavigationOption item = new NavigationOption(m.getDisplayName());
-            item.setOnAction(e -> m.onProjectCreator());
-            createMenuNavigation.add(item);
-        });
-        createMenuNavigation.sort(Comparator.comparing(n -> n.getText().getText()));
-        NavigationBar createMenu = new NavigationBar();
-        createMenu.getChildren().addAll(createMenuNavigation);
-        this.navBar.getTabs().add(new Tab("Create", createMenu));
+    private NavigationBar createNavBar() {
+        var createMenuNavigation = new ArrayList<NavigationItem.EndNavigationItem>();
+        Blocks.getInstance()
+                .getAllEnabledPlugins()
+                .getAll(PluginContainer::getModules)
+                .parallelStream()
+                .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getDisplayName(), (e) -> m.onProjectCreator())));
+        createMenuNavigation.sort(Comparator.comparing(Labeled::getText));
+        var createOption = new NavigationItem.TreeNavigationItem("Create", createMenuNavigation.toArray(new NavigationItem[0]));
 
-        NavigationOption joinNetworkOption = new NavigationOption("Join");
-        //TODO JOIN
-        NavigationBar networkBar = new NavigationBar(joinNetworkOption);
+        var networkJoin = new NavigationItem.EndNavigationItem("Join", (e) -> {});
+        var networkOption = new NavigationItem.TreeNavigationItem("Network", networkJoin);
 
-        this.navBar.getTabs().add(new Tab("Network", networkBar));
-
-        NavigationOption generalSettingsBar = new NavigationOption("General Settings");
-        generalSettingsBar.setOnAction(e -> {
+        var settingsOption = new NavigationItem.EndNavigationItem("Settings", (e) -> {
             var stage = Blocks.getInstance().getFXWindow();
-            var settings = new GeneralSettings(false);
-            stage.setScene(settings.build());
+            var settings = new GeneralSettings();
+            stage.setScene(new Scene(settings));
         });
 
-
-        NavigationBar settingsBar = new NavigationBar(generalSettingsBar);
-        this.navBar.getTabs().add(new Tab("Settings", settingsBar));
-
-
-        return this.navBar;
-    }
-
-    @Override
-    public Scene build() {
-        TabbedNavigationBar navBar = this.createNavBar();
-        ListView<ToStringWrapper<UnloadedProject>> projects = this.createProjectList();
-        Pane blankProjectPane = new Pane();
-        this.splitPane.getItems().add(projects);
-        this.splitPane.getItems().add(blankProjectPane);
-        this.splitPane.setDividerPosition(0, this.splitPane.getDividerPositions()[0] / 2);
-        VBox box = new VBox(navBar, this.splitPane);
-        VBox.setVgrow(this.splitPane, Priority.ALWAYS);
-        return new Scene(box);
+        return new NavigationBar(createOption, networkOption, settingsOption);
     }
 }

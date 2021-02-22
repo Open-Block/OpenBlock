@@ -27,10 +27,12 @@ public class Blocks {
 
     private static Blocks instance;
 
+    @Deprecated
     public SceneSource getSceneSource(){
         return this.source;
     }
 
+    @Deprecated
     public void setSceneSource(SceneSource source){
         this.source = source;
     }

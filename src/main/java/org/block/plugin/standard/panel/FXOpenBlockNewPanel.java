@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import org.block.Blocks;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.project.UnloadedProject;
-import org.block.panel.launch.FXProjectsPanel;
 import org.block.panel.SceneSource;
 import org.block.util.ToStringWrapper;
 
@@ -61,7 +60,7 @@ public class FXOpenBlockNewPanel {
                 Stage stage = (Stage)this.createButton.getScene().getWindow();
                 stage.close();
                 SceneSource source = Blocks.getInstance().getSceneSource();
-                if(source instanceof FXProjectsPanel){
+                /*if(source instanceof FXProjectsPanel){
                     FXProjectsPanel fxPanel = (FXProjectsPanel) source;
                     fxPanel.getProjectListView().getItems().add(new ToStringWrapper<>(project, (pro) -> {
                         try {
@@ -70,7 +69,7 @@ public class FXOpenBlockNewPanel {
                             return pro.getDirectory().getName();
                         }
                     }));
-                }
+                }*/
             } catch (IOException ioException) {
                 ioException.printStackTrace();
                 return;

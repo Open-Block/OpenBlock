@@ -1,8 +1,14 @@
 package org.block.panel;
 
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 
+@Deprecated
 public interface SceneSource {
 
-    Scene build();
+    Parent buildNode();
+
+    default Scene build(){
+        return new Scene(buildNode());
+    }
 }
