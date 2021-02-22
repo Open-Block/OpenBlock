@@ -3,6 +3,7 @@ package org.block;
 import javafx.stage.Stage;
 import org.block.network.client.ClientConnection;
 import org.block.network.server.ServerConnection;
+import org.block.panel.settings.GeneralSettings;
 import org.block.plugin.PluginContainer;
 import org.block.plugin.PluginContainers;
 import org.block.project.module.project.Project;
@@ -19,6 +20,7 @@ public class Blocks {
     private Project.Loaded loadedProject;
     private ServerConnection server;
     private ClientConnection client;
+    private GeneralSettings settings;
 
     private Stage win;
     private SceneSource source;
@@ -26,6 +28,10 @@ public class Blocks {
     public static final int[] VERSION = {0, 0, 0, 1};
 
     private static Blocks instance;
+
+    public GeneralSettings getSettings(){
+        return this.settings;
+    }
 
     @Deprecated
     public SceneSource getSceneSource(){
