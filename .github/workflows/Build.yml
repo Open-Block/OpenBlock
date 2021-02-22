@@ -130,10 +130,13 @@ jobs:
         with:
           name: Package
           path: staging
-      - name: Failed
+      - name: Making directory
+        if: ${{ failure() }}
+        run: mkdir staging/android
+      - name: Failed pt2
         if: ${{ failure() }}
         run: cp -r target/client/aarch64-android/gvm/* staging/android/
-      - name: Failed pt2
+      - name: Failed pt3
         if: ${{ failure() }}
         uses: actions/upload-artifact@v2
         with:
