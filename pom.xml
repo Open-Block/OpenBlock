@@ -37,10 +37,8 @@
                 <configuration>
                     <target>${client.target}</target>
                     <attachList>
-                        <list>display</list>
-                        <list>lifecycle</list>
-                        <list>statusbar</list>
                         <list>storage</list>
+                        <list>lifecycle</list>
                     </attachList>
                     <mainClass>${client.mainClassName}</mainClass>
                 </configuration>
@@ -80,31 +78,61 @@
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>util</artifactId>
             <version>4.0.9</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.gluonapplication</groupId>
+                    <artifactId>HelloWorldApp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>storage</artifactId>
             <version>4.0.9</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.gluonapplication</groupId>
+                    <artifactId>HelloWorldApp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>lifecycle</artifactId>
             <version>4.0.6</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.gluonapplication</groupId>
+                    <artifactId>HelloWorldApp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>display</artifactId>
             <version>4.0.6</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.gluonapplication</groupId>
+                    <artifactId>HelloWorldApp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>statusbar</artifactId>
             <version>4.0.10</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.gluonapplication</groupId>
+                    <artifactId>HelloWorldApp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -112,6 +140,12 @@
             <artifactId>charm-down-core</artifactId>
             <version>3.8.0</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.gluonapplication</groupId>
+                    <artifactId>HelloWorldApp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
