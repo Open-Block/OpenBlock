@@ -90,35 +90,26 @@
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>storage</artifactId>
             <version>4.0.10</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.gluonhq</groupId>
-                    <artifactId>helloandroid</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>lifecycle</artifactId>
             <version>4.0.10</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.gluonhq</groupId>
-                    <artifactId>helloandroid</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>display</artifactId>
+            <version>4.0.10</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>statusbar</artifactId>
+            <version>4.0.10</version>
+        </dependency>
         <dependency>
             <groupId>com.gluonhq</groupId>
             <artifactId>charm-down-core</artifactId>
             <version>3.8.6</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.gluonhq</groupId>
-                    <artifactId>helloandroid</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
