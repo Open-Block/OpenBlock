@@ -14,10 +14,11 @@ public class FXProjectPanelsAndroid extends MobileApplication {
     @Override
     public void init() {
         ShinyOutputStream.createDefault();
-        View view = new View(new ProjectsPanel(new File("Projects")));
+        this.addViewFactory(HOME_VIEW, () -> {
+          View view = new View(new ProjectsPanel(new File("Projects")));
         Blocks.setInstance(new MobileBlocks(view));
-
-        this.addViewFactory(HOME_VIEW, () -> view);
+          return view;
+        });
     }
 
     public static void main(String[] args) {
