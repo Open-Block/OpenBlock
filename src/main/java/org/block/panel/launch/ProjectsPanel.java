@@ -119,8 +119,7 @@ public class ProjectsPanel extends VBox {
         Button load = new Button("Load");
         load.setOnAction((event) -> {
             FXMainDisplay display = new FXMainDisplay();
-            Blocks.getInstance().setWindow(display.buildNode());
-            Blocks.getInstance().setSceneSource(display);
+            Blocks.getInstance().setWindow(display);
         });
         Button delete = new Button("Delete");
         delete.setOnAction((event) -> {

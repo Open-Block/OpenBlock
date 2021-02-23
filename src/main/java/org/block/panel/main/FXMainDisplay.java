@@ -7,7 +7,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.array.utils.ArrayUtils;
-import org.block.panel.SceneSource;
 import org.block.panel.main.selector.BlockSelector;
 import org.block.panel.main.selector.GroupSelector;
 import org.block.panel.main.selector.Selector;
@@ -17,11 +16,15 @@ import org.block.project.block.BlockType;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FXMainDisplay implements SceneSource {
+public class FXMainDisplay extends VBox {
 
-    private VBox blocks = new VBox();
-    private MenuBar navBar = new MenuBar();
-    private Pane panel = new Pane();
+    private VBox blocks = this.createBlocksView();
+    private MenuBar navBar = this.createNavBar();
+    private Pane panel = this.createBlockView();
+
+    public FXMainDisplay() {
+        this.init();
+    }
 
     public MenuBar getNavBar() {
         return this.navBar;
@@ -42,26 +45,18 @@ public class FXMainDisplay implements SceneSource {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public VBox buildNode() {
-        MenuBar navBar = createNavBar();
-        VBox blocks = createBlocksView();
-        Pane panel = createBlockView();
-
-        SplitPane splitPane = new SplitPane(blocks, panel);
-        VBox mainBox = new VBox(navBar, splitPane);
+    private void init() {
+        SplitPane splitPane = new SplitPane(this.blocks, this.panel);
+        this.getChildren().addAll(this.navBar, splitPane);
         VBox.setVgrow(splitPane, Priority.ALWAYS);
-        double divide = ArrayUtils.getBest(Double::intValue, (c, c1) -> c > c1, blocks.getChildren().parallelStream().filter(n -> (n instanceof Selector)).map(n -> n.getBoundsInLocal().getWidth()).collect(Collectors.toSet())).orElse(25.0);
-        blocks.setMaxWidth(divide);
-        return mainBox;
+        double divide = ArrayUtils.getBest(Double::intValue, (c, c1) -> c > c1, this.blocks.getChildren().parallelStream().filter(n -> (n instanceof Selector)).map(n -> n.getBoundsInLocal().getWidth()).collect(Collectors.toSet())).orElse(25.0);
+        this.blocks.setMaxWidth(divide);
     }
 
     private MenuBar createNavBar() {
         Menu file = new Menu("File");
         Menu network = new Menu("Network");
-        this.navBar.getMenus().add(file);
-        this.navBar.getMenus().add(network);
-        return this.navBar;
+        return new MenuBar(file, network);
     }
 
     private void registerBlocks(VBox box) {
@@ -74,11 +69,12 @@ public class FXMainDisplay implements SceneSource {
     }
 
     private VBox createBlocksView() {
-        registerBlocks(this.blocks);
-        return this.blocks;
+        var box = new VBox();
+        this.registerBlocks(box);
+        return box;
     }
 
     private Pane createBlockView() {
-        return this.panel;
+        return new Pane();
     }
 }

@@ -76,7 +76,7 @@ public class MinusOperation extends AbstractNumberOperation {
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
-            FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+            FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getWindow();
             List<Block> blocks = panel.getDisplayingBlocks();
             MinusOperation minusBlock = new MinusOperation(opX.get(), opY.get());
             List<BlockGroup> groups = minusBlock.getGroups();

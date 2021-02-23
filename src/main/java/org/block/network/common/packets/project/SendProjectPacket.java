@@ -38,13 +38,13 @@ public class SendProjectPacket implements Packet {
         }
         Project.Loaded loadedProject = (Project.Loaded) project;
         //TODO - all classes
-        FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+        FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getWindow();
         List<Block> blocks = panel.getDisplayingBlocks();
         String first = builder.build(direct);
         direct.sendMessage(first);
         for (Block block : blocks) {
             NetworkConfigNode node = ConfigImplementation.NETWORK.createEmptyNode();
-            writeBlock(node, block);
+            this.writeBlock(node, block);
             String text = ConfigImplementation.NETWORK.write(node);
             direct.sendMessage(text);
         }

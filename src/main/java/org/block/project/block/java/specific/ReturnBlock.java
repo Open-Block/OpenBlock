@@ -19,6 +19,7 @@ public class ReturnBlock extends AbstractAttachableBlock {
     public static final String RETURN_BLOCK = "return:value";
     private int marginX = 2;
     private int marginY = 4;
+
     public ReturnBlock(int x, int y) {
         super(x, y);
         this.blockGroups.add(new ReturnBlockGroup());
@@ -77,7 +78,7 @@ public class ReturnBlock extends AbstractAttachableBlock {
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
-            FXMainDisplay panel = ((FXMainDisplay) Blocks.getInstance().getSceneSource());
+            FXMainDisplay panel = ((FXMainDisplay) Blocks.getInstance().getWindow());
             List<Block> blocks = panel.getDisplayingBlocks();
             ReturnBlock methodBlock = new ReturnBlock(opX.get(), opY.get());
             ReturnBlockGroup returnBlockGroup = methodBlock.getReturnBlockList();

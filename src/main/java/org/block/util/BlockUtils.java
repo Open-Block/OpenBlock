@@ -20,7 +20,7 @@ public class BlockUtils {
     }
 
     public static Set<Block> load(Project.Loaded project, File folder, ConfigImplementation<? extends ConfigNode> impl, Consumer<Block> loaded) {
-        FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+        FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getWindow();
         List<BlockType<? extends Block>> blockTypes = /*project.getPanel().getChooserPanel().getBlockTypes();*/ new ArrayList<>();
         Map<File, BlockType<? extends Block>> depends = new HashMap<>();
         Set<Block> load = new HashSet<>();
@@ -51,7 +51,7 @@ public class BlockUtils {
                     clazzName = "Global";
                 }
                 final String finalClassName = clazzName;
-                FXMainDisplay bdPanel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+                FXMainDisplay bdPanel = (FXMainDisplay) Blocks.getInstance().getWindow();
 
 
                 try {
@@ -85,7 +85,7 @@ public class BlockUtils {
                     clazzName = "Global";
                 }
                 final String finalClassName = clazzName;
-                FXMainDisplay bdPanel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+                FXMainDisplay bdPanel = (FXMainDisplay) Blocks.getInstance().getWindow();
 
                 try {
                     Block block = entry.getValue().build(node);

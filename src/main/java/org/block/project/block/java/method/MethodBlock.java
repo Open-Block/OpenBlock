@@ -31,6 +31,7 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
     public static final String SECTION_NAME = "method:name";
     private int marginX = 8;
     private int marginY = 8;
+
     public MethodBlock(int x, int y) {
         this(x, y, null);
     }
@@ -130,7 +131,7 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
-            FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getSceneSource();
+            FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getWindow();
             List<Block> blocks = panel.getDisplayingBlocks();
             MethodBlock methodBlock = new MethodBlock(opX.get(), opY.get());
             methodBlock.id = opUUID.get();
