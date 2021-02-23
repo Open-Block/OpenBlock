@@ -78,8 +78,7 @@
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>util</artifactId>
-            <version>4.0.9</version>
-            <scope>compile</scope>
+            <version>4.0.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.gluonhq</groupId>
@@ -90,8 +89,7 @@
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>storage</artifactId>
-            <version>4.0.9</version>
-            <scope>compile</scope>
+            <version>4.0.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.gluonhq</groupId>
@@ -102,8 +100,7 @@
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>lifecycle</artifactId>
-            <version>4.0.6</version>
-            <scope>compile</scope>
+            <version>4.0.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.gluonhq</groupId>
@@ -115,8 +112,7 @@
         <dependency>
             <groupId>com.gluonhq</groupId>
             <artifactId>charm-down-core</artifactId>
-            <version>3.8.0</version>
-            <scope>compile</scope>
+            <version>3.8.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.gluonhq</groupId>
