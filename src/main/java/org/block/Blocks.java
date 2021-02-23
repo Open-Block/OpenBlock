@@ -27,6 +27,14 @@ public abstract class Blocks {
 
     public abstract void setWindow(Parent parent);
 
+    public abstract void requestNewWidth(double width);
+
+    public abstract void requestNewHeight(double height);
+
+    public abstract double getHeight();
+
+    public abstract double getWidth();
+
     public GeneralSettings getSettings() {
         return this.settings;
     }

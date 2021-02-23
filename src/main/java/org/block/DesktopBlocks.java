@@ -29,6 +29,27 @@ public class DesktopBlocks extends Blocks {
         this.stage.setScene(scene);
     }
 
+    @Override
+    public void requestNewWidth(double width) {
+        this.stage.setWidth(width);
+    }
+
+    @Override
+    public void requestNewHeight(double height) {
+        this.stage.setHeight(height);
+
+    }
+
+    @Override
+    public double getHeight() {
+        return this.stage.getHeight();
+    }
+
+    @Override
+    public double getWidth() {
+        return this.stage.getWidth();
+    }
+
     protected Scene onSceneCreate(Scene scene, Parent parent) {
         scene.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             if (KeyCode.ESCAPE.equals(e.getCode())) {
