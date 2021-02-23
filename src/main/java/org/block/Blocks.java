@@ -1,6 +1,6 @@
 package org.block;
 
-import javafx.stage.Stage;
+import javafx.scene.Parent;
 import org.block.network.client.ClientConnection;
 import org.block.network.server.ServerConnection;
 import org.block.panel.SceneSource;
@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Blocks {
+public abstract class Blocks {
 
     public static final int[] VERSION = {0, 0, 0, 1};
     private static Blocks instance;
@@ -23,8 +23,11 @@ public class Blocks {
     private ServerConnection server;
     private ClientConnection client;
     private GeneralSettings settings = new GeneralSettings();
-    private Stage win;
     private SceneSource source;
+
+    public abstract Parent getWindow();
+
+    public abstract void setWindow(Parent parent);
 
     public GeneralSettings getSettings() {
         return this.settings;
@@ -38,14 +41,6 @@ public class Blocks {
     @Deprecated
     public void setSceneSource(SceneSource source) {
         this.source = source;
-    }
-
-    public Stage getFXWindow() {
-        return this.win;
-    }
-
-    public void setFXWindow(Stage window) {
-        this.win = window;
     }
 
     public Optional<ClientConnection> getClient() {

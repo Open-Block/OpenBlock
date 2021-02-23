@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.block.Blocks;
+import org.block.DesktopBlocks;
 import org.block.panel.launch.ProjectsPanel;
 import org.util.print.ShinyOutputStream;
 import org.util.storage.DesktopStorageFactory;
@@ -16,9 +17,8 @@ public class FXProjectsPanelTest extends Application {
     @Override
     public void start(Stage stage) {
         ShinyOutputStream.createDefault();
-        Blocks.setInstance(new Blocks());
+        Blocks.setInstance(new DesktopBlocks(stage));
         stage.setTitle("Test");
-        Blocks.getInstance().setFXWindow(stage);
         stage.setScene(new Scene(new ProjectsPanel(new File("Projects"))));
         stage.setWidth(500);
         stage.setHeight(500);

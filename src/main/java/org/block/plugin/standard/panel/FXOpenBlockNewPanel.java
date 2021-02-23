@@ -1,46 +1,55 @@
 package org.block.plugin.standard.panel;
 
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import org.block.Blocks;
-import org.block.panel.SceneSource;
+import org.block.panel.common.dialog.Dialog;
+import org.block.panel.launch.ProjectsPanel;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.project.UnloadedProject;
+import org.block.util.ToStringWrapper;
 
 import java.io.File;
 import java.io.IOException;
 
 
-public class FXOpenBlockNewPanel {
+public class FXOpenBlockNewPanel extends VBox implements Dialog {
 
     private final TextField nameField = new TextField();
     private final TextField versionField = new TextField("1.0.0-SNAPSHOT");
-    private final Label locationLabel = new Label(new File("Projects/OpenBlock.json").getAbsolutePath());
+    private final Label locationLabel = new Label(new File(Blocks.getInstance().getSettings().getProjectPath().valueProperty().getValue().getAbsolutePath() + "/OpenBlock.json").getAbsolutePath());
     private final Button cancelButton = new Button("Cancel");
     private final Button createButton = new Button("Create");
+    private final ProjectsPanel origin;
 
-    public Scene build() {
-        GridPane grid = createGrid();
-        HBox buttons = createButtons();
+    public FXOpenBlockNewPanel(ProjectsPanel panel) {
+        this.origin = panel;
+        this.init();
+    }
+
+    @Override
+    public Parent getBackParent() {
+        return this.origin;
+    }
+
+    private void init() {
+        var grid = this.createGrid();
+        var buttons = this.createButtons();
         grid.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
-
-        buttons.prefWidthProperty().bind(grid.widthProperty());
-        VBox box = new VBox(grid, buttons);
-        return new Scene(box);
+        this.getChildren().addAll(grid, buttons);
     }
 
     private GridPane createGrid() {
         GridPane pane = new GridPane();
-        createRow(pane, "Name", this.nameField, 0);
-        createRow(pane, "Version", this.versionField, 1);
-        createRow(pane, "Location", this.locationLabel, 2);
+        this.createRow(pane, "Name", this.nameField, 0);
+        this.createRow(pane, "Version", this.versionField, 1);
+        this.createRow(pane, "Location", this.locationLabel, 2);
         return pane;
     }
 
@@ -54,8 +63,8 @@ public class FXOpenBlockNewPanel {
     }
 
     private HBox createButtons() {
-        this.nameField.setOnKeyTyped((e) -> createKeyEvent(e, true));
-        this.versionField.setOnKeyTyped((e) -> createKeyEvent(e, false));
+        this.nameField.setOnKeyTyped((e) -> this.createKeyEvent(e, true));
+        this.versionField.setOnKeyTyped((e) -> this.createKeyEvent(e, false));
         this.cancelButton.setCancelButton(true);
 
         this.createButton.setOnAction((event) -> {
@@ -66,28 +75,21 @@ public class FXOpenBlockNewPanel {
             project.addTempVersions(this.versionField.getText());
             try {
                 project.saveTempData();
-                Stage stage = (Stage) this.createButton.getScene().getWindow();
-                stage.close();
-                SceneSource source = Blocks.getInstance().getSceneSource();
-                /*if(source instanceof FXProjectsPanel){
-                    FXProjectsPanel fxPanel = (FXProjectsPanel) source;
-                    fxPanel.getProjectListView().getItems().add(new ToStringWrapper<>(project, (pro) -> {
-                        try {
-                            return pro.getDisplayName();
-                        } catch (IOException e) {
-                            return pro.getDirectory().getName();
-                        }
-                    }));
-                }*/
+                Blocks.getInstance().setWindow(this.origin);
+                this.origin.getProjectListView().getItems().add(new ToStringWrapper<>(project, (pro) -> {
+                    try {
+                        return pro.getDisplayName();
+                    } catch (IOException e) {
+                        return pro.getDirectory().getName();
+                    }
+                }));
             } catch (IOException ioException) {
                 ioException.printStackTrace();
-                return;
             }
         });
 
         this.cancelButton.setOnAction((event) -> {
-            Stage stage = (Stage) this.cancelButton.getScene().getWindow();
-            stage.close();
+            Blocks.getInstance().setWindow(this.origin);
         });
 
         HBox box = new HBox(this.cancelButton, this.createButton);
@@ -101,7 +103,7 @@ public class FXOpenBlockNewPanel {
 
     private void createKeyEvent(KeyEvent event, boolean checkName) {
         if (checkName) {
-            this.locationLabel.setText(new File("Projects/" + this.nameField.getText() + "/OpenBlock.json").getAbsolutePath());
+            this.locationLabel.setText(new File(Blocks.getInstance().getSettings().getProjectPath().valueProperty().getValue().getAbsolutePath() + "/" + this.nameField.getText() + "/OpenBlock.json").getAbsolutePath());
         }
         if (this.nameField.getText().trim().length() == 0) {
             this.createButton.setDisable(true);

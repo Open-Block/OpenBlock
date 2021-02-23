@@ -1,6 +1,7 @@
 package org.block.project.module;
 
 import javafx.scene.layout.Region;
+import org.block.panel.launch.ProjectsPanel;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.project.Project;
 import org.block.project.module.project.UnloadedProject;
@@ -63,8 +64,10 @@ public interface Module {
     /**
      * Called when a project creator for this module is called. This is typically caused
      * when the ProjectPanel attempts to create a new project of this module.
+     *
+     * @param panel The original panel
      */
-    void onProjectCreator();
+    void onProjectCreator(ProjectsPanel panel);
 
     /**
      * Gets the display node for displaying the projects info before the project has loaded.

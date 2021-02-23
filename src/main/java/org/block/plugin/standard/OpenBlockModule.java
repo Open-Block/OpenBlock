@@ -1,11 +1,11 @@
 package org.block.plugin.standard;
 
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.stage.Stage;
+import org.block.Blocks;
+import org.block.panel.launch.ProjectsPanel;
 import org.block.plugin.PluginContainer;
 import org.block.plugin.standard.panel.FXOpenBlockNewPanel;
 import org.block.project.module.Module;
@@ -59,13 +59,9 @@ public final class OpenBlockModule implements Module {
     }
 
     @Override
-    public void onProjectCreator() {
-        Stage stage = new Stage();
-        stage.setTitle("Create Java Module");
-        stage.setWidth(600);
-        Scene scene = new FXOpenBlockNewPanel().build();
-        stage.setScene(scene);
-        stage.show();
+    public void onProjectCreator(ProjectsPanel panel) {
+        var newPanel = new FXOpenBlockNewPanel(panel);
+        Blocks.getInstance().setWindow(newPanel);
     }
 
     @Override
@@ -79,7 +75,7 @@ public final class OpenBlockModule implements Module {
         GridPane gridPane = new GridPane();
         gridPane.setGridLinesVisible(true);
 
-        addGridRowToDisplayInfo(gridPane, "name", displayName, 0);
+        this.addGridRowToDisplayInfo(gridPane, "name", displayName, 0);
 
         return gridPane;
     }

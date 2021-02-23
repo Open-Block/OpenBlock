@@ -2,7 +2,6 @@ package org.block.panel.launch;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.block.Blocks;
@@ -10,6 +9,7 @@ import org.block.panel.common.navigation.NavigationBar;
 import org.block.panel.common.navigation.NavigationItem;
 import org.block.panel.main.FXMainDisplay;
 import org.block.panel.settings.GeneralSettings;
+import org.block.panel.settings.SettingsDisplay;
 import org.block.project.module.Module;
 import org.block.project.module.project.UnloadedProject;
 import org.block.util.GeneralUntil;
@@ -119,7 +119,7 @@ public class ProjectsPanel extends VBox {
         Button load = new Button("Load");
         load.setOnAction((event) -> {
             FXMainDisplay display = new FXMainDisplay();
-            Blocks.getInstance().getFXWindow().setScene(display.build());
+            Blocks.getInstance().setWindow(display.buildNode());
             Blocks.getInstance().setSceneSource(display);
         });
         Button delete = new Button("Delete");
@@ -156,7 +156,7 @@ public class ProjectsPanel extends VBox {
                     return Arrays.asList(modules);
                 })
                 .parallelStream()
-                .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getDisplayName(), (e) -> m.onProjectCreator())));
+                .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getDisplayName(), (e) -> m.onProjectCreator(ProjectsPanel.this))));
         createMenuNavigation.sort(Comparator.comparing(Labeled::getText));
         var createOption = new NavigationItem.TreeNavigationItem("Create", createMenuNavigation.toArray(new NavigationItem[0]));
 
@@ -165,9 +165,8 @@ public class ProjectsPanel extends VBox {
         var networkOption = new NavigationItem.TreeNavigationItem("Network", networkJoin);
 
         var settingsOption = new NavigationItem.EndNavigationItem("Settings", (e) -> {
-            var stage = Blocks.getInstance().getFXWindow();
-            var settings = new GeneralSettings();
-            stage.setScene(new Scene(settings));
+            var settings = new SettingsDisplay<>(new GeneralSettings(), ProjectsPanel.this);
+            Blocks.getInstance().setWindow(settings);
         });
 
         return new NavigationBar(createOption, networkOption, settingsOption);
