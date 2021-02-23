@@ -39,6 +39,7 @@
                     <attachList>
                         <list>storage</list>
                         <list>lifecycle</list>
+                        <list>utils</list>
                     </attachList>
                     <mainClass>${client.mainClassName}</mainClass>
                 </configuration>
@@ -78,11 +79,11 @@
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>util</artifactId>
             <version>4.0.9</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.gluonapplication</groupId>
-                    <artifactId>HelloWorldApp</artifactId>
+                    <groupId>com.gluonhq</groupId>
+                    <artifactId>helloandroid</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -93,8 +94,8 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.gluonapplication</groupId>
-                    <artifactId>HelloWorldApp</artifactId>
+                    <groupId>com.gluonhq</groupId>
+                    <artifactId>helloandroid</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -105,8 +106,8 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.gluonapplication</groupId>
-                    <artifactId>HelloWorldApp</artifactId>
+                    <groupId>com.gluonhq</groupId>
+                    <artifactId>helloandroid</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -117,8 +118,8 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.gluonapplication</groupId>
-                    <artifactId>HelloWorldApp</artifactId>
+                    <groupId>com.gluonhq</groupId>
+                    <artifactId>helloandroid</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -129,8 +130,8 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.gluonapplication</groupId>
-                    <artifactId>HelloWorldApp</artifactId>
+                    <groupId>com.gluonhq</groupId>
+                    <artifactId>helloandroid</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -142,8 +143,8 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.gluonapplication</groupId>
-                    <artifactId>HelloWorldApp</artifactId>
+                    <groupId>com.gluonhq</groupId>
+                    <artifactId>helloandroid</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
