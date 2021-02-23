@@ -1,10 +1,10 @@
 package org.block.plugin.standard.panel;
 
+import com.gluonhq.charm.glisten.control.TextField;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -88,9 +88,7 @@ public class FXOpenBlockNewPanel extends VBox implements Dialog {
             }
         });
 
-        this.cancelButton.setOnAction((event) -> {
-            Blocks.getInstance().setWindow(this.origin);
-        });
+        this.cancelButton.setOnAction((event) -> Blocks.getInstance().setWindow(this.origin));
 
         HBox box = new HBox(this.cancelButton, this.createButton);
         box.setFillHeight(true);
