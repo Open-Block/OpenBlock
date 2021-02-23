@@ -39,21 +39,21 @@ public class ShinyOutputStream extends OutputStream {
         write(new int[]{b}, 0, 1);
     }
 
-    public void write(int[] bytes, int offset, int length){
+    public void write(int[] bytes, int offset, int length) {
         String character = new String(bytes, offset, length);
         this.buffer = this.buffer + character;
-        if(this.console != null) {
+        if (this.console != null) {
             this.console.print(character);
         }
         try {
-            if(this.debugStream != null) {
+            if (this.debugStream != null) {
                 this.debugStream.write(character);
             }
         } catch (IOException ignore) {
         }
-        if(character.charAt(0) == '\n'){
+        if (character.charAt(0) == '\n') {
             boolean isNumberAtEnd = false;
-            if(this.buffer.length() >= 4) {
+            if (this.buffer.length() >= 4) {
                 try {
                     Integer.parseInt(this.buffer.charAt(this.buffer.length() - 4) + "");
                     isNumberAtEnd = true;
@@ -61,31 +61,31 @@ public class ShinyOutputStream extends OutputStream {
                 }
             }
 
-            if(!(this.buffer.startsWith("\t") && isNumberAtEnd)){
+            if (!(this.buffer.startsWith("\t") && isNumberAtEnd)) {
                 this.bufferError = false;
             }
             try {
-                if(this.debugStream != null) {
+                if (this.debugStream != null) {
                     this.debugStream.flush();
                 }
             } catch (IOException ignore) {
             }
-            if(this.simpleStream != null && !this.bufferError) {
+            if (this.simpleStream != null && !this.bufferError) {
                 try {
                     this.simpleStream.write(this.buffer);
                     this.simpleStream.flush();
                 } catch (IOException e) {
                 }
             }
-            if(this.buffer.contains("Exception") || this.buffer.contains("Error")){
+            if (this.buffer.contains("Exception") || this.buffer.contains("Error")) {
                 this.bufferError = true;
             }
             this.buffer = "";
         }
     }
 
-    public static void createDefault(){
-        createDefault( new File("logs/Simple.txt"), new File("logs/Debug.txt"));
+    public static void createDefault() {
+        createDefault(new File("logs/Simple.txt"), new File("logs/Debug.txt"));
     }
 
     public static void createDefault(File simple, File debug) {

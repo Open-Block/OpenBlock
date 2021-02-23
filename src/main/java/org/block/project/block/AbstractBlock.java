@@ -2,7 +2,8 @@ package org.block.project.block;
 
 import org.block.project.block.type.called.CodeStartBlock;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 public abstract class AbstractBlock implements Block {
 
@@ -15,7 +16,7 @@ public abstract class AbstractBlock implements Block {
     protected int layer;
     protected CodeStartBlock codeStartBlock;
 
-    public AbstractBlock(int x, int y){
+    public AbstractBlock(int x, int y) {
         this.x = x;
         this.y = y;
         this.id = UUID.randomUUID();
@@ -72,6 +73,11 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
+    public UUID getUniqueId() {
+        return this.id;
+    }
+
+    @Override
     public int getLayer() {
         return this.layer;
     }
@@ -82,26 +88,21 @@ public abstract class AbstractBlock implements Block {
     }
 
     @Override
-    public UUID getUniqueId() {
-        return this.id;
-    }
-
-    @Override
     public Optional<CodeStartBlock> getParent() {
         return Optional.ofNullable(this.codeStartBlock);
     }
 
     @Override
     public void setParent(CodeStartBlock block) {
-this.codeStartBlock = block;
+        this.codeStartBlock = block;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof Block)){
+        if (!(obj instanceof Block)) {
             return false;
         }
-        Block block = (Block)obj;
+        Block block = (Block) obj;
         return this.getUniqueId().equals(block.getUniqueId());
     }
 }

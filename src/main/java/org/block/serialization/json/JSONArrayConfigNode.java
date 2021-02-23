@@ -14,7 +14,7 @@ public class JSONArrayConfigNode implements ConfigNode {
 
     private final JSONArray path;
 
-    public JSONArrayConfigNode(JSONArray path){
+    public JSONArrayConfigNode(JSONArray path) {
         this.path = path;
     }
 
@@ -25,14 +25,14 @@ public class JSONArrayConfigNode implements ConfigNode {
         }
         int entry = Integer.parseInt(path[0]);
         JSONConfigNode node;
-        try{
+        try {
             node = new JSONConfigNode(this.path.getJSONObject(entry));
-        }catch(JSONException e){
+        } catch (JSONException e) {
             this.path.put(entry, new JSONObject());
             node = new JSONConfigNode(this.path.getJSONObject(entry));
         }
         String[] newPath = new String[path.length - 1];
-        for(int A = 0; A < path.length - 1; A++){
+        for (int A = 0; A < path.length - 1; A++) {
             newPath[A] = path[A + 1];
         }
         return node.getNode(newPath);
@@ -41,14 +41,6 @@ public class JSONArrayConfigNode implements ConfigNode {
     @Override
     public Optional<String> getString(String title) {
         return Optional.ofNullable(this.path.optString(Integer.parseInt(title)));
-    }
-
-    public <T extends Number> Optional<T> getNumber(String title, Function<Number, T> function){
-        Number number = this.path.optNumber(Integer.parseInt(title));
-        if(number == null){
-            return Optional.empty();
-        }
-        return Optional.of(function.apply(number));
     }
 
     @Override
@@ -74,13 +66,13 @@ public class JSONArrayConfigNode implements ConfigNode {
     @Override
     public Optional<Boolean> getBoolean(String title) {
         Object obj = this.path.opt(Integer.parseInt(title));
-        if(obj == null){
+        if (obj == null) {
             return Optional.empty();
         }
-        if(!(obj instanceof Boolean)){
+        if (!(obj instanceof Boolean)) {
             return Optional.empty();
         }
-        return Optional.of((boolean)obj);
+        return Optional.of((boolean) obj);
     }
 
     @Override
@@ -108,13 +100,13 @@ public class JSONArrayConfigNode implements ConfigNode {
         JSONArray array = null;
         try {
             array = this.path.getJSONArray(Integer.parseInt(title));
-        }catch (JSONException e){
+        } catch (JSONException e) {
             array = new JSONArray();
             this.path.put(Integer.parseInt(title), array);
             array = this.path.getJSONArray(Integer.parseInt(title));
         }
         int index = 0;
-        for(Object value : collection){
+        for (Object value : collection) {
             array.put(index, value);
         }
     }
@@ -124,16 +116,24 @@ public class JSONArrayConfigNode implements ConfigNode {
         JSONArray array = null;
         try {
             array = this.path.getJSONArray(Integer.parseInt(title));
-        }catch (JSONException e){
+        } catch (JSONException e) {
             array = new JSONArray();
             this.path.put(Integer.parseInt(title), array);
 
         }
         JSONArrayConfigNode node = new JSONArrayConfigNode(array);
         int index = 0;
-        for(T value : collection){
+        for (T value : collection) {
             parser.serialize(node, index + "", value);
             index++;
         }
+    }
+
+    public <T extends Number> Optional<T> getNumber(String title, Function<Number, T> function) {
+        Number number = this.path.optNumber(Integer.parseInt(title));
+        if (number == null) {
+            return Optional.empty();
+        }
+        return Optional.of(function.apply(number));
     }
 }

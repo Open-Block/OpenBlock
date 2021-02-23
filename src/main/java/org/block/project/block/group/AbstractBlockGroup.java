@@ -2,9 +2,40 @@ package org.block.project.block.group;
 
 import org.block.project.block.Block;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class AbstractBlockGroup implements BlockGroup {
+
+    private final String id;
+    private final String name;
+    private int relativeY;
+    public AbstractBlockGroup(String id, String name, int relativeY) {
+        this.id = id;
+        this.name = name;
+        this.relativeY = relativeY;
+    }
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public int getRelativeYPosition() {
+        return this.relativeY;
+    }
+
+    @Override
+    public void setRelativeYPosition(int pos) {
+        this.relativeY = pos;
+    }
 
     public static class AbstractListBlockGroup extends AbstractBlockGroup {
 
@@ -36,40 +67,10 @@ public abstract class AbstractBlockGroup implements BlockGroup {
 
         @Override
         public BlockSector<B> getSector() {
-            if(this.sector == null){
+            if (this.sector == null) {
                 throw new IllegalStateException("A Single block group was created without a block sector. Fix this");
             }
             return this.sector;
         }
-    }
-
-    private final String id;
-    private final String name;
-    private int relativeY;
-
-    public AbstractBlockGroup(String id, String name, int relativeY){
-        this.id = id;
-        this.name = name;
-        this.relativeY = relativeY;
-    }
-
-    @Override
-    public String getId() {
-        return this.id;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public int getRelativeYPosition() {
-        return this.relativeY;
-    }
-
-    @Override
-    public void setRelativeYPosition(int pos) {
-        this.relativeY = pos;
     }
 }

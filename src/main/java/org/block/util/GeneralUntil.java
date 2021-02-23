@@ -4,76 +4,78 @@ package org.block.util;
 import org.block.project.block.type.value.ValueBlock;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public interface GeneralUntil {
 
-    static String[] getImport(ValueBlock<?> value){
+    static String[] getImport(ValueBlock<?> value) {
         Class<?> clazz = null;
         String nested = null;
-        do{
+        do {
             Class<?> clazz2 = (clazz == null) ? value.getExpectedValue().orElse(null) : clazz.getDeclaringClass();
-            if(clazz2 == null){
+            if (clazz2 == null) {
                 break;
             }
-            if(nested == null){
+            if (nested == null) {
                 nested = clazz2.getSimpleName();
-            }else{
+            } else {
                 nested = clazz2.getSimpleName() + "." + nested;
             }
             clazz = clazz2;
-        }while(true);
+        } while (true);
 
-        if(clazz == null){
+        if (clazz == null) {
             throw new IllegalStateException("No value block attached");
         }
         return new String[]{clazz.getPackage().getName(), nested};
     }
 
-    static String formatToClassName(String name){
+    static String formatToClassName(String name) {
         return formatTypicalName(name, true);
     }
 
-    static String formatToMethodName(String name){
+    static String formatToMethodName(String name) {
         return formatToLocalVariableName(name);
     }
 
-    static String formatToLocalVariableName(String name){
+    static String formatToLocalVariableName(String name) {
         return formatTypicalName(name, false);
     }
 
-    static String formatTypicalName(String name, boolean shouldUpper){
+    static String formatTypicalName(String name, boolean shouldUpper) {
         String ret = "";
-        for(int A = 0; A < name.length(); A++){
+        for (int A = 0; A < name.length(); A++) {
             char at = name.charAt(A);
-            if(at == ' '){
+            if (at == ' ') {
                 shouldUpper = true;
                 continue;
             }
-            if(shouldUpper){
+            if (shouldUpper) {
                 ret += Character.toUpperCase(at);
-            }else{
+            } else {
                 ret += Character.toLowerCase(at);
             }
         }
         return ret;
     }
 
-    static Set<File> getFiles(File folder){
+    static Set<File> getFiles(File folder) {
         return getFiles(folder, new HashSet<>());
     }
 
-    static <C extends Collection<File>> C getFiles(File folder, C collection){
-        if(folder.isFile()){
+    static <C extends Collection<File>> C getFiles(File folder, C collection) {
+        if (folder.isFile()) {
             collection.add(folder);
             return collection;
         }
-        if(folder.isDirectory()){
+        if (folder.isDirectory()) {
             File[] files = folder.listFiles();
-            if(files == null){
+            if (files == null) {
                 return collection;
             }
-            for(File file : files){
+            for (File file : files) {
                 getFiles(file, collection);
             }
             collection.add(folder);

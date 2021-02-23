@@ -1,7 +1,5 @@
 package org.block.project.block.type.value;
 
-import org.block.project.block.BlockGraphics;
-
 import java.util.Optional;
 
 /**
@@ -14,12 +12,13 @@ public interface ConnectedValueBlock<V> extends ValueBlock<V> {
 
     /**
      * Gets the value of the block
+     *
      * @return The actual value of the block
      */
     V getValue();
 
     @Override
-    default Optional<Class<V>> getExpectedValue(){
-        return Optional.of((Class<V>)getValue().getClass());
+    default Optional<Class<V>> getExpectedValue() {
+        return Optional.of((Class<V>) getValue().getClass());
     }
 }

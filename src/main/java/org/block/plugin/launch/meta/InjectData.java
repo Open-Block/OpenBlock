@@ -23,34 +23,36 @@ public enum InjectData {
 
     private Class<?>[] types;
 
-    InjectData(Class<?>... types){
+    InjectData(Class<?>... types) {
         this.types = types;
     }
 
     /**
      * Gets the acceptable class types this implementation takes
+     *
      * @return The acceptable types of classes
      */
-    public Class<?>[] getAcceptableTypes(){
+    public Class<?>[] getAcceptableTypes() {
         return this.types;
     }
 
     /**
      * Applies the provided value to the provided field
+     *
      * @param holder The holder of the field
-     * @param field The field found within the holder
-     * @param obj the object to set
+     * @param field  The field found within the holder
+     * @param obj    the object to set
      * @throws IllegalAccessException Shouldn't happen
      */
     public void apply(Object holder, Field field, Object obj) throws IllegalAccessException {
-        if(!field.isAnnotationPresent(Inject.class)){
+        if (!field.isAnnotationPresent(Inject.class)) {
             throw new IllegalArgumentException("Field does not contain @Inject");
         }
-        if (!field.getAnnotation(Inject.class).as().equals(this)){
+        if (!field.getAnnotation(Inject.class).as().equals(this)) {
             throw new IllegalArgumentException("Field has a different @Inject as to " + this.name());
         }
-        for(Class<?> clazz : this.getAcceptableTypes()){
-            if(clazz.isInstance(obj)){
+        for (Class<?> clazz : this.getAcceptableTypes()) {
+            if (clazz.isInstance(obj)) {
                 field.setAccessible(true);
                 field.set(holder, obj);
                 field.setAccessible(false);

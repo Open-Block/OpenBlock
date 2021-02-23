@@ -18,13 +18,6 @@
  */
 package com.dosse.upnp;
 
-import java.net.HttpURLConnection;
-import java.net.Inet4Address;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,8 +25,15 @@ import org.w3c.dom.traversal.DocumentTraversal;
 import org.w3c.dom.traversal.NodeFilter;
 import org.w3c.dom.traversal.NodeIterator;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.net.HttpURLConnection;
+import java.net.Inet4Address;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 /**
- * 
  * @author Federico
  */
 class Gateway {
@@ -94,41 +94,6 @@ class Gateway {
             controlURL = "/" + controlURL;
         }
         controlURL = location + controlURL;
-    }
-
-    private Map<String, String> command(String action, Map<String, String> params) throws Exception {
-        Map<String, String> ret = new HashMap<String, String>();
-        String soap = "<?xml version=\"1.0\"?>\r\n" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
-                + "<SOAP-ENV:Body>"
-                + "<m:" + action + " xmlns:m=\"" + serviceType + "\">";
-        if (params != null) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                soap += "<" + entry.getKey() + ">" + entry.getValue() + "</" + entry.getKey() + ">";
-            }
-        }
-        soap += "</m:" + action + "></SOAP-ENV:Body></SOAP-ENV:Envelope>";
-        byte[] req = soap.getBytes();
-        HttpURLConnection conn = (HttpURLConnection) new URL(controlURL).openConnection();
-        conn.setRequestMethod("POST");
-        conn.setDoOutput(true);
-        conn.setRequestProperty("Content-Type", "text/xml");
-        conn.setRequestProperty("SOAPAction", "\"" + serviceType + "#" + action + "\"");
-        conn.setRequestProperty("Connection", "Close");
-        conn.setRequestProperty("Content-Length", "" + req.length);
-        conn.getOutputStream().write(req);
-        Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(conn.getInputStream());
-        NodeIterator iter = ((DocumentTraversal) d).createNodeIterator(d.getDocumentElement(), NodeFilter.SHOW_ELEMENT, null, true);
-        Node n;
-        while ((n = iter.nextNode()) != null) {
-            try {
-                if (n.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-                    ret.put(n.getNodeName(), n.getTextContent());
-                }
-            } catch (Throwable t) {
-            }
-        }
-        conn.disconnect();
-        return ret;
     }
 
     public String getLocalIP() {
@@ -199,6 +164,41 @@ class Gateway {
             return false;
         }
 
+    }
+
+    private Map<String, String> command(String action, Map<String, String> params) throws Exception {
+        Map<String, String> ret = new HashMap<String, String>();
+        String soap = "<?xml version=\"1.0\"?>\r\n" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
+                + "<SOAP-ENV:Body>"
+                + "<m:" + action + " xmlns:m=\"" + serviceType + "\">";
+        if (params != null) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                soap += "<" + entry.getKey() + ">" + entry.getValue() + "</" + entry.getKey() + ">";
+            }
+        }
+        soap += "</m:" + action + "></SOAP-ENV:Body></SOAP-ENV:Envelope>";
+        byte[] req = soap.getBytes();
+        HttpURLConnection conn = (HttpURLConnection) new URL(controlURL).openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "text/xml");
+        conn.setRequestProperty("SOAPAction", "\"" + serviceType + "#" + action + "\"");
+        conn.setRequestProperty("Connection", "Close");
+        conn.setRequestProperty("Content-Length", "" + req.length);
+        conn.getOutputStream().write(req);
+        Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(conn.getInputStream());
+        NodeIterator iter = ((DocumentTraversal) d).createNodeIterator(d.getDocumentElement(), NodeFilter.SHOW_ELEMENT, null, true);
+        Node n;
+        while ((n = iter.nextNode()) != null) {
+            try {
+                if (n.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+                    ret.put(n.getNodeName(), n.getTextContent());
+                }
+            } catch (Throwable t) {
+            }
+        }
+        conn.disconnect();
+        return ret;
     }
 
 }

@@ -9,24 +9,23 @@ import java.io.File;
 
 public class OpenBlockProject implements Project.Loaded {
 
-    private File file;
+    private final File file;
 
-    public OpenBlockProject(UnloadedProject project){
+    public OpenBlockProject(UnloadedProject project) {
         this.file = project.getDirectory();
-        init();
-    }
-
-    private void init(){
+        this.init();
     }
 
     @Override
     public Module getModule() {
-        return PluginContainer.OPEN_BLOCK_CONTAINER.getModules().iterator().next();
+        return PluginContainer.OPEN_BLOCK_CONTAINER.getModules()[0];
     }
-
 
     @Override
     public File getDirectory() {
         return this.file;
+    }
+
+    private void init() {
     }
 }

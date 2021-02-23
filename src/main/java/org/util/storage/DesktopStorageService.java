@@ -18,7 +18,7 @@ public class DesktopStorageService implements StorageService {
 
     @Override
     public boolean isExternalStorageWritable() {
-        if(getPrivateStorage().isEmpty()){
+        if (getPrivateStorage().isEmpty()) {
             return false;
         }
         return getPrivateStorage().get().canWrite();
@@ -26,7 +26,7 @@ public class DesktopStorageService implements StorageService {
 
     @Override
     public boolean isExternalStorageReadable() {
-        if(getPrivateStorage().isEmpty()){
+        if (getPrivateStorage().isEmpty()) {
             return false;
         }
         return getPrivateStorage().get().canRead();

@@ -4,8 +4,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import org.block.project.block.Block;
 import org.block.panel.main.BlockRender;
+import org.block.project.block.Block;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,11 +16,11 @@ public class BlockSelector extends Parent implements Selector {
     private final BlockRender render;
     private final Set<String> search = new HashSet<>();
 
-    public BlockSelector(Block block, String... search){
+    public BlockSelector(Block block, String... search) {
         this(block.getGraphicRender(), search);
     }
 
-    public BlockSelector(BlockRender render, String... search){
+    public BlockSelector(BlockRender render, String... search) {
         this.render = render;
         Label label = new Label(render.getBlock().getType().getName());
         VBox box = new VBox(label, render);
@@ -31,7 +31,7 @@ public class BlockSelector extends Parent implements Selector {
 
     }
 
-    public BlockRender getRender(){
+    public BlockRender getRender() {
         return this.render;
     }
 

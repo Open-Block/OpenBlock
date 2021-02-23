@@ -8,25 +8,26 @@ import java.util.function.Predicate;
 
 public class AbstractBlockSector<B extends Block> implements BlockSector<B> {
 
-    private B block;
     private final Class<B> generic;
     private final BlockGroup parent;
     private final Predicate<B> acceptable;
+    private B block;
 
-    public AbstractBlockSector(BlockGroup parent, Class<B> clazz){
+    public AbstractBlockSector(BlockGroup parent, Class<B> clazz) {
         this(parent, clazz, null);
     }
 
-    public AbstractBlockSector(BlockGroup parent, Class<B> clazz, @Nullable B block){
+    public AbstractBlockSector(BlockGroup parent, Class<B> clazz, @Nullable B block) {
         this(parent, clazz, block, t -> true);
     }
 
-    public AbstractBlockSector(BlockGroup parent, Class<B> clazz, @Nullable B block, Predicate<B> acceptable){
+    public AbstractBlockSector(BlockGroup parent, Class<B> clazz, @Nullable B block, Predicate<B> acceptable) {
         this.block = block;
         this.parent = parent;
         this.generic = clazz;
         this.acceptable = acceptable;
     }
+
     @Override
     public BlockGroup getParent() {
         return this.parent;
@@ -39,21 +40,21 @@ public class AbstractBlockSector<B extends Block> implements BlockSector<B> {
 
     @Override
     public void setAttachedBlock(@Nullable Block block) throws IllegalArgumentException {
-        if(block != null){
-            if(!this.generic.isInstance(block)){
+        if (block != null) {
+            if (!this.generic.isInstance(block)) {
                 throw new IllegalArgumentException("Block (" + block.toString() + ") is not of class (" + this.generic.getTypeName() + ")");
             }
-            if(!this.acceptable.test((B)block)){
+            if (!this.acceptable.test((B) block)) {
                 throw new IllegalArgumentException("Block was rejected");
             }
         }
 
-        this.block = (B)block;
+        this.block = (B) block;
     }
 
     @Override
     public boolean canAccept(Block block) {
-        if(!this.generic.isInstance(block)){
+        if (!this.generic.isInstance(block)) {
             return false;
         }
         return this.acceptable.test((B) block);
@@ -61,7 +62,7 @@ public class AbstractBlockSector<B extends Block> implements BlockSector<B> {
 
     @Override
     public int getHeight() {
-        if(this.block == null){
+        if (this.block == null) {
             return 20;
         }
         return this.block.getHeight();
@@ -69,7 +70,7 @@ public class AbstractBlockSector<B extends Block> implements BlockSector<B> {
 
     @Override
     public int getWidth() {
-        if(this.block == null){
+        if (this.block == null) {
             return 50;
         }
         return this.block.getWidth();

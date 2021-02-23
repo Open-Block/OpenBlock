@@ -11,23 +11,53 @@ import java.util.Optional;
 
 public class JSFGeneric implements JSFPart<JSFGeneric> {
 
-    public static class Builder implements JSFPart.Builder<JSFGeneric>{
+    private final String representation;
+    private final boolean extended;
+    private final List<String> classes = new ArrayList<>();
+    public JSFGeneric(String representation, boolean extended, Collection<String> collection) {
+        this.representation = representation;
+        this.extended = extended;
+        this.classes.addAll(collection);
+    }
+
+    public String getRepresentation() {
+        return this.representation;
+    }
+
+    public boolean isExtending() {
+        return this.extended;
+    }
+
+    public List<String> getClasses() {
+        return this.classes;
+    }
+
+    @Override
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.extending = this.getClasses();
+        builder.isExtending = this.isExtending();
+        builder.reference = this.getRepresentation();
+        return builder;
+    }
+
+    public static class Builder implements JSFPart.Builder<JSFGeneric> {
 
         private String reference;
         private boolean isExtending;
         private List<String> extending = new ArrayList<>();
 
-        public Builder setReferenceName(String name){
+        public Builder setReferenceName(String name) {
             this.reference = name;
             return this;
         }
 
-        public Builder setExtending(boolean check){
+        public Builder setExtending(boolean check) {
             this.isExtending = check;
             return this;
         }
 
-        public Builder addClasses(Collection<String> collection){
+        public Builder addClasses(Collection<String> collection) {
             this.extending.addAll(collection);
             return this;
         }
@@ -62,36 +92,5 @@ public class JSFGeneric implements JSFPart<JSFGeneric> {
             JSFPart.TITLE_IS_EXTENDING.serialize(base, value.isExtending());
             JSFPart.TITLE_IMPLEMENTING.serialize(base, value.getClasses());
         }
-    }
-
-    private final String representation;
-    private final boolean extended;
-    private final List<String> classes = new ArrayList<>();
-
-    public JSFGeneric(String representation, boolean extended, Collection<String> collection){
-        this.representation = representation;
-        this.extended = extended;
-        this.classes.addAll(collection);
-    }
-
-    public String getRepresentation(){
-        return this.representation;
-    }
-
-    public boolean isExtending(){
-        return this.extended;
-    }
-
-    public List<String> getClasses(){
-        return this.classes;
-    }
-
-    @Override
-    public Builder toBuilder() {
-        Builder builder = new Builder();
-        builder.extending = this.getClasses();
-        builder.isExtending = this.isExtending();
-        builder.reference = this.getRepresentation();
-        return builder;
     }
 }

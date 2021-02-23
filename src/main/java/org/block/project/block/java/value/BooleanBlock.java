@@ -1,6 +1,5 @@
 package org.block.project.block.java.value;
 
-import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 
 import java.util.Collection;
@@ -13,6 +12,7 @@ public class BooleanBlock extends AbstractValue<Boolean> {
 
     /**
      * Used to init the block
+     *
      * @param x The X position
      * @param y The Y position
      */
@@ -26,12 +26,12 @@ public class BooleanBlock extends AbstractValue<Boolean> {
     }
 
     @Override
-    public BlockType<?> getType() {
-        return null;
+    public Collection<String> getCodeImports() {
+        return Collections.unmodifiableCollection(Collections.emptySet());
     }
 
     @Override
-    public Collection<String> getCodeImports() {
-        return Collections.unmodifiableCollection(Collections.emptySet());
+    public BlockType<?> getType() {
+        return null;
     }
 }

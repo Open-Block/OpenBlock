@@ -8,7 +8,7 @@ public abstract class JSFValue<V extends JSFValue<?>> implements JSFPart<V> {
     private final String type;
     private final boolean isFinal;
 
-    public JSFValue(boolean isFinal, String type, String name){
+    public JSFValue(boolean isFinal, String type, String name) {
         this.name = name;
         this.type = type;
         this.isFinal = isFinal;
@@ -28,7 +28,7 @@ public abstract class JSFValue<V extends JSFValue<?>> implements JSFPart<V> {
 
     @Override
     public boolean equals(Object obj) {
-        if(!this.getClass().isInstance(obj)){
+        if (!this.getClass().isInstance(obj)) {
             return false;
         }
         JSFValue<?> value = (JSFValue<?>) obj;

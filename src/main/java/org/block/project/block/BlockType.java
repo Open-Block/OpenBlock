@@ -1,9 +1,9 @@
 package org.block.project.block;
 
+import org.block.project.block.java.method.MethodBlock;
 import org.block.project.block.java.method.call.JavaMethodCallBlock;
 import org.block.project.block.java.operation.number.MinusOperation;
 import org.block.project.block.java.specific.ReturnBlock;
-import org.block.project.block.java.method.MethodBlock;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.java.value.number.IntegerBlock;
 import org.block.project.block.java.variable.CallVariableBlock;
@@ -19,6 +19,7 @@ import java.util.UUID;
 /**
  * The BlockType provides global data between all Blocks it produces.
  * The BlockType is used with the display chooser to produce new blocks with default values
+ *
  * @param <B> The Blocks class type it is connected with
  */
 public interface BlockType<B extends Block> {
@@ -41,6 +42,7 @@ public interface BlockType<B extends Block> {
 
     /**
      * Creates a new instance of a block with the provided position
+     *
      * @param x The X position
      * @param y The Y position
      * @return The newly created Block
@@ -49,6 +51,7 @@ public interface BlockType<B extends Block> {
 
     /**
      * Creates a new instance of a block with the values found within the provided ConfigNode
+     *
      * @param node The node with the values
      * @return The built instance
      * @throws IllegalStateException If the ConfigNode does not have the required values stored within
@@ -57,12 +60,14 @@ public interface BlockType<B extends Block> {
 
     /**
      * Gets the default save location for all of the Blocks of this type
+     *
      * @return The save location
      */
     File saveLocation();
 
     /**
      * Gets the BlockType's name
+     *
      * @return The Block type's name
      */
     String getName();
@@ -70,10 +75,11 @@ public interface BlockType<B extends Block> {
     /**
      * Designed to be overwritten with super call to this.
      * Writes the provided block to the provided ConfigNode
-     * @param node The save location
+     *
+     * @param node  The save location
      * @param block The block to save
      */
-    default void write(@NotNull ConfigNode node, @NotNull B block){
+    default void write(@NotNull ConfigNode node, @NotNull B block) {
         TITLE_X.serialize(node, block.getX());
         TITLE_Y.serialize(node, block.getY());
         TITLE_LAYER.serialize(node, block.getLayer());
@@ -84,11 +90,12 @@ public interface BlockType<B extends Block> {
      * Creates a new instanceof a block with the provided position.
      * This function is used in the chooser, therefore you can have different settings for the chooser version
      * if the implementation allows for it, by default it uses the {@link BlockType#build(int x, int y)}
+     *
      * @param x The X position
      * @param y The Y position
      * @return The newly created Block
      */
-    default B buildDefault(int x, int y){
+    default B buildDefault(int x, int y) {
         return build(x, y);
     }
 }

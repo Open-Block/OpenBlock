@@ -14,7 +14,7 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
 
     @Override
     public JSONConfigNode load(String json) {
-        if(json.length() == 0){
+        if (json.length() == 0) {
             return new JSONConfigNode(new JSONObject());
         }
         return new JSONConfigNode(new JSONObject(json));
@@ -22,18 +22,18 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
 
     @Override
     public String write(ConfigNode node) {
-        if(!(node instanceof JSONConfigNode)){
+        if (!(node instanceof JSONConfigNode)) {
             throw new IllegalArgumentException("Node is not JSON");
         }
-        String singleLined = JSONWriter.valueToString(((JSONConfigNode)node).getPath());
+        String singleLined = JSONWriter.valueToString(((JSONConfigNode) node).getPath());
         String newPage = "";
         int tab = 0;
         boolean isInString = false;
         boolean tabBefore = false;
-        for(int A = 0; A < singleLined.length(); A++){
+        for (int A = 0; A < singleLined.length(); A++) {
             char at = singleLined.charAt(A);
-            if(isInString){
-                if(at == '"'){
+            if (isInString) {
+                if (at == '"') {
                     isInString = false;
                     newPage += '"';
                     continue;
@@ -41,33 +41,33 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
                 newPage += '"';
                 continue;
             }
-            if(at == '{' || at == '['){
+            if (at == '{' || at == '[') {
                 tab++;
                 newPage += at + "\n";
                 tabBefore = true;
                 continue;
             }
-            if(at == '}' || at == ']'){
+            if (at == '}' || at == ']') {
                 tab--;
-                if(tabBefore) {
+                if (tabBefore) {
                     newPage += tab(tab);
                 }
-                if((A + 1) != singleLined.length() && singleLined.charAt(A + 1) == ','){
+                if ((A + 1) != singleLined.length() && singleLined.charAt(A + 1) == ',') {
                     newPage += "\n" + tab(tab) + at;
-                }else{
+                } else {
                     newPage += "\n" + tab(tab) + at + "\n";
                 }
                 continue;
             }
-            if(at == ','){
-                if(A >= 1 && singleLined.charAt(A - 1) == ','){
+            if (at == ',') {
+                if (A >= 1 && singleLined.charAt(A - 1) == ',') {
                     continue;
                 }
                 newPage += at + "\n";
                 tabBefore = true;
                 continue;
             }
-            if(tabBefore){
+            if (tabBefore) {
                 tabBefore = false;
                 newPage += tab(tab);
             }
@@ -76,9 +76,9 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
         return newPage;
     }
 
-    private String tab(int A){
+    private String tab(int A) {
         String value = "";
-        for(int B = 0; B < A; B++){
+        for (int B = 0; B < A; B++) {
             value += "\t";
         }
         return value;

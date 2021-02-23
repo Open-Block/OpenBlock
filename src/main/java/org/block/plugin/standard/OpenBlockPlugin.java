@@ -2,9 +2,6 @@ package org.block.plugin.standard;
 
 import org.block.Blocks;
 import org.block.plugin.Plugin;
-import org.block.plugin.PluginContainer;
-import org.block.plugin.launch.LaunchListener;
-import org.block.plugin.launch.event.ModuleRegisterEvent;
 import org.block.plugin.launch.meta.Author;
 
 /**
@@ -32,8 +29,4 @@ import org.block.plugin.launch.meta.Author;
         })
 public final class OpenBlockPlugin {
 
-    @LaunchListener
-    public void registerModule(ModuleRegisterEvent event){
-        event.getModule().add(PluginContainer.OPEN_BLOCK_MODULE);
-    }
 }

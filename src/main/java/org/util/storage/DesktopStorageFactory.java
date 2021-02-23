@@ -9,7 +9,7 @@ public class DesktopStorageFactory implements ServiceFactory<StorageService> {
 
     private final StorageService service;
 
-    public DesktopStorageFactory(StorageService service){
+    public DesktopStorageFactory(StorageService service) {
         this.service = service;
     }
 

@@ -14,21 +14,17 @@ public class JSONConfigNode implements ConfigNode {
 
     private final JSONObject path;
 
-    public JSONConfigNode(JSONObject obj){
+    public JSONConfigNode(JSONObject obj) {
         this.path = obj;
-    }
-
-    JSONObject getPath(){
-        return this.path;
     }
 
     @Override
     public ConfigNode getNode(String... path) {
         JSONObject obj = this.path;
-        for(String key : path){
+        for (String key : path) {
             try {
                 obj = obj.getJSONObject(key);
-            }catch (JSONException e){
+            } catch (JSONException e) {
                 JSONObject obj1 = new JSONObject();
                 obj.put(key, obj1);
                 obj = obj.getJSONObject(key);
@@ -40,14 +36,6 @@ public class JSONConfigNode implements ConfigNode {
     @Override
     public Optional<String> getString(String title) {
         return Optional.ofNullable(this.path.optString(title));
-    }
-
-    public <T extends Number> Optional<T> getNumber(String title, Function<Number, T> function){
-        Number number = this.path.optNumber(title);
-        if(number == null){
-            return Optional.empty();
-        }
-        return Optional.of(function.apply(number));
     }
 
     @Override
@@ -74,20 +62,20 @@ public class JSONConfigNode implements ConfigNode {
     @Override
     public Optional<Boolean> getBoolean(String title) {
         Object obj = this.path.opt(title);
-        if(obj == null){
+        if (obj == null) {
             return Optional.empty();
         }
-        if(!(obj instanceof Boolean)){
+        if (!(obj instanceof Boolean)) {
             return Optional.empty();
         }
-        return Optional.of((boolean)obj);
+        return Optional.of((boolean) obj);
     }
 
     @Override
     public <T> Optional<T> getValue(String title, Parser<T> parser) {
         try {
             return parser.deserialize(this, title);
-        }catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             return Optional.empty();
         }
     }
@@ -97,14 +85,14 @@ public class JSONConfigNode implements ConfigNode {
         JSONArray array = null;
         try {
             array = this.path.getJSONArray(title);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return into;
         }
         JSONArrayConfigNode node = new JSONArrayConfigNode(array);
-        for(int A = 0; A < array.length(); A++){
+        for (int A = 0; A < array.length(); A++) {
             try {
                 parser.deserialize(node, A + "").ifPresent(e -> into.add(e));
-            }catch (IllegalStateException e){
+            } catch (IllegalStateException e) {
                 continue;
             }
         }
@@ -126,13 +114,13 @@ public class JSONConfigNode implements ConfigNode {
         JSONArray array = null;
         try {
             array = this.path.getJSONArray(title);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             JSONArray jArray = new JSONArray();
             this.path.put(title, jArray);
             array = this.path.getJSONArray(title);
         }
         int index = 0;
-        for(Object value : collection){
+        for (Object value : collection) {
             array.put(index, value);
             index++;
         }
@@ -143,15 +131,27 @@ public class JSONConfigNode implements ConfigNode {
         JSONArray array = null;
         try {
             array = this.path.getJSONArray(title);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             array = new JSONArray();
             this.path.put(title, array);
         }
         JSONArrayConfigNode node = new JSONArrayConfigNode(array);
         int index = 0;
-        for(T value : collection){
+        for (T value : collection) {
             parser.serialize(node, index + "", value);
             index++;
         }
+    }
+
+    public <T extends Number> Optional<T> getNumber(String title, Function<Number, T> function) {
+        Number number = this.path.optNumber(title);
+        if (number == null) {
+            return Optional.empty();
+        }
+        return Optional.of(function.apply(number));
+    }
+
+    JSONObject getPath() {
+        return this.path;
     }
 }

@@ -6,11 +6,11 @@ public class VerifyConnectionValue implements PacketValue {
 
     private VerifyConnectionPacketBuilder builder;
 
-    public VerifyConnectionValue(VerifyConnectionPacketBuilder builder){
-            this.builder = builder;
+    public VerifyConnectionValue(VerifyConnectionPacketBuilder builder) {
+        this.builder = builder;
     }
 
-    public VerifyConnectionPacketBuilder getBuilder(){
+    public VerifyConnectionPacketBuilder getBuilder() {
         return this.builder;
     }
 

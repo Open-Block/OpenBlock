@@ -1,10 +1,8 @@
 package org.block.project.block.type.value;
 
-import org.block.project.block.BlockGraphics;
-
 import java.util.function.Consumer;
 
-public interface MutableConnectedValueBlock<V> extends ConnectedValueBlock<V>{
+public interface MutableConnectedValueBlock<V> extends ConnectedValueBlock<V> {
 
     /**
      * Displays the dialog to set the value of the block
@@ -13,6 +11,7 @@ public interface MutableConnectedValueBlock<V> extends ConnectedValueBlock<V>{
 
     /**
      * Sets the provided value
+     *
      * @param value The new value
      */
     void setValue(V value);

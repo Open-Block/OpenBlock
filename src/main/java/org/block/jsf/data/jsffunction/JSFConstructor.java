@@ -11,13 +11,33 @@ import java.util.*;
 
 public class JSFConstructor extends JSFFunction<JSFConstructor> {
 
+    public JSFConstructor(Visibility visibility, boolean isFinal, String returning) {
+        super(visibility, isFinal, false, returning);
+    }
+
+    @Override
+    public String getName() {
+        return this.getReturning();
+    }
+
+    @Override
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.generics.addAll(this.getGenerics());
+        builder.isFinal = this.isFinal();
+        builder.parameters.addAll(this.getParameters());
+        builder.visibility = this.getVisibility();
+        builder.returning = this.getReturning();
+        return builder;
+    }
+
     public static class Builder implements JSFPart.Builder<JSFConstructor> {
 
+        private final List<JSFGeneric> generics = new ArrayList<>();
+        private final List<JSFParameter> parameters = new ArrayList<>();
         private Visibility visibility = Visibility.PUBLIC;
         private String returning;
         private boolean isFinal;
-        private final List<JSFGeneric> generics = new ArrayList<>();
-        private final List<JSFParameter> parameters = new ArrayList<>();
 
         public Visibility getVisibility() {
             return visibility;
@@ -54,21 +74,21 @@ public class JSFConstructor extends JSFFunction<JSFConstructor> {
             return parameters;
         }
 
-        public Builder addParameters(JSFParameter... collection){
+        public Builder addParameters(JSFParameter... collection) {
             return addParameters(Arrays.asList(collection));
         }
 
-        public Builder addParameters(Collection<JSFParameter> collection){
+        public Builder addParameters(Collection<JSFParameter> collection) {
             this.parameters.addAll(collection);
             return this;
         }
 
         @Override
         public JSFConstructor build() {
-            if(this.visibility == null){
+            if (this.visibility == null) {
                 throw new IllegalStateException("Visibility cannot be null");
             }
-            if(this.returning == null){
+            if (this.returning == null) {
                 throw new IllegalStateException("Returning value cannot be null");
             }
             JSFConstructor cons = new JSFConstructor(this.visibility, this.isFinal, this.returning);
@@ -102,26 +122,5 @@ public class JSFConstructor extends JSFFunction<JSFConstructor> {
             JSFPart.TITLE_PARAMETERS.serialize(base, value.getParameters());
             JSFPart.TITLE_GENERICS.serialize(base, value.getGenerics());
         }
-    }
-
-    public JSFConstructor(Visibility visibility, boolean isFinal, String returning) {
-        super(visibility, isFinal, false, returning);
-    }
-
-    @Override
-    public String getName() {
-        return this.getReturning();
-    }
-
-
-    @Override
-    public Builder toBuilder() {
-        Builder builder = new Builder();
-        builder.generics.addAll(this.getGenerics());
-        builder.isFinal = this.isFinal();
-        builder.parameters.addAll(this.getParameters());
-        builder.visibility = this.getVisibility();
-        builder.returning = this.getReturning();
-        return builder;
     }
 }

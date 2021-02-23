@@ -8,7 +8,7 @@ public interface SceneSource {
 
     Parent buildNode();
 
-    default Scene build(){
+    default Scene build() {
         return new Scene(buildNode());
     }
 }

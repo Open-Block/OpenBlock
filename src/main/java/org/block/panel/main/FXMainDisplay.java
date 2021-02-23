@@ -1,7 +1,5 @@
 package org.block.panel.main;
 
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SplitPane;
@@ -9,12 +7,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.array.utils.ArrayUtils;
+import org.block.panel.SceneSource;
 import org.block.panel.main.selector.BlockSelector;
 import org.block.panel.main.selector.GroupSelector;
 import org.block.panel.main.selector.Selector;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
-import org.block.panel.SceneSource;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +42,20 @@ public class FXMainDisplay implements SceneSource {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public VBox buildNode() {
+        MenuBar navBar = createNavBar();
+        VBox blocks = createBlocksView();
+        Pane panel = createBlockView();
+
+        SplitPane splitPane = new SplitPane(blocks, panel);
+        VBox mainBox = new VBox(navBar, splitPane);
+        VBox.setVgrow(splitPane, Priority.ALWAYS);
+        double divide = ArrayUtils.getBest(Double::intValue, (c, c1) -> c > c1, blocks.getChildren().parallelStream().filter(n -> (n instanceof Selector)).map(n -> n.getBoundsInLocal().getWidth()).collect(Collectors.toSet())).orElse(25.0);
+        blocks.setMaxWidth(divide);
+        return mainBox;
+    }
+
     private MenuBar createNavBar() {
         Menu file = new Menu("File");
         Menu network = new Menu("Network");
@@ -68,19 +80,5 @@ public class FXMainDisplay implements SceneSource {
 
     private Pane createBlockView() {
         return this.panel;
-    }
-
-    @Override
-    public VBox buildNode() {
-        MenuBar navBar = createNavBar();
-        VBox blocks = createBlocksView();
-        Pane panel = createBlockView();
-
-        SplitPane splitPane = new SplitPane(blocks, panel);
-        VBox mainBox = new VBox(navBar, splitPane);
-        VBox.setVgrow(splitPane, Priority.ALWAYS);
-        double divide = ArrayUtils.getBest(Double::intValue, (c, c1) -> c > c1, blocks.getChildren().parallelStream().filter(n -> (n instanceof Selector)).map(n -> n.getBoundsInLocal().getWidth()).collect(Collectors.toSet())).orElse(25.0);
-        blocks.setMaxWidth(divide);
-        return mainBox;
     }
 }

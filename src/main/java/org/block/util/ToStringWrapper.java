@@ -7,12 +7,12 @@ public class ToStringWrapper<W> {
     private final W value;
     private final Function<W, String> toString;
 
-    public ToStringWrapper(W value, Function<W, String> toString){
+    public ToStringWrapper(W value, Function<W, String> toString) {
         this.toString = toString;
         this.value = value;
     }
 
-    public W getValue(){
+    public W getValue() {
         return this.value;
     }
 

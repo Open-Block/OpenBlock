@@ -14,6 +14,7 @@ public @interface Inject {
 
     /**
      * Gets the expected value
+     *
      * @return The inject data type
      */
     InjectData as();

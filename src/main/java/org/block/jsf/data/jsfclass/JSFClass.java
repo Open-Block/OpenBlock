@@ -4,7 +4,6 @@ import org.block.jsf.data.JSFPart;
 import org.block.jsf.data.Visibility;
 import org.block.jsf.data.generic.JSFGeneric;
 import org.block.jsf.data.jsffunction.JSFConstructor;
-import org.block.jsf.data.jsffunction.JSFFunction;
 import org.block.jsf.data.jsffunction.JSFMethod;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +12,73 @@ import java.util.*;
 
 public class JSFClass implements JSFPart<JSFClass> {
 
-    public static class Builder implements JSFPart.Builder<JSFClass>{
+    private final Visibility visibility;
+    private final boolean isFinal;
+    private final JSFClassType classType;
+    private final String className;
+    private final boolean isAbstract;
+    private final String extendingClass;
+    private final TreeSet<String> implementingClasses = new TreeSet<>();
+    private final TreeSet<JSFConstructor> constructors = new TreeSet<>();
+    private final TreeSet<JSFMethod> methods = new TreeSet<>();
+    private final List<JSFGeneric> generics = new ArrayList<>();
+    public JSFClass(Visibility visibility, JSFClassType classType, String className, boolean isFinal, boolean isAbstract, String extendingClass) {
+        this.classType = classType;
+        this.className = className;
+        this.isAbstract = isAbstract;
+        this.extendingClass = extendingClass;
+        this.visibility = visibility;
+        this.isFinal = isFinal;
+    }
+
+    public boolean isFinal() {
+        return this.isFinal;
+    }
+
+    public Visibility getVisibility() {
+        return this.visibility;
+    }
+
+    public JSFClassType getClassType() {
+        return classType;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+
+    public Optional<String> getExtendingClass() {
+        return Optional.ofNullable(extendingClass);
+    }
+
+    public TreeSet<String> getImplementingClasses() {
+        return implementingClasses;
+    }
+
+    public TreeSet<JSFConstructor> getConstructors() {
+        return constructors;
+    }
+
+    public TreeSet<JSFMethod> getMethods() {
+        return methods;
+    }
+
+    public List<JSFGeneric> getGenerics() {
+        return generics;
+    }
+
+    @Override
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        //TODO apply values
+        return builder;
+    }
+
+    public static class Builder implements JSFPart.Builder<JSFClass> {
 
         private JSFClassType classType;
         private String className;
@@ -26,55 +91,55 @@ public class JSFClass implements JSFPart<JSFClass> {
         private TreeSet<JSFMethod> methods = new TreeSet<>();
         private List<JSFGeneric> generics = new ArrayList<>();
 
-        public Builder setVisibility(Visibility visibility){
+        public Builder setVisibility(Visibility visibility) {
             this.visibility = visibility;
             return this;
         }
 
-        public Builder setType(JSFClassType type){
+        public Builder setType(JSFClassType type) {
             this.classType = type;
             return this;
         }
 
-        public Builder setClass(String name){
+        public Builder setClass(String name) {
             this.className = name;
             return this;
         }
 
-        public Builder setAbstract(boolean isAbstract){
+        public Builder setAbstract(boolean isAbstract) {
             this.isAbstract = isAbstract;
             return this;
         }
 
-        public Builder setExtending(String name){
+        public Builder setExtending(String name) {
             this.extendingClass = name;
             return this;
         }
 
-        public Builder setFinal(boolean isFinal){
+        public Builder setFinal(boolean isFinal) {
             this.isFinal = isFinal;
             return this;
         }
 
-        public Builder addImplementations(Collection<String> collection){
+        public Builder addImplementations(Collection<String> collection) {
             this.implementingClasses.addAll(collection);
             return this;
         }
 
-        public Builder addMethods(Collection<JSFMethod> methods){
+        public Builder addMethods(Collection<JSFMethod> methods) {
             this.methods.addAll(methods);
             return this;
         }
 
         @Override
         public JSFClass build() {
-            if(this.className == null){
+            if (this.className == null) {
                 throw new IllegalStateException("ClassName cannot be null");
             }
-            if(this.classType == null){
+            if (this.classType == null) {
                 throw new IllegalStateException("ClassType cannot be null");
             }
-            if(this.visibility == null){
+            if (this.visibility == null) {
                 throw new IllegalStateException("Visibility cannot be null");
             }
             JSFClass jsfClass = new JSFClass(this.visibility, this.classType, this.className, this.isFinal, this.isAbstract, this.extendingClass);
@@ -131,72 +196,5 @@ public class JSFClass implements JSFPart<JSFClass> {
             JSFClass.TITLE_IS_FINAL.serialize(base, value.isFinal());
             JSFClass.TITLE_VISIBILITY.serialize(base, value.getVisibility());
         }
-    }
-
-    private final Visibility visibility;
-    private final boolean isFinal;
-    private final JSFClassType classType;
-    private final String className;
-    private final boolean isAbstract;
-    private final String extendingClass;
-    private final TreeSet<String> implementingClasses = new TreeSet<>();
-    private final TreeSet<JSFConstructor> constructors = new TreeSet<>();
-    private final TreeSet<JSFMethod> methods = new TreeSet<>();
-    private final List<JSFGeneric> generics = new ArrayList<>();
-
-    public JSFClass(Visibility visibility, JSFClassType classType, String className, boolean isFinal, boolean isAbstract, String extendingClass) {
-        this.classType = classType;
-        this.className = className;
-        this.isAbstract = isAbstract;
-        this.extendingClass = extendingClass;
-        this.visibility = visibility;
-        this.isFinal = isFinal;
-    }
-
-    public boolean isFinal(){
-        return this.isFinal;
-    }
-
-    public Visibility getVisibility(){
-        return this.visibility;
-    }
-
-    public JSFClassType getClassType() {
-        return classType;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public boolean isAbstract() {
-        return isAbstract;
-    }
-
-    public Optional<String> getExtendingClass() {
-        return Optional.ofNullable(extendingClass);
-    }
-
-    public TreeSet<String> getImplementingClasses() {
-        return implementingClasses;
-    }
-
-    public TreeSet<JSFConstructor> getConstructors() {
-        return constructors;
-    }
-
-    public TreeSet<JSFMethod> getMethods() {
-        return methods;
-    }
-
-    public List<JSFGeneric> getGenerics() {
-        return generics;
-    }
-
-    @Override
-    public Builder toBuilder() {
-        Builder builder = new Builder();
-        //TODO apply values
-        return builder;
     }
 }

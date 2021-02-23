@@ -19,13 +19,13 @@ public class FileEditor implements OptionEditor<File> {
     private final FileFilter filter;
     private final MappedBindedProperty<String, File> mappedValue = new MappedBindedProperty<>(this.field.textProperty(), File::getAbsolutePath, File::new);
 
-    public FileEditor(Option<File> option){
+    public FileEditor(Option<File> option) {
         this(option, pathname -> true);
     }
 
     public FileEditor(Option<File> option, FileFilter fileFilter) {
         this.filter = fileFilter;
-        valueProperty().bindBidirectional(option.valueProperty());
+        this.valueProperty().bindBidirectional(option.valueProperty());
 
         this.field.setCompleterMode(AutoCompleteTextField.CompleterMode.SEARCH_AUTOMATICALLY);
 
@@ -61,7 +61,7 @@ public class FileEditor implements OptionEditor<File> {
         });
     }
 
-    public FileFilter getFilter(){
+    public FileFilter getFilter() {
         return this.filter;
     }
 

@@ -1,20 +1,15 @@
 package org.block.plugin.standard;
 
 import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import org.block.plugin.PluginContainer;
 import org.block.plugin.standard.panel.FXOpenBlockNewPanel;
-import org.block.project.module.project.Project;
 import org.block.project.module.Module;
+import org.block.project.module.project.Project;
 import org.block.project.module.project.UnloadedProject;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
@@ -89,7 +84,7 @@ public final class OpenBlockModule implements Module {
         return gridPane;
     }
 
-    private void addGridRowToDisplayInfo(GridPane gridPane, String key, String value, int row){
+    private void addGridRowToDisplayInfo(GridPane gridPane, String key, String value, int row) {
         Label keyL = new Label(key);
         Label valueL = new Label(value);
         valueL.setPadding(new Insets(0, 10, 0, 10));

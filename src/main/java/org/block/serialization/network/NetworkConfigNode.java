@@ -12,22 +12,13 @@ public class NetworkConfigNode implements ConfigNode {
     private String[] node;
     private NetworkConfigImplementation implementation;
 
-    public NetworkConfigNode(NetworkConfigImplementation impl, String... node){
+    public NetworkConfigNode(NetworkConfigImplementation impl, String... node) {
         this.node = node;
         this.implementation = impl;
     }
 
-    public String[] getCurrentNode(){
+    public String[] getCurrentNode() {
         return this.node;
-    }
-
-    private String[] getPath(String title){
-        String[] path = new String[this.node.length + 1];
-        for(int A = 0; A < this.node.length; A++){
-            path[A] = this.node[A];
-        }
-        path[this.node.length] = title;
-        return path;
     }
 
     @Override
@@ -68,7 +59,7 @@ public class NetworkConfigNode implements ConfigNode {
     @Override
     public <T> Optional<T> getValue(String title, Parser<T> parser) {
         Optional<String> opValue = this.getString(title);
-        if(!opValue.isPresent()){
+        if (!opValue.isPresent()) {
             return Optional.empty();
         }
         return parser.deserialize(this, opValue.get());
@@ -77,11 +68,11 @@ public class NetworkConfigNode implements ConfigNode {
     @Override
     public <T, C extends Collection<T>> C getCollection(String title, Parser<T> parser, C into) {
         Optional<String> opString = this.getString(title);
-        if(!opString.isPresent()){
+        if (!opString.isPresent()) {
             return into;
         }
         String[] array = opString.get().split("¬");
-        for(int A = 0; A < array.length; A++){
+        for (int A = 0; A < array.length; A++) {
             parser.deserialize(this, A + "").ifPresent(into::add);
         }
         return into;
@@ -105,9 +96,18 @@ public class NetworkConfigNode implements ConfigNode {
     @Override
     public <T> void setCollection(String title, Parser<T> parser, Collection<T> collection) {
         int index = 0;
-        for(T value : collection){
+        for (T value : collection) {
             parser.serialize(this, index + "", value);
             index++;
         }
+    }
+
+    private String[] getPath(String title) {
+        String[] path = new String[this.node.length + 1];
+        for (int A = 0; A < this.node.length; A++) {
+            path[A] = this.node[A];
+        }
+        path[this.node.length] = title;
+        return path;
     }
 }

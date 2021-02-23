@@ -1,6 +1,5 @@
 package org.block.panel.launch;
 
-import com.gluonhq.charm.glisten.control.NavigationDrawer;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -11,7 +10,6 @@ import org.block.panel.common.navigation.NavigationBar;
 import org.block.panel.common.navigation.NavigationItem;
 import org.block.panel.main.FXMainDisplay;
 import org.block.panel.settings.GeneralSettings;
-import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.project.module.project.UnloadedProject;
 import org.block.util.GeneralUntil;
@@ -21,9 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProjectsPanel extends VBox {
 
@@ -34,12 +34,24 @@ public class ProjectsPanel extends VBox {
 
     public ProjectsPanel(@NotNull File projectsDirectory) {
         this.projectsDirectory = projectsDirectory;
-        this.navBar = createNavBar();
-        this.projectListView = createProjectList();
-        init();
+        this.navBar = this.createNavBar();
+        this.projectListView = this.createProjectList();
+        this.init();
     }
 
-    private void init(){
+    public ListView<ToStringWrapper<UnloadedProject>> getProjectListView() {
+        return this.projectListView;
+    }
+
+    public File getProjectDirectory() {
+        return this.projectsDirectory;
+    }
+
+    public SplitPane getSplitPane() {
+        return this.splitPane;
+    }
+
+    private void init() {
         this.splitPane.getItems().add(this.projectListView);
         this.splitPane.getItems().add(new Pane());
         this.splitPane.setDividerPosition(0, this.splitPane.getDividerPositions()[0] / 2);
@@ -49,20 +61,7 @@ public class ProjectsPanel extends VBox {
 
     }
 
-    public ListView<ToStringWrapper<UnloadedProject>> getProjectListView(){
-        return this.projectListView;
-    }
-
-    public File getProjectDirectory(){
-        return this.projectsDirectory;
-    }
-
-    public SplitPane getSplitPane(){
-        return this.splitPane;
-    }
-
-
-    private void searchForProjects(){
+    private void searchForProjects() {
         System.out.println("ProjectDir: " + this.projectsDirectory);
         File[] files = this.projectsDirectory.listFiles(File::isDirectory);
         if (files == null) {
@@ -94,7 +93,7 @@ public class ProjectsPanel extends VBox {
             ObservableList<Node> splitItems = this.splitPane.getItems();
             try {
                 ToStringWrapper<UnloadedProject> wrapper = projectListView.getSelectionModel().getSelectedItem();
-                if(wrapper == null){
+                if (wrapper == null) {
                     return;
                 }
                 UnloadedProject project = wrapper.getValue();
@@ -102,7 +101,7 @@ public class ProjectsPanel extends VBox {
                 double[] pos = this.splitPane.getDividerPositions();
                 splitItems.remove(1);
                 Region info = module.createDisplayInfo(project);
-                VBox wrapped = createProjectInfo(project, info);
+                VBox wrapped = this.createProjectInfo(project, info);
                 splitItems.add(wrapped);
                 this.splitPane.setDividerPositions(pos);
 
@@ -116,7 +115,7 @@ public class ProjectsPanel extends VBox {
         return projectListView;
     }
 
-    private VBox createProjectInfo(UnloadedProject project, Region region){
+    private VBox createProjectInfo(UnloadedProject project, Region region) {
         Button load = new Button("Load");
         load.setOnAction((event) -> {
             FXMainDisplay display = new FXMainDisplay();
@@ -128,7 +127,7 @@ public class ProjectsPanel extends VBox {
             GeneralUntil.getFiles(project.getDirectory()).parallelStream().forEach(File::delete);
 
             Optional<ToStringWrapper<UnloadedProject>> opWrapper = this.projectListView.getItems().parallelStream().filter(w -> w.getValue().equals(project)).findFirst();
-            if(opWrapper.isEmpty()){
+            if (opWrapper.isEmpty()) {
                 return;
             }
             this.projectListView.getItems().remove(opWrapper.get());
@@ -151,13 +150,18 @@ public class ProjectsPanel extends VBox {
         var createMenuNavigation = new ArrayList<NavigationItem.EndNavigationItem>();
         Blocks.getInstance()
                 .getAllEnabledPlugins()
-                .getAll(PluginContainer::getModules)
+                .getAll(c -> {
+                    var modules = c.getModules();
+                    System.out.println("Modules for " + c.getPluginMeta().id() + ": " + Stream.of(modules).parallel().map(Module::getId).collect(Collectors.toSet()));
+                    return Arrays.asList(modules);
+                })
                 .parallelStream()
                 .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getDisplayName(), (e) -> m.onProjectCreator())));
         createMenuNavigation.sort(Comparator.comparing(Labeled::getText));
         var createOption = new NavigationItem.TreeNavigationItem("Create", createMenuNavigation.toArray(new NavigationItem[0]));
 
-        var networkJoin = new NavigationItem.EndNavigationItem("Join", (e) -> {});
+        var networkJoin = new NavigationItem.EndNavigationItem("Join", (e) -> {
+        });
         var networkOption = new NavigationItem.TreeNavigationItem("Network", networkJoin);
 
         var settingsOption = new NavigationItem.EndNavigationItem("Settings", (e) -> {

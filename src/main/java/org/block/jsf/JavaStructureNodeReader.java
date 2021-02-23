@@ -10,15 +10,15 @@ public class JavaStructureNodeReader {
 
     private final ConfigNode node;
 
-    public JavaStructureNodeReader(ConfigNode node){
+    public JavaStructureNodeReader(ConfigNode node) {
         this.node = node;
     }
 
-    public ConfigNode getNode(){
+    public ConfigNode getNode() {
         return this.node;
     }
 
-    public List<JSFClass> read(){
+    public List<JSFClass> read() {
         return JSFPart.TITLE_CLASSES.deserialize(this.node).get();
     }
 }

@@ -6,17 +6,18 @@ import javafx.beans.value.ObservableValue;
 
 import java.util.function.Function;
 
-public class MappedObservableValue <C, T> implements ObservableValue<T> {
+public class MappedObservableValue<C, T> implements ObservableValue<T> {
 
     private final ObservableValue<C> value;
     private final Function<C, T> to;
     private final Function<T, C> from;
 
-    public MappedObservableValue(ObservableValue<C> value, Function<T, C> from, Function<C, T> to){
+    public MappedObservableValue(ObservableValue<C> value, Function<T, C> from, Function<C, T> to) {
         this.value = value;
         this.to = to;
         this.from = from;
     }
+
     @Override
     public void addListener(ChangeListener<? super T> changeListener) {
         ChangeListener<? super C> changeListener1 = new MappedChangeListener<T, C>((ChangeListener<T>) changeListener, this.from, this.to);

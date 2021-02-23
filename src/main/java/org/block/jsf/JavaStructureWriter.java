@@ -6,7 +6,9 @@ import org.block.serialization.ConfigImplementation;
 import org.block.serialization.json.JSONConfigImplementation;
 import org.block.serialization.json.JSONConfigNode;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.*;
 
 public class JavaStructureWriter {
@@ -14,19 +16,19 @@ public class JavaStructureWriter {
     private final OutputStream stream;
     private final TreeSet<JSFClass> classes = new TreeSet<>(Comparator.comparing(JSFClass::getClassName));
 
-    public JavaStructureWriter(OutputStream file){
+    public JavaStructureWriter(OutputStream file) {
         this.stream = file;
     }
 
-    public OutputStream getStream(){
+    public OutputStream getStream() {
         return this.stream;
     }
 
-    public void addClasses(JSFClass... collection){
+    public void addClasses(JSFClass... collection) {
         this.addClasses(Arrays.asList(collection));
     }
 
-    public void addClasses(Collection<JSFClass> collection){
+    public void addClasses(Collection<JSFClass> collection) {
         this.classes.addAll(collection);
     }
 
@@ -40,8 +42,6 @@ public class JavaStructureWriter {
         writer.flush();
         writer.close();
     }
-
-
 
 
 }

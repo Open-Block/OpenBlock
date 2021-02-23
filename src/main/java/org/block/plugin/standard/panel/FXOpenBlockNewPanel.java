@@ -10,10 +10,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.block.Blocks;
+import org.block.panel.SceneSource;
 import org.block.plugin.PluginContainer;
 import org.block.project.module.project.UnloadedProject;
-import org.block.panel.SceneSource;
-import org.block.util.ToStringWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +26,17 @@ public class FXOpenBlockNewPanel {
     private final Button cancelButton = new Button("Cancel");
     private final Button createButton = new Button("Create");
 
-    private GridPane createGrid(){
+    public Scene build() {
+        GridPane grid = createGrid();
+        HBox buttons = createButtons();
+        grid.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
+
+        buttons.prefWidthProperty().bind(grid.widthProperty());
+        VBox box = new VBox(grid, buttons);
+        return new Scene(box);
+    }
+
+    private GridPane createGrid() {
         GridPane pane = new GridPane();
         createRow(pane, "Name", this.nameField, 0);
         createRow(pane, "Version", this.versionField, 1);
@@ -35,7 +44,7 @@ public class FXOpenBlockNewPanel {
         return pane;
     }
 
-    private void createRow(GridPane pane, String key, Region node, int row){
+    private void createRow(GridPane pane, String key, Region node, int row) {
         Label keyL = new Label(key);
         keyL.setPadding(new Insets(0, 10, 0, 10));
         pane.add(keyL, 0, row);
@@ -44,7 +53,7 @@ public class FXOpenBlockNewPanel {
         GridPane.setVgrow(node, Priority.ALWAYS);
     }
 
-    private HBox createButtons(){
+    private HBox createButtons() {
         this.nameField.setOnKeyTyped((e) -> createKeyEvent(e, true));
         this.versionField.setOnKeyTyped((e) -> createKeyEvent(e, false));
         this.cancelButton.setCancelButton(true);
@@ -57,7 +66,7 @@ public class FXOpenBlockNewPanel {
             project.addTempVersions(this.versionField.getText());
             try {
                 project.saveTempData();
-                Stage stage = (Stage)this.createButton.getScene().getWindow();
+                Stage stage = (Stage) this.createButton.getScene().getWindow();
                 stage.close();
                 SceneSource source = Blocks.getInstance().getSceneSource();
                 /*if(source instanceof FXProjectsPanel){
@@ -77,7 +86,7 @@ public class FXOpenBlockNewPanel {
         });
 
         this.cancelButton.setOnAction((event) -> {
-            Stage stage = (Stage)this.cancelButton.getScene().getWindow();
+            Stage stage = (Stage) this.cancelButton.getScene().getWindow();
             stage.close();
         });
 
@@ -90,28 +99,18 @@ public class FXOpenBlockNewPanel {
         return box;
     }
 
-    private void createKeyEvent(KeyEvent event, boolean checkName){
-        if(checkName){
+    private void createKeyEvent(KeyEvent event, boolean checkName) {
+        if (checkName) {
             this.locationLabel.setText(new File("Projects/" + this.nameField.getText() + "/OpenBlock.json").getAbsolutePath());
         }
-        if(this.nameField.getText().trim().length() == 0){
+        if (this.nameField.getText().trim().length() == 0) {
             this.createButton.setDisable(true);
             return;
         }
-        if(this.versionField.getText().trim().length() == 0){
+        if (this.versionField.getText().trim().length() == 0) {
             this.createButton.setDisable(true);
             return;
         }
         this.createButton.setDisable(false);
-    }
-
-    public Scene build(){
-        GridPane grid = createGrid();
-        HBox buttons = createButtons();
-        grid.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
-
-        buttons.prefWidthProperty().bind(grid.widthProperty());
-        VBox box = new VBox(grid, buttons);
-        return new Scene(box);
     }
 }

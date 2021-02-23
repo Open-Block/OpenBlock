@@ -10,6 +10,7 @@ import java.nio.file.Path;
 
 /**
  * This is all the global settings for loading and saving from a particular implementation of structured file
+ *
  * @param <CN> The default configuration node
  */
 public interface ConfigImplementation<CN extends ConfigNode> {
@@ -25,6 +26,7 @@ public interface ConfigImplementation<CN extends ConfigNode> {
 
     /**
      * Creates a empty root node for creation of the structured file
+     *
      * @return An empty node at the root
      */
     CN createEmptyNode();
@@ -32,6 +34,7 @@ public interface ConfigImplementation<CN extends ConfigNode> {
     /**
      * Loads the root node of the provided text from the structured file.
      * This is useful for if the file was provided from a abnormal location such as user inputted text
+     *
      * @param structure the text of the structured file
      * @return The root node
      */
@@ -39,6 +42,7 @@ public interface ConfigImplementation<CN extends ConfigNode> {
 
     /**
      * Writes the structured contents as a String treating the provided node as the root
+     *
      * @param node The provided node
      * @return The outputting structured text
      * @throws IllegalArgumentException If the provided node isn't of the correct implementation
@@ -47,10 +51,11 @@ public interface ConfigImplementation<CN extends ConfigNode> {
 
     /**
      * Loads the root node of the provided structured file.
+     *
      * @param path The Path to the file
      * @return The Root node
      * @throws java.nio.file.NoSuchFileException If the file does not exist
-     * @throws IOException error reading file
+     * @throws IOException                       error reading file
      */
     default CN load(Path path) throws IOException {
         StringBuilder builder = new StringBuilder();
@@ -60,12 +65,13 @@ public interface ConfigImplementation<CN extends ConfigNode> {
 
     /**
      * Writes the structured contents as a File treating the provided node as the root
+     *
      * @param node The provided node
      * @param path The provided file
      * @return The outputting structured text
-     * @throws IllegalArgumentException If the provided node isn't of the correct implementation
+     * @throws IllegalArgumentException          If the provided node isn't of the correct implementation
      * @throws java.nio.file.NoSuchFileException If the file does not exist
-     * @throws IOException error reading file
+     * @throws IOException                       error reading file
      */
     default String write(ConfigNode node, Path path) throws IOException {
         FileWriter writer = new FileWriter(path.toFile());

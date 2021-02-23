@@ -8,12 +8,12 @@ public class VerifyConnectionEvent implements NetworkEvent {
     private VerifyConnectionPacketBuilder builder;
     private Connection.Direct direct;
 
-    public VerifyConnectionEvent(Connection.Direct direct, VerifyConnectionPacketBuilder builder){
+    public VerifyConnectionEvent(Connection.Direct direct, VerifyConnectionPacketBuilder builder) {
         this.builder = builder;
         this.direct = direct;
     }
 
-    public VerifyConnectionPacketBuilder getValue(){
+    public VerifyConnectionPacketBuilder getValue() {
         return this.builder;
     }
 

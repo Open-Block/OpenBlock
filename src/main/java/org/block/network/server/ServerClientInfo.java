@@ -15,7 +15,7 @@ public class ServerClientInfo extends AbstractConnection {
         this.connection = connection;
     }
 
-    public ServerConnection getServer(){
+    public ServerConnection getServer() {
         return this.connection;
     }
 

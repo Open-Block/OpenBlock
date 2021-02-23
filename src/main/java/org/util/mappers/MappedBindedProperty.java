@@ -13,7 +13,7 @@ public class MappedBindedProperty<C, T> implements Property<T> {
     private final Function<C, T> to;
     private final Function<T, C> from;
 
-    public MappedBindedProperty(Property<C> property, Function<T, C> from, Function<C, T> to){
+    public MappedBindedProperty(Property<C> property, Function<T, C> from, Function<C, T> to) {
         this.property = property;
         this.from = from;
         this.to = to;
@@ -26,7 +26,7 @@ public class MappedBindedProperty<C, T> implements Property<T> {
 
     @Override
     public void unbind() {
-    this.property.unbind();
+        this.property.unbind();
     }
 
     @Override

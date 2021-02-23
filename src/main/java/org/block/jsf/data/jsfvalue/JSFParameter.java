@@ -1,13 +1,21 @@
 package org.block.jsf.data.jsfvalue;
 
 import org.block.jsf.data.JSFPart;
-import org.block.jsf.data.Visibility;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
 public class JSFParameter extends JSFValue<JSFParameter> {
+
+    public JSFParameter(boolean isFinal, String type, String name) {
+        super(isFinal, type, name);
+    }
+
+    @Override
+    public Builder toBuilder() {
+        return null;
+    }
 
     public static class Builder implements JSFPart.Builder<JSFParameter> {
 
@@ -44,10 +52,10 @@ public class JSFParameter extends JSFValue<JSFParameter> {
 
         @Override
         public JSFParameter build() {
-            if(this.name == null){
+            if (this.name == null) {
                 throw new IllegalStateException("Parameter name cannot be null");
             }
-            if(this.type == null){
+            if (this.type == null) {
                 throw new IllegalStateException("Parameter type cannot be null");
             }
             return new JSFParameter(this.isFinal, this.type, this.name);
@@ -78,14 +86,5 @@ public class JSFParameter extends JSFValue<JSFParameter> {
             JSFPart.TITLE_NAME.serialize(base, value.getName());
             JSFPart.TITLE_RETURN.serialize(base, value.getType());
         }
-    }
-
-    public JSFParameter(boolean isFinal, String type, String name) {
-        super(isFinal, type, name);
-    }
-
-    @Override
-    public Builder toBuilder() {
-        return null;
     }
 }

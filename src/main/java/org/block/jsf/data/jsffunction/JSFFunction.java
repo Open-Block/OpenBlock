@@ -17,14 +17,14 @@ public abstract class JSFFunction<F extends JSFFunction<?>> implements Comparabl
     private final List<JSFGeneric> generics = new ArrayList<>();
     private final List<JSFParameter> parameters = new ArrayList<>();
 
-    public abstract String getName();
-
-    public JSFFunction(Visibility visibility, boolean isFinal, boolean isStatic, String returning){
+    public JSFFunction(Visibility visibility, boolean isFinal, boolean isStatic, String returning) {
         this.visibility = visibility;
         this.returning = returning;
         this.isStatic = isStatic;
         this.isFinal = isFinal;
     }
+
+    public abstract String getName();
 
     public Visibility getVisibility() {
         return visibility;
@@ -54,19 +54,19 @@ public abstract class JSFFunction<F extends JSFFunction<?>> implements Comparabl
     public int compareTo(F o) {
         List<JSFParameter> parameters = this.getParameters();
         List<JSFParameter> otherParameters = o.getParameters();
-        if(parameters.isEmpty()){
+        if (parameters.isEmpty()) {
             return -1;
         }
-        if(otherParameters.isEmpty()){
+        if (otherParameters.isEmpty()) {
             return 1;
         }
         int similar = 0;
         int diff = parameters.size() - otherParameters.size();
-        if(diff < 0){
+        if (diff < 0) {
             diff = -diff;
         }
-        for(int A = 0; A < Math.min(parameters.size(), otherParameters.size()); A++){
-            if(parameters.get(A).equals(otherParameters.get(A))){
+        for (int A = 0; A < Math.min(parameters.size(), otherParameters.size()); A++) {
+            if (parameters.get(A).equals(otherParameters.get(A))) {
                 similar++;
             }
         }

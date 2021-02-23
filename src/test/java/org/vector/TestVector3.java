@@ -7,7 +7,7 @@ import org.vector.type.Vector3;
 public class TestVector3 {
 
     @Test
-    public void testSumSame(){
+    public void testSumSame() {
         //SETUP
         Vector3<Double> origin = Vector3.valueOf(1.0, 0, 0);
         Vector3<Double> sum = Vector3.valueOf(2.0, 0, 0);

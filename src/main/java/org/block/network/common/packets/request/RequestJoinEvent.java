@@ -8,12 +8,12 @@ public class RequestJoinEvent implements NetworkEvent {
     private RequestPacketValue value;
     private Connection.Direct connection;
 
-    public RequestJoinEvent(Connection.Direct connection, RequestPacketValue value){
+    public RequestJoinEvent(Connection.Direct connection, RequestPacketValue value) {
         this.value = value;
         this.connection = connection;
     }
 
-    public RequestPacketValue getPacketValue(){
+    public RequestPacketValue getPacketValue() {
         return this.value;
     }
 

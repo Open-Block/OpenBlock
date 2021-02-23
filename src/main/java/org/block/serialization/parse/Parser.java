@@ -2,16 +2,18 @@ package org.block.serialization.parse;
 
 import javafx.scene.shape.Rectangle;
 import org.block.Blocks;
-import org.block.plugin.PluginContainer;
 import org.block.project.module.Module;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * The interface of both serialize and deserialize in a combined faction
+ *
  * @param <T> The expected value class type for serialization and deserialization
  */
 public interface Parser<T> extends Serialize<T>, Deserialize<T> {
@@ -28,7 +30,14 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
     });
     Parser<Module> MODULE = new Abstract<>((n, t, v) -> n.setValue(t, v.getId()), (n, t) -> {
         Optional<String> opValue = n.getString(t);
-        return opValue.flatMap(s -> Blocks.getInstance().getAllEnabledPlugins().getAll(PluginContainer::getModules).parallelStream().filter(m -> m.getId().equals(s)).findAny());
+        System.out.println("string: " + opValue.isPresent());
+        if (opValue.isEmpty()) {
+            return Optional.empty();
+        }
+        System.out.println("Looking for " + opValue.get());
+        var modules = Blocks.getInstance().getAllEnabledPlugins().getAll(c -> Arrays.asList(c.getModules()));
+        System.out.println("Modules: " + modules.parallelStream().map(m -> m.getId()).collect(Collectors.toList()));
+        return modules.parallelStream().filter(m -> m.getId().equals(opValue.get())).findAny();
     });
     Parser<Rectangle> RECTANGLE = new Abstract<>((n, t, v) -> {
         n.getNode(t).setValue("x", v.getX());
@@ -40,7 +49,7 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
         Optional<Integer> opY = n.getNode(t).getInteger("y");
         Optional<Integer> opWidth = n.getNode(t).getInteger("width");
         Optional<Integer> opHeight = n.getNode(t).getInteger("height");
-        if(opX.isPresent() && opY.isPresent() && opWidth.isPresent() && opHeight.isPresent()){
+        if (opX.isPresent() && opY.isPresent() && opWidth.isPresent() && opHeight.isPresent()) {
             return Optional.of(new Rectangle(opX.get(), opY.get(), opWidth.get(), opHeight.get()));
         }
         return Optional.empty();
@@ -51,7 +60,7 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
         private final Serialize<T> serialize;
         private final Deserialize<T> deserialize;
 
-        public Abstract(@NotNull Serialize<T> serialize, @NotNull Deserialize<T> deserialize){
+        public Abstract(@NotNull Serialize<T> serialize, @NotNull Deserialize<T> deserialize) {
             this.serialize = serialize;
             this.deserialize = deserialize;
         }

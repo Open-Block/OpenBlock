@@ -25,22 +25,7 @@ public class ServerConnection implements Connection {
         this.socket = socket;
     }
 
-    @Override
-    public void sendMessage(String message) {
-        this.clients.parallelStream().forEach(ci -> ci.sendMessage(message));
-    }
-
-    @Override
-    public void sendMessage(Packet.PacketBuilder builder) {
-        this.clients.parallelStream().forEach(ci -> ci.sendMessage(builder));
-    }
-
-    @Override
-    public void onReceive(Consumer<String> consumer) {
-        this.clients.parallelStream().forEach(ci -> ci.onReceive(consumer));
-    }
-
-    public ServerSocket getTargetSocket(){
+    public ServerSocket getTargetSocket() {
         return this.socket;
     }
 
@@ -73,7 +58,7 @@ public class ServerConnection implements Connection {
                     }
                 }).start();
             } catch (IOException e) {
-                if(!this.stopConnections) {
+                if (!this.stopConnections) {
                     e.printStackTrace();
                 }
             }
@@ -84,7 +69,7 @@ public class ServerConnection implements Connection {
     public Set<PacketValue> getPacketValues() {
         Set<PacketValue> set = new HashSet<>(this.packetValues);
         Iterator<ServerClientInfo> iter = this.clients.iterator();
-        while(iter.hasNext()){
+        while (iter.hasNext()) {
             set.addAll(iter.next().getPacketValues());
         }
         return Collections.unmodifiableSet(set);
@@ -98,7 +83,7 @@ public class ServerConnection implements Connection {
 
     @Override
     public void unregisterPacketValue(PacketValue... values) {
-        for(PacketValue value : values){
+        for (PacketValue value : values) {
             this.packetValues.remove(value);
         }
         this.clients.forEach(c -> c.registerPacketValues(values));
@@ -124,5 +109,20 @@ public class ServerConnection implements Connection {
     @Override
     public ConnectionMeans getMeans() {
         return ConnectionMeans.HOST;
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        this.clients.parallelStream().forEach(ci -> ci.sendMessage(message));
+    }
+
+    @Override
+    public void sendMessage(Packet.PacketBuilder builder) {
+        this.clients.parallelStream().forEach(ci -> ci.sendMessage(builder));
+    }
+
+    @Override
+    public void onReceive(Consumer<String> consumer) {
+        this.clients.parallelStream().forEach(ci -> ci.onReceive(consumer));
     }
 }

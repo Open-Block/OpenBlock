@@ -4,33 +4,36 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class GroupSelector extends Parent implements Selector{
+public class GroupSelector extends Parent implements Selector {
 
     private final String display;
     private final Set<String> searchTerms = new HashSet<>();
 
-    public GroupSelector(String display, String... searchTerms){
+    public GroupSelector(String display, String... searchTerms) {
         this.display = display;
         this.searchTerms.addAll(Arrays.asList(searchTerms));
     }
 
-    public List<Selector> getSelectors(){
+    public List<Selector> getSelectors() {
         return this.getChildrenUnmodifiable().stream()
                 .filter(n -> n instanceof Selector)
-                .map(n -> (Selector)n)
+                .map(n -> (Selector) n)
                 .collect(Collectors.toList());
     }
 
-    public void addChild(Node node){
+    public void addChild(Node node) {
         this.getChildren().add(node);
         this.getChildren().sort((o1, o2) -> {
-            if(!(o1 instanceof Selector)){
+            if (!(o1 instanceof Selector)) {
                 return 1;
             }
-            if(!(o2 instanceof Selector)){
+            if (!(o2 instanceof Selector)) {
                 return -1;
             }
             Selector selector1 = (Selector) o1;

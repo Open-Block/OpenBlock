@@ -5,14 +5,14 @@ import javafx.beans.value.ObservableValue;
 
 import java.util.function.Function;
 
-public class MappedChangeListener <C, T> implements ChangeListener<T> {
+public class MappedChangeListener<C, T> implements ChangeListener<T> {
 
     private final Function<T, C> to;
     private final Function<C, T> from;
 
     private final ChangeListener<C> listener;
 
-    public MappedChangeListener(ChangeListener<C> listener, Function<C, T> from, Function<T, C> to){
+    public MappedChangeListener(ChangeListener<C> listener, Function<C, T> from, Function<T, C> to) {
         this.to = to;
         this.from = from;
         this.listener = listener;

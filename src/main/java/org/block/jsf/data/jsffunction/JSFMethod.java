@@ -11,6 +11,46 @@ import java.util.*;
 
 public class JSFMethod extends JSFFunction<JSFMethod> {
 
+    private final String name;
+    private final boolean isAbstract;
+    public JSFMethod(Visibility visibility, boolean isFinal, boolean isStatic, String returning, String name, boolean isAbstract) {
+        super(visibility, isFinal, isStatic, returning);
+        this.name = name;
+        this.isAbstract = isAbstract;
+    }
+
+    public boolean isAbstract() {
+        return this.isAbstract;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public int compareTo(@NotNull JSFMethod o) {
+        int stringCompare = o.getName().compareTo(this.getName());
+        if (stringCompare != 0) {
+            return stringCompare;
+        }
+        return super.compareTo(o);
+    }
+
+    @Override
+    public JSFMethod.Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.generics.addAll(this.getGenerics());
+        builder.isFinal = this.isFinal();
+        builder.parameters.addAll(this.getParameters());
+        builder.visibility = this.getVisibility();
+        builder.returning = this.getReturning();
+        builder.isStatic = this.isStatic();
+        builder.isAbstract = this.isAbstract();
+        builder.name = this.getName();
+        return builder;
+    }
+
     public static class Builder implements JSFPart.Builder<JSFMethod> {
 
         private Visibility visibility = Visibility.PUBLIC;
@@ -22,11 +62,11 @@ public class JSFMethod extends JSFFunction<JSFMethod> {
         private List<JSFGeneric> generics = new ArrayList<>();
         private List<JSFParameter> parameters = new ArrayList<>();
 
-        public String getName(){
+        public String getName() {
             return this.name;
         }
 
-        public Builder setName(String name){
+        public Builder setName(String name) {
             this.name = name;
             return this;
         }
@@ -66,24 +106,24 @@ public class JSFMethod extends JSFFunction<JSFMethod> {
             return parameters;
         }
 
-        public Builder addParameters(JSFParameter... collection){
+        public Builder addParameters(JSFParameter... collection) {
             return addParameters(Arrays.asList(collection));
         }
 
-        public Builder addParameters(Collection<JSFParameter> collection){
+        public Builder addParameters(Collection<JSFParameter> collection) {
             this.parameters.addAll(collection);
             return this;
         }
 
         @Override
         public JSFMethod build() {
-            if(this.visibility == null){
+            if (this.visibility == null) {
                 throw new IllegalStateException("Visibility cannot be null");
             }
-            if(this.returning == null){
+            if (this.returning == null) {
                 throw new IllegalStateException("Returning value cannot be null");
             }
-            if(this.name == null){
+            if (this.name == null) {
                 throw new IllegalStateException("Name value cannot be null");
             }
             JSFMethod cons = new JSFMethod(this.visibility, this.isFinal, this.isStatic, this.returning, this.name, this.isAbstract);
@@ -131,46 +171,5 @@ public class JSFMethod extends JSFFunction<JSFMethod> {
             JSFPart.TITLE_IS_ABSTRACT.serialize(base, value.isAbstract());
             JSFPart.TITLE_GENERICS.serialize(base, value.getGenerics());
         }
-    }
-
-    private final String name;
-    private final boolean isAbstract;
-
-    public JSFMethod(Visibility visibility, boolean isFinal, boolean isStatic, String returning, String name, boolean isAbstract) {
-        super(visibility, isFinal, isStatic, returning);
-        this.name = name;
-        this.isAbstract = isAbstract;
-    }
-
-    public boolean isAbstract(){
-        return this.isAbstract;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public int compareTo(@NotNull JSFMethod o) {
-        int stringCompare = o.getName().compareTo(this.getName());
-        if(stringCompare != 0){
-            return stringCompare;
-        }
-        return super.compareTo(o);
-    }
-
-    @Override
-    public JSFMethod.Builder toBuilder() {
-        Builder builder = new Builder();
-        builder.generics.addAll(this.getGenerics());
-        builder.isFinal = this.isFinal();
-        builder.parameters.addAll(this.getParameters());
-        builder.visibility = this.getVisibility();
-        builder.returning = this.getReturning();
-        builder.isStatic = this.isStatic();
-        builder.isAbstract = this.isAbstract();
-        builder.name = this.getName();
-        return builder;
     }
 }

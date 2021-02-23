@@ -16,6 +16,7 @@ public class DragContext {
 
     /**
      * If the dragging block has been attached to another block, then that will be provided here.
+     *
      * @return A optional value of the attached block to the block being dragged.
      */
     public Optional<Block> getAttached() {
@@ -24,6 +25,7 @@ public class DragContext {
 
     /**
      * Sets the block that is attaching the dragged block
+     *
      * @param attached The attached block
      * @return itself for chaining
      * @throws IllegalArgumentException if the provided block does not have the dragging block attached
@@ -35,6 +37,7 @@ public class DragContext {
 
     /**
      * Gets the block being dragged
+     *
      * @return The block being dragged
      */
     public Block getDragging() {
@@ -44,6 +47,7 @@ public class DragContext {
     /**
      * Sets the block being dragged.
      * Please note that this may not work depending on the implementation of the dragging
+     *
      * @param dragging The block being dragged
      * @return Itself for chaining
      */
@@ -54,6 +58,7 @@ public class DragContext {
 
     /**
      * Gets the X offset. This prevents the annoyance of Blocks moving way too much after a slight drag.
+     *
      * @return The X offset in pixels
      */
     public int getOffX() {
@@ -62,6 +67,7 @@ public class DragContext {
 
     /**
      * Sets the X offset.
+     *
      * @param offX The X offset
      * @return Itself for chaining
      */
@@ -72,6 +78,7 @@ public class DragContext {
 
     /**
      * Gets the Y offset. This prevents the annoyance of Blocks moving way too much after a slight drag.
+     *
      * @return The Y offset in pixels
      */
     public int getOffY() {
@@ -80,6 +87,7 @@ public class DragContext {
 
     /**
      * Sets the Y offset.
+     *
      * @param offY The Y offset
      * @return Itself for chaining
      */

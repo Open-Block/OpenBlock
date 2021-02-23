@@ -35,8 +35,78 @@ public abstract class AbstractConnection implements Connection.Direct {
     }
 
     @Override
+    public Socket getTargetSocket() {
+        return this.socket;
+    }
+
+    @Override
+    public void connect() {
+        try {
+            this.connection = true;
+            String fromServer;
+            while (this.connection && (fromServer = this.sendToServer.readLine()) != null) {
+                if (fromServer.startsWith("Pack: ")) {
+                    this.onReceive = null;
+                    String id = fromServer.substring(6);
+                    Optional<? extends Packet> opPacket = Packet.PACKETS.parallelStream().filter(p -> p.getId().equals(id)).findAny();
+                    if (!opPacket.isPresent()) {
+                        System.err.println("Unknown Packet of " + id);
+                        continue;
+                    }
+                    opPacket.get().onReceive(this);
+                    continue;
+                }
+
+                if (this.onReceive != null) {
+                    this.onReceive.accept(fromServer);
+                    continue;
+                }
+                if (fromServer.equals("end")) {
+                    break;
+                }
+            }
+            if (this instanceof ServerClientInfo) {
+                this.sendMessage("end");
+            }
+        } catch (IOException ignore) {
+        }
+    }
+
+    @Override
+    public void disconnect() {
+
+    }
+
+    @Override
+    public BufferedReader getConnectionReader() {
+        return this.sendToServer;
+    }
+
+    @Override
+    public PrintWriter getConnectionWriter() {
+        return this.printWriter;
+    }
+
+    @Override
     public Collection<NetworkListener> getListeners() {
         return this.networkListeners;
+    }
+
+    @Override
+    public Set<PacketValue> getPacketValues() {
+        return Collections.unmodifiableSet(this.packetValues);
+    }
+
+    @Override
+    public void registerPacketValues(PacketValue... values) {
+        this.packetValues.addAll(Arrays.asList(values));
+    }
+
+    @Override
+    public void unregisterPacketValue(PacketValue... values) {
+        for (PacketValue value : values) {
+            this.packetValues.remove(value);
+        }
     }
 
     @Override
@@ -52,14 +122,14 @@ public abstract class AbstractConnection implements Connection.Direct {
     @Override
     public void callEvent(NetworkEvent event) {
         this.networkListeners.parallelStream().forEach(l -> {
-            for (Method method : l.getClass().getDeclaredMethods()){
-                if (method.getParameterCount() != 1){
+            for (Method method : l.getClass().getDeclaredMethods()) {
+                if (method.getParameterCount() != 1) {
                     continue;
                 }
-                if(!method.isAnnotationPresent(NetEvent.class)){
+                if (!method.isAnnotationPresent(NetEvent.class)) {
                     continue;
                 }
-                if (!method.getParameters()[0].getType().isInstance(event)){
+                if (!method.getParameters()[0].getType().isInstance(event)) {
                     continue;
                 }
                 try {
@@ -69,66 +139,6 @@ public abstract class AbstractConnection implements Connection.Direct {
                 }
             }
         });
-    }
-
-    @Override
-    public void disconnect() {
-
-    }
-
-    @Override
-    public void connect() {
-        try {
-            this.connection = true;
-            String fromServer;
-            while (this.connection && (fromServer = this.sendToServer.readLine()) != null) {
-                if (fromServer.startsWith("Pack: ")){
-                    this.onReceive = null;
-                    String id = fromServer.substring(6);
-                    Optional<? extends Packet> opPacket = Packet.PACKETS.parallelStream().filter(p -> p.getId().equals(id)).findAny();
-                    if(!opPacket.isPresent()){
-                        System.err.println("Unknown Packet of " + id);
-                        continue;
-                    }
-                    opPacket.get().onReceive(this);
-                    continue;
-                }
-
-                if(this.onReceive != null){
-                    this.onReceive.accept(fromServer);
-                    continue;
-                }
-                if(fromServer.equals("end")){
-                    break;
-                }
-            }
-            if(this instanceof ServerClientInfo) {
-                this.sendMessage("end");
-            }
-        }catch (IOException ignore){
-        }
-    }
-
-    @Override
-    public Socket getTargetSocket() {
-        return this.socket;
-    }
-
-    @Override
-    public Set<PacketValue> getPacketValues() {
-        return Collections.unmodifiableSet(this.packetValues);
-    }
-
-    @Override
-    public void registerPacketValues(PacketValue... values) {
-        this.packetValues.addAll(Arrays.asList(values));
-    }
-
-    @Override
-    public void unregisterPacketValue(PacketValue... values) {
-        for(PacketValue value : values){
-            this.packetValues.remove(value);
-        }
     }
 
     @Override
@@ -149,18 +159,8 @@ public abstract class AbstractConnection implements Connection.Direct {
     }
 
     @Override
-    public BufferedReader getConnectionReader() {
-        return this.sendToServer;
-    }
-
-    @Override
-    public PrintWriter getConnectionWriter() {
-        return this.printWriter;
-    }
-
-    @Override
-    public boolean equals(Object object){
-        if(object instanceof AbstractConnection){
+    public boolean equals(Object object) {
+        if (object instanceof AbstractConnection) {
             return this.socket.getInetAddress().equals(((AbstractConnection) object).socket.getInetAddress());
         }
         return false;
@@ -168,13 +168,13 @@ public abstract class AbstractConnection implements Connection.Direct {
 
     @Override
     public String toString() {
-        for(RequestPacketValue value : getPacketValue(RequestPacketValue.class)){
-            if(value.getUsername() != null){
+        for (RequestPacketValue value : getPacketValue(RequestPacketValue.class)) {
+            if (value.getUsername() != null) {
                 return value.getUsername();
             }
         }
-        for (VerifyConnectionValue value : getPacketValue(VerifyConnectionValue.class)){
-            if(value.getBuilder().getId().isPresent()){
+        for (VerifyConnectionValue value : getPacketValue(VerifyConnectionValue.class)) {
+            if (value.getBuilder().getId().isPresent()) {
                 return value.getBuilder().getId().get();
             }
         }

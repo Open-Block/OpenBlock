@@ -34,15 +34,15 @@ public interface JSFPart<P extends JSFPart<?>> {
     FixedTitle.Listable<JSFMethod> TITLE_METHODS = new FixedTitle.Listable<>("method", BUILDER_METHOD);
     FixedTitle.Listable<JSFClass> TITLE_CLASSES = new FixedTitle.Listable<>("classes", BUILDER_CLASS);
 
+    Builder<P> toBuilder();
 
     interface Builder<B extends JSFPart<?>> extends Parser<B>, Cloneable {
 
         B build();
+
         Builder<B> clone();
 
     }
-
-    Builder<P> toBuilder();
 
 
 }

@@ -14,6 +14,28 @@ public interface MethodCallBlock extends AttachableBlock, ValueBlock<Object> {
     String METHOD_NAME_BLOCK_GROUP = "method_call:name";
     String METHOD_PARAMETERS_BLOCK_GROUP = "method_call:parameters";
 
+    default MethodNameBlockGroup getNameBlockGroup() {
+        Optional<BlockGroup> opBlockGroup = this.getGroup(METHOD_NAME_BLOCK_GROUP);
+        if (opBlockGroup.isEmpty()) {
+            throw new IllegalStateException("This object has not registered the block group of '" + METHOD_NAME_BLOCK_GROUP + "'");
+        }
+
+        return (MethodNameBlockGroup) opBlockGroup.get();
+    }
+
+    default MethodParameterBlockGroup getParametersBlockGroup() {
+        Optional<BlockGroup> opBlockGroup = this.getGroup(METHOD_NAME_BLOCK_GROUP);
+        if (opBlockGroup.isEmpty()) {
+            throw new IllegalStateException("This object has not registered the block group of '" + METHOD_PARAMETERS_BLOCK_GROUP + "'");
+        }
+
+        return (MethodParameterBlockGroup) opBlockGroup.get();
+    }
+
+    @Override
+    default BlockGraphics getGraphicShape() {
+        throw new IllegalStateException("Not Implemented");
+    }
 
     class MethodNameBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
 
@@ -30,28 +52,5 @@ public interface MethodCallBlock extends AttachableBlock, ValueBlock<Object> {
 
         public abstract void update();
 
-    }
-
-    default MethodNameBlockGroup getNameBlockGroup() {
-        Optional<BlockGroup> opBlockGroup = this.getGroup(METHOD_NAME_BLOCK_GROUP);
-        if(opBlockGroup.isEmpty()){
-            throw new IllegalStateException("This object has not registered the block group of '" + METHOD_NAME_BLOCK_GROUP + "'");
-        }
-
-        return (MethodNameBlockGroup) opBlockGroup.get();
-    }
-
-    default MethodParameterBlockGroup getParametersBlockGroup() {
-        Optional<BlockGroup> opBlockGroup = this.getGroup(METHOD_NAME_BLOCK_GROUP);
-        if(opBlockGroup.isEmpty()){
-            throw new IllegalStateException("This object has not registered the block group of '" + METHOD_PARAMETERS_BLOCK_GROUP + "'");
-        }
-
-        return (MethodParameterBlockGroup) opBlockGroup.get();
-    }
-
-    @Override
-    default BlockGraphics getGraphicShape() {
-        throw new IllegalStateException("Not Implemented");
     }
 }

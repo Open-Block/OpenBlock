@@ -17,15 +17,18 @@ public interface Packet {
 
     Set<? extends Packet> PACKETS = new HashSet<>(Arrays.asList(SEND_PROJECT_PACKET, REQUEST_CONNECTION_PACKET, VERIFY_CONNECTION_PACKET));
 
+    String getId();
+
+    void onReceive(Connection.Direct direct);
+
+    void onSend(Connection.Direct direct, PacketBuilder builder);
+
     interface PacketBuilder {
 
         String build(Connection connection);
+
         Packet getPacket();
 
     }
-
-    String getId();
-    void onReceive(Connection.Direct direct);
-    void onSend(Connection.Direct direct, PacketBuilder builder);
 
 }

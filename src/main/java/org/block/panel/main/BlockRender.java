@@ -1,10 +1,7 @@
 package org.block.panel.main;
 
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import org.block.project.block.Block;
@@ -16,7 +13,7 @@ public class BlockRender extends Pane {
     private Color selectedColour = Color.RED;
     private boolean isSelected;
 
-    public BlockRender(Block block){
+    public BlockRender(Block block) {
         this.block = block;
         this.getChildren().add(this.canvas);
         this.setHeight(block.getGraphicShape().getHeight());
@@ -25,32 +22,32 @@ public class BlockRender extends Pane {
         this.canvas.heightProperty().bind(this.heightProperty());
     }
 
-    public Block getBlock(){
+    public Block getBlock() {
         return this.block;
     }
 
-    public Canvas getCanvas(){
+    public Canvas getCanvas() {
         return this.canvas;
     }
 
-    public Color getSelectedColour(){
+    public Color getSelectedColour() {
         return this.selectedColour;
     }
 
-    public void setSelectedColour(Color colour){
+    public void setSelectedColour(Color colour) {
         this.selectedColour = colour;
     }
 
-    public boolean isSelected(){
+    public boolean isSelected() {
         return this.isSelected;
     }
 
-    public void setSelected(boolean selected){
+    public void setSelected(boolean selected) {
         this.isSelected = selected;
     }
 
     @Override
-    protected void layoutChildren(){
+    protected void layoutChildren() {
         super.layoutChildren();
         GraphicsContext graphics = this.canvas.getGraphicsContext2D();
         this.block.getGraphicShape().draw(graphics);

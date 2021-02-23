@@ -17,34 +17,34 @@ import java.util.function.Predicate;
 public interface CodeStartBlock extends CalledBlock {
 
     @Override
-    default String writeCode(int tab){
+    default String writeCode(int tab) {
         return "";
     }
 
-    default Set<Block> getChildren(Predicate<Block> predicate){
-        if(!(this instanceof AttachableBlock)){
+    default Set<Block> getChildren(Predicate<Block> predicate) {
+        if (!(this instanceof AttachableBlock)) {
             return Collections.emptySet();
         }
-        AttachableBlock target = (AttachableBlock)this;
+        AttachableBlock target = (AttachableBlock) this;
         Set<AttachableBlock> toProcess = new HashSet<>();
         Set<Block> children = new HashSet<>();
-        while(true){
-            for(BlockGroup group : target.getGroups()){
-                for (BlockSector<?> sector : group.getSectors()){
+        while (true) {
+            for (BlockGroup group : target.getGroups()) {
+                for (BlockSector<?> sector : group.getSectors()) {
                     Optional<? extends Block> opBlock = sector.getAttachedBlock();
-                    if(opBlock.isEmpty()){
+                    if (opBlock.isEmpty()) {
                         continue;
                     }
-                    if(predicate.test(opBlock.get())){
+                    if (predicate.test(opBlock.get())) {
                         children.add(opBlock.get());
                     }
-                    if(!(opBlock.get() instanceof AttachableBlock)){
+                    if (!(opBlock.get() instanceof AttachableBlock)) {
                         continue;
                     }
                     toProcess.add((AttachableBlock) opBlock.get());
                 }
             }
-            if(toProcess.isEmpty()){
+            if (toProcess.isEmpty()) {
                 break;
             }
             target = toProcess.stream().findAny().get();

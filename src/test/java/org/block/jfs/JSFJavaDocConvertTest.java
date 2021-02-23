@@ -15,9 +15,9 @@ import java.util.Collections;
 public class JSFJavaDocConvertTest {
 
     @Test
-    public void docReadTest(){
+    public void docReadTest() {
         InputStream stream = JSFJavaDocConvertTest.class.getClassLoader().getResourceAsStream("File.html");
-        if(stream == null){
+        if (stream == null) {
             Assertions.fail("Files.html could not be found");
             return;
         }
