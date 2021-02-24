@@ -60,8 +60,9 @@ public final class OpenBlockModule implements Module {
 
     @Override
     public void onProjectCreator(ProjectsPanel panel) {
-        var newPanel = new FXOpenBlockNewPanel(panel);
-        Blocks.getInstance().setWindow(newPanel);
+        var newPanel = new FXOpenBlockNewPanel(Blocks.getInstance().LAUNCH_WINDOW);
+        Blocks.getInstance().registerWindow(FXOpenBlockNewPanel.OPEN_BLOCK_CREATOR_WINDOW, newPanel);
+        Blocks.getInstance().setWindow(FXOpenBlockNewPanel.OPEN_BLOCK_CREATOR_WINDOW);
     }
 
     @Override

@@ -4,6 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 
+import java.util.function.Supplier;
+
 public abstract class NavigationItem extends Button {
 
     public NavigationItem(String text, EventHandler<ActionEvent> event) {
@@ -20,9 +22,9 @@ public abstract class NavigationItem extends Button {
 
     public static class TreeNavigationItem extends NavigationItem {
 
-        private NavigationItem[] children;
+        private Supplier<NavigationItem[]> children;
 
-        public TreeNavigationItem(String text, NavigationItem... items) {
+        public TreeNavigationItem(String text, Supplier<NavigationItem[]> items) {
             super(text, e -> {
             });
             this.children = items;
@@ -30,12 +32,20 @@ public abstract class NavigationItem extends Button {
 
         }
 
+        public TreeNavigationItem(String text, NavigationItem... items) {
+            super(text, e -> {
+            });
+            this.children = () -> items;
+            this.setOnAction((e) -> ((NavigationBar) TreeNavigationItem.this.getParent().getParent()).onAction(TreeNavigationItem.this));
+
+        }
+
         public void setNextRow(NavigationItem... row) {
-            this.children = row;
+            this.children = () -> row;
         }
 
         public NavigationItem[] getNextRow() {
-            return this.children;
+            return this.children.get();
         }
     }
 }

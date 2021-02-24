@@ -7,12 +7,18 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.block.panel.common.dialog.Dialog;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DesktopBlocks extends Blocks {
 
+    private final Map<String, Scene> views = new HashMap<>();
     private final Stage stage;
 
-    public DesktopBlocks(Stage stage) {
+    public DesktopBlocks(Stage stage, String main) {
+        super(main);
         this.stage = stage;
+        this.init();
     }
 
     @Override
@@ -21,12 +27,17 @@ public class DesktopBlocks extends Blocks {
     }
 
     @Override
-    public void setWindow(Parent parent) {
-        var scene = parent.getScene();
+    public void setWindow(String title) {
+        Scene scene = this.views.get(title);
         if (scene == null) {
-            scene = this.onSceneCreate(new Scene(parent), parent);
+            throw new IllegalStateException("The window of '" + title + "' has not been registered");
         }
         this.stage.setScene(scene);
+    }
+
+    @Override
+    public void registerWindow(String title, Parent parent) {
+        this.views.put(title, new Scene(parent));
     }
 
     @Override
@@ -37,7 +48,6 @@ public class DesktopBlocks extends Blocks {
     @Override
     public void requestNewHeight(double height) {
         this.stage.setHeight(height);
-
     }
 
     @Override
@@ -54,7 +64,7 @@ public class DesktopBlocks extends Blocks {
         scene.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             if (KeyCode.ESCAPE.equals(e.getCode())) {
                 if (parent instanceof Dialog) {
-                    this.setWindow(((Dialog) parent).getBackParent());
+                    this.setWindow(((Dialog) parent).getBackWindow());
                 }
             }
         });

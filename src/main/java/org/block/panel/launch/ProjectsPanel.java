@@ -8,8 +8,6 @@ import org.block.Blocks;
 import org.block.panel.common.navigation.NavigationBar;
 import org.block.panel.common.navigation.NavigationItem;
 import org.block.panel.main.FXMainDisplay;
-import org.block.panel.settings.GeneralSettings;
-import org.block.panel.settings.SettingsDisplay;
 import org.block.project.module.Module;
 import org.block.project.module.project.UnloadedProject;
 import org.block.util.GeneralUntil;
@@ -22,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ProjectsPanel extends VBox {
 
@@ -119,7 +115,8 @@ public class ProjectsPanel extends VBox {
         Button load = new Button("Load");
         load.setOnAction((event) -> {
             FXMainDisplay display = new FXMainDisplay();
-            Blocks.getInstance().setWindow(display);
+            Blocks.getInstance().registerWindow(Blocks.getInstance().BLOCKS_WINDOW, display);
+            Blocks.getInstance().setWindow(Blocks.getInstance().BLOCKS_WINDOW);
         });
         Button delete = new Button("Delete");
         delete.setOnAction((event) -> {
@@ -146,26 +143,26 @@ public class ProjectsPanel extends VBox {
     }
 
     private NavigationBar createNavBar() {
-        var createMenuNavigation = new ArrayList<NavigationItem.EndNavigationItem>();
-        Blocks.getInstance()
-                .getAllEnabledPlugins()
-                .getAll(c -> {
-                    var modules = c.getModules();
-                    System.out.println("Modules for " + c.getPluginMeta().id() + ": " + Stream.of(modules).parallel().map(Module::getId).collect(Collectors.toSet()));
-                    return Arrays.asList(modules);
-                })
-                .parallelStream()
-                .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getDisplayName(), (e) -> m.onProjectCreator(ProjectsPanel.this))));
-        createMenuNavigation.sort(Comparator.comparing(Labeled::getText));
-        var createOption = new NavigationItem.TreeNavigationItem("Create", createMenuNavigation.toArray(new NavigationItem[0]));
+        var createOption = new NavigationItem.TreeNavigationItem("Create", () -> {
+            var createMenuNavigation = new ArrayList<NavigationItem.EndNavigationItem>();
+            Blocks.getInstance()
+                    .getAllEnabledPlugins()
+                    .getAll(c -> {
+                        var modules = c.getModules();
+                        return Arrays.asList(modules);
+                    })
+                    .parallelStream()
+                    .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getDisplayName(), (e) -> m.onProjectCreator(ProjectsPanel.this))));
+            createMenuNavigation.sort(Comparator.comparing(Labeled::getText));
+            return createMenuNavigation.toArray(new NavigationItem.EndNavigationItem[0]);
+        });
 
         var networkJoin = new NavigationItem.EndNavigationItem("Join", (e) -> {
         });
         var networkOption = new NavigationItem.TreeNavigationItem("Network", networkJoin);
 
         var settingsOption = new NavigationItem.EndNavigationItem("Settings", (e) -> {
-            var settings = new SettingsDisplay<>(new GeneralSettings(), ProjectsPanel.this);
-            Blocks.getInstance().setWindow(settings);
+            Blocks.getInstance().setWindow(Blocks.getInstance().GENERAL_SETTINGS_WINDOW);
         });
 
         return new NavigationBar(createOption, networkOption, settingsOption);

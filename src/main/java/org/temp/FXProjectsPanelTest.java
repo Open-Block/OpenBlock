@@ -17,7 +17,7 @@ public class FXProjectsPanelTest extends Application {
     @Override
     public void start(Stage stage) {
         ShinyOutputStream.createDefault();
-        Blocks.setInstance(new DesktopBlocks(stage));
+        Blocks.setInstance(new DesktopBlocks(stage, "Home"));
         stage.setTitle("Test");
         stage.setScene(new Scene(new ProjectsPanel(new File("Projects"))));
         stage.setWidth(500);

@@ -4,6 +4,7 @@ import javafx.scene.Parent;
 import org.block.network.client.ClientConnection;
 import org.block.network.server.ServerConnection;
 import org.block.panel.settings.GeneralSettings;
+import org.block.panel.settings.SettingsDisplay;
 import org.block.plugin.PluginContainer;
 import org.block.plugin.PluginContainers;
 import org.block.project.module.project.Project;
@@ -17,15 +18,24 @@ public abstract class Blocks {
 
     public static final int[] VERSION = {0, 0, 0, 1};
     private static Blocks instance;
+    public final String LAUNCH_WINDOW;
+    public final String GENERAL_SETTINGS_WINDOW = "GeneralSettings";
+    public final String BLOCKS_WINDOW = "Blocks";
     private final PluginContainers plugins = new PluginContainers();
+    private final GeneralSettings settings = new GeneralSettings();
     private Project.Loaded loadedProject;
     private ServerConnection server;
     private ClientConnection client;
-    private GeneralSettings settings = new GeneralSettings();
+
+    public Blocks(String titleOfMain) {
+        this.LAUNCH_WINDOW = titleOfMain;
+    }
 
     public abstract Parent getWindow();
 
-    public abstract void setWindow(Parent parent);
+    public abstract void setWindow(String title);
+
+    public abstract void registerWindow(String title, Parent parent);
 
     public abstract void requestNewWidth(double width);
 
@@ -126,5 +136,9 @@ public abstract class Blocks {
 
     public static Blocks getInstance() {
         return instance;
+    }
+
+    protected void init() {
+        this.registerWindow(this.GENERAL_SETTINGS_WINDOW, new SettingsDisplay<>(new GeneralSettings(), this.LAUNCH_WINDOW));
     }
 }

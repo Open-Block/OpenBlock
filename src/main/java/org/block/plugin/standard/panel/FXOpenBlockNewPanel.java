@@ -21,20 +21,21 @@ import java.io.IOException;
 
 public class FXOpenBlockNewPanel extends VBox implements Dialog {
 
+    public static final String OPEN_BLOCK_CREATOR_WINDOW = "CreateOpenBlockProject";
     private final TextField nameField = new TextField();
     private final TextField versionField = new TextField("1.0.0-SNAPSHOT");
     private final Label locationLabel = new Label(new File(Blocks.getInstance().getSettings().getProjectPath().valueProperty().getValue().getAbsolutePath() + "/OpenBlock.json").getAbsolutePath());
     private final Button cancelButton = new Button("Cancel");
     private final Button createButton = new Button("Create");
-    private final ProjectsPanel origin;
+    private final String origin;
 
-    public FXOpenBlockNewPanel(ProjectsPanel panel) {
+    public FXOpenBlockNewPanel(String panel) {
         this.origin = panel;
         this.init();
     }
 
     @Override
-    public Parent getBackParent() {
+    public String getBackWindow() {
         return this.origin;
     }
 
@@ -76,13 +77,17 @@ public class FXOpenBlockNewPanel extends VBox implements Dialog {
             try {
                 project.saveTempData();
                 Blocks.getInstance().setWindow(this.origin);
-                this.origin.getProjectListView().getItems().add(new ToStringWrapper<>(project, (pro) -> {
-                    try {
-                        return pro.getDisplayName();
-                    } catch (IOException e) {
-                        return pro.getDirectory().getName();
-                    }
-                }));
+                Parent origin = Blocks.getInstance().getWindow();
+                if (origin instanceof ProjectsPanel) {
+                    ((ProjectsPanel) origin).getProjectListView().getItems().add(new ToStringWrapper<>(project, (pro) -> {
+                        try {
+                            return pro.getDisplayName();
+                        } catch (IOException e) {
+                            return pro.getDirectory().getName();
+                        }
+                    }));
+                }
+
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

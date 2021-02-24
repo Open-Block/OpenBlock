@@ -1,7 +1,6 @@
 package org.block.panel.settings;
 
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -10,10 +9,10 @@ import org.block.panel.common.dialog.Dialog;
 
 public class SettingsDisplay<N extends Node> extends VBox implements Dialog {
 
-    private final Parent origin;
+    private final String origin;
     private final N display;
 
-    public SettingsDisplay(N display, Parent origin) {
+    public SettingsDisplay(N display, String origin) {
         this.display = display;
         this.origin = origin;
         this.init();
@@ -24,7 +23,7 @@ public class SettingsDisplay<N extends Node> extends VBox implements Dialog {
     }
 
     @Override
-    public Parent getBackParent() {
+    public String getBackWindow() {
         return this.origin;
     }
 
