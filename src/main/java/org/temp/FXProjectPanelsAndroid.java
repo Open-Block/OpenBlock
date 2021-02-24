@@ -17,18 +17,19 @@ public class FXProjectPanelsAndroid extends MobileApplication {
 
     @Override
     public void init() {
-        this.setTitle("Open Blocks");
         this.addViewFactory(HOME_VIEW, () -> {
             try {
                 View view = new View(new ProjectsPanel(new File("Projects")));
                 Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
                 ShinyOutputStream.createDefault();
+                this.setTitle("Open Blocks");
                 return view;
             } catch (Throwable e) {
                 String stackTrace = ArrayUtils.toString("\n\t", t -> t.getFileName() + "[" + t.getLineNumber() + "]", e.getStackTrace());
                 return new View(new VBox(new Label(e.getMessage()), new TextArea(stackTrace)));
             }
         });
+
     }
 
     public static void main(String[] args) {
