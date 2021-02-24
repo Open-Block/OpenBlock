@@ -9,7 +9,6 @@ import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.MobileBlocks;
 import org.block.panel.launch.ProjectsPanel;
-import org.util.print.ShinyOutputStream;
 
 import java.io.File;
 
@@ -21,7 +20,7 @@ public class FXProjectPanelsAndroid extends MobileApplication {
             try {
                 View view = new View(new ProjectsPanel(new File("Projects")));
                 Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
-                ShinyOutputStream.createDefault();
+                //ShinyOutputStream.createDefault();
                 this.setTitle("Open Blocks");
                 return view;
             } catch (Throwable e) {
