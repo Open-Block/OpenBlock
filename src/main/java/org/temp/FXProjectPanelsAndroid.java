@@ -20,8 +20,9 @@ public class FXProjectPanelsAndroid extends MobileApplication {
         ShinyOutputStream.createDefault();
         this.addViewFactory(HOME_VIEW, () -> {
             try {
-                View view = new View(new ProjectsPanel(new File("Projects")));
+                View view = new View();
                 Blocks.setInstance(new MobileBlocks(view));
+                view.getChildren().add(new ProjectsPanel(new File("Projects")));
                 return view;
             } catch (Throwable e) {
                 String stackTrace = ArrayUtils.toString("\n\t", t -> t.getFileName() + "[" + t.getLineNumber() + "]", e.getStackTrace());
