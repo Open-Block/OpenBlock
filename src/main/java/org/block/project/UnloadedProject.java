@@ -1,8 +1,8 @@
-package org.block.project.module.project;
+package org.block.project;
 
 import javafx.scene.shape.Rectangle;
 import org.block.Blocks;
-import org.block.project.module.Module;
+import org.block.plugin.Plugin;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.json.JSONConfigNode;
@@ -15,7 +15,7 @@ public final class UnloadedProject implements Project {
 
     private final File path;
     private String tempName;
-    private Module tempModule;
+    private Plugin tempPlugin;
     private TreeSet<String> tempVersions = new TreeSet<>();
 
     public UnloadedProject(File file) {
@@ -26,8 +26,8 @@ public final class UnloadedProject implements Project {
         this.tempName = name;
     }
 
-    public void setTempModule(Module module) {
-        this.tempModule = module;
+    public void setTempPlugin(Plugin module) {
+        this.tempPlugin = module;
     }
 
     public void addTempVersions(String... versions) {
@@ -51,8 +51,8 @@ public final class UnloadedProject implements Project {
         }
         JSONConfigNode node = ConfigImplementation.JSON.createEmptyNode();
         Project.CONFIG_PROJECT_NAME.serialize(node, this.tempName);
-        Project.CONFIG_MODULE.serialize(node, this.tempModule);
-        Project.CONFIG_MODULE_VERSION.serialize(node, this.tempModule.getVersion());
+        Project.CONFIG_PLUGIN.serialize(node, this.tempPlugin);
+        Project.CONFIG_PLUGIN_VERSION.serialize(node, this.tempPlugin.getVersion());
         Project.CONFIG_PROJECT_VERSION.serialize(node, new ArrayList<>(this.tempVersions));
         Project.CONFIG_PROJECT_WINDOW_LOCATION.serialize(node, new Rectangle(0, 0, 600, 800));
         ConfigImplementation.JSON.write(node, this.getFile().toPath());
@@ -60,19 +60,14 @@ public final class UnloadedProject implements Project {
 
     public Project.Loaded load(ConfigImplementation<? extends ConfigNode> impl) {
         try {
-            return this.load(this.getExpectedModule(), impl);
+            return this.load(this.getExpectedPlugin(), impl);
         } catch (IOException e) {
-            Set<Module> modules = Blocks.getInstance().getEnabledPlugins().getAll(c -> Arrays.asList(c.getModules()));
-            Optional<Module> opMod = modules.parallelStream().filter(m -> m.canLoad(this)).findFirst();
-            if (opMod.isPresent()) {
-                return this.load(opMod.get(), impl);
-            }
+            throw new IllegalStateException("No plugin found to load project", e);
         }
-        throw new IllegalStateException("No module found to load project");
     }
 
-    public Project.Loaded load(Module module, ConfigImplementation<? extends ConfigNode> impl) {
-        Project.Loaded loaded = module.load(this, impl);
+    public Project.Loaded load(Plugin plugin, ConfigImplementation<? extends ConfigNode> impl) {
+        Project.Loaded loaded = plugin.load(this, impl);
         Blocks.getInstance().setLoadedProject(loaded);
         return loaded;
     }

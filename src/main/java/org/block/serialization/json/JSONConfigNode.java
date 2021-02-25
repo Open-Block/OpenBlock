@@ -6,9 +6,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class JSONConfigNode implements ConfigNode {
 
@@ -39,19 +39,19 @@ public class JSONConfigNode implements ConfigNode {
     }
 
     @Override
-    public Optional<Integer> getInteger(String title) {
-        return getNumber(title, Number::intValue);
+    public OptionalInt getInteger(String title) {
+        return this.getNumber(title, Number::intValue, OptionalInt::empty, OptionalInt::of);
     }
 
     @Override
-    public Optional<Long> getLong(String title) {
-        return getNumber(title, Number::longValue);
+    public OptionalLong getLong(String title) {
+        return getNumber(title, Number::longValue, OptionalLong::empty, OptionalLong::of);
 
     }
 
     @Override
-    public Optional<Double> getDouble(String title) {
-        return getNumber(title, Number::doubleValue);
+    public OptionalDouble getDouble(String title) {
+        return getNumber(title, Number::doubleValue, OptionalDouble::empty, OptionalDouble::of);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class JSONConfigNode implements ConfigNode {
 
     @Override
     public <T, C extends Collection<T>> C getCollection(String title, Parser<T> parser, C into) {
-        JSONArray array = null;
+        JSONArray array;
         try {
             array = this.path.getJSONArray(title);
         } catch (JSONException e) {
@@ -91,9 +91,8 @@ public class JSONConfigNode implements ConfigNode {
         JSONArrayConfigNode node = new JSONArrayConfigNode(array);
         for (int A = 0; A < array.length(); A++) {
             try {
-                parser.deserialize(node, A + "").ifPresent(e -> into.add(e));
-            } catch (IllegalStateException e) {
-                continue;
+                parser.deserialize(node, A + "").ifPresent(into::add);
+            } catch (IllegalStateException ignored) {
             }
         }
         return into;
@@ -111,7 +110,7 @@ public class JSONConfigNode implements ConfigNode {
 
     @Override
     public void setCollection(String title, Collection<?> collection) {
-        JSONArray array = null;
+        JSONArray array;
         try {
             array = this.path.getJSONArray(title);
         } catch (JSONException e) {
@@ -128,7 +127,7 @@ public class JSONConfigNode implements ConfigNode {
 
     @Override
     public <T> void setCollection(String title, Parser<T> parser, Collection<T> collection) {
-        JSONArray array = null;
+        JSONArray array;
         try {
             array = this.path.getJSONArray(title);
         } catch (JSONException e) {
@@ -141,6 +140,15 @@ public class JSONConfigNode implements ConfigNode {
             parser.serialize(node, index + "", value);
             index++;
         }
+    }
+
+    public <T extends Number, O> O getNumber(String title, Function<Number, T> function, Supplier<O> empty, Function<T, O> map) {
+        Number number = this.path.optNumber(title);
+        if (number == null) {
+            return empty.get();
+        }
+        var parsed = function.apply(number);
+        return map.apply(parsed);
     }
 
     public <T extends Number> Optional<T> getNumber(String title, Function<Number, T> function) {

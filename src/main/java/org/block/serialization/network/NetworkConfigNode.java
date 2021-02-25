@@ -4,8 +4,9 @@ import org.array.utils.ArrayUtils;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.parse.Parser;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class NetworkConfigNode implements ConfigNode {
 
@@ -32,18 +33,18 @@ public class NetworkConfigNode implements ConfigNode {
     }
 
     @Override
-    public Optional<Integer> getInteger(String title) {
-        return this.getValue(title, Parser.INTEGER);
+    public OptionalInt getInteger(String title) {
+        return this.getValue(title, Parser.INTEGER, OptionalInt::empty, OptionalInt::of);
     }
 
     @Override
-    public Optional<Long> getLong(String title) {
-        return this.getValue(title, Parser.LONG);
+    public OptionalLong getLong(String title) {
+        return this.getValue(title, Parser.LONG, OptionalLong::empty, OptionalLong::of);
     }
 
     @Override
-    public Optional<Double> getDouble(String title) {
-        return this.getValue(title, Parser.DOUBLE);
+    public OptionalDouble getDouble(String title) {
+        return this.getValue(title, Parser.DOUBLE, OptionalDouble::empty, OptionalDouble::of);
     }
 
     @Override
@@ -59,10 +60,19 @@ public class NetworkConfigNode implements ConfigNode {
     @Override
     public <T> Optional<T> getValue(String title, Parser<T> parser) {
         Optional<String> opValue = this.getString(title);
-        if (!opValue.isPresent()) {
+        if (opValue.isEmpty()) {
             return Optional.empty();
         }
         return parser.deserialize(this, opValue.get());
+    }
+
+    private <T, O> O getValue(String title, Parser<T> parser, Supplier<O> supplier, Function<T, O> function){
+        Optional<String> opValue = this.getString(title);
+        if (opValue.isEmpty()) {
+            return supplier.get();
+        }
+        var value = parser.deserialize(this, opValue.get());
+        return function.apply(value.get());
     }
 
     @Override

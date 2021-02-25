@@ -5,14 +5,17 @@ import org.block.network.client.ClientConnection;
 import org.block.network.server.ServerConnection;
 import org.block.panel.settings.GeneralSettings;
 import org.block.panel.settings.SettingsDisplay;
-import org.block.plugin.PluginContainer;
-import org.block.plugin.PluginContainers;
-import org.block.project.module.project.Project;
+import org.block.plugin.Plugin;
+import org.block.plugin.ResourcePlugin;
+import org.block.project.Project;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class Blocks {
 
@@ -21,7 +24,7 @@ public abstract class Blocks {
     public final String LAUNCH_WINDOW;
     public final String GENERAL_SETTINGS_WINDOW = "GeneralSettings";
     public final String BLOCKS_WINDOW = "Blocks";
-    private final PluginContainers plugins = new PluginContainers();
+    private final Set<Plugin> plugins = new HashSet<>();
     private final GeneralSettings settings = new GeneralSettings();
     private Project.Loaded loadedProject;
     private ServerConnection server;
@@ -73,27 +76,11 @@ public abstract class Blocks {
         this.loadedProject = loaded;
     }
 
-    public PluginContainers getPlugins() {
-        return new PluginContainers(this.plugins);
+    public Set<Plugin> getPlugins() {
+        return this.plugins;
     }
 
-    public PluginContainers getAllPlugins() {
-        Set<PluginContainer> set = new HashSet<>(this.plugins);
-        set.add(PluginContainer.OPEN_BLOCK_CONTAINER);
-        return new PluginContainers(set);
-    }
-
-    public PluginContainers getEnabledPlugins() {
-        return new PluginContainers(this.plugins.parallelStream().filter(p -> p.isDisabled()).collect(Collectors.toSet()));
-    }
-
-    public PluginContainers getAllEnabledPlugins() {
-        Set<PluginContainer> set = new HashSet<>(this.getEnabledPlugins());
-        set.add(PluginContainer.OPEN_BLOCK_CONTAINER);
-        return new PluginContainers(set);
-    }
-
-    public void register(PluginContainer container) {
+    public void registerPlugin(Plugin container) {
         this.plugins.add(container);
     }
 
@@ -140,5 +127,25 @@ public abstract class Blocks {
 
     protected void init() {
         this.registerWindow(this.GENERAL_SETTINGS_WINDOW, new SettingsDisplay<>(new GeneralSettings(), this.LAUNCH_WINDOW));
+
+
+        var pluginPath = this.getSettings().getValue(this.getSettings().getPluginPath());
+        if (!pluginPath.canWrite()){
+            //TODO CANNOT WRITE
+        }
+        try {
+            if(!pluginPath.exists()) {
+                Files.createDirectory(pluginPath.toPath());
+            }
+        } catch (IOException e) {
+            //TODO CANNOT WRITE
+        }
+        Stream.of(ResourcePlugin.values()).forEach(p -> {
+            try {
+                p.copyTo(pluginPath);
+            } catch (IOException e) {
+                System.err.println("Could not create plugin " + p.name());
+            }
+        });
     }
 }

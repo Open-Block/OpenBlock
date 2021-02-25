@@ -4,7 +4,7 @@ import org.block.Blocks;
 import org.block.panel.main.FXMainDisplay;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
-import org.block.project.module.project.Project;
+import org.block.project.Project;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.ConfigNode;
 

@@ -2,14 +2,13 @@ package org.block.serialization.parse;
 
 import javafx.scene.shape.Rectangle;
 import org.block.Blocks;
-import org.block.project.module.Module;
+import org.block.plugin.Plugin;
 import org.block.serialization.ConfigNode;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * The interface of both serialize and deserialize in a combined faction
@@ -19,25 +18,26 @@ import java.util.stream.Collectors;
 public interface Parser<T> extends Serialize<T>, Deserialize<T> {
 
     Parser<String> STRING = new Abstract<>(ConfigNode::setValue, ConfigNode::getString);
-    Parser<Integer> INTEGER = new Abstract<>(ConfigNode::setValue, ConfigNode::getInteger);
-    Parser<Long> LONG = new Abstract<>(ConfigNode::setValue, ConfigNode::getLong);
-    Parser<Double> DOUBLE = new Abstract<>(ConfigNode::setValue, ConfigNode::getDouble);
+    Parser<Integer> INTEGER = new Abstract<>(ConfigNode::setValue, ConfigNode::getGenericInteger);
+    Parser<Long> LONG = new Abstract<>(ConfigNode::setValue, ConfigNode::getGenericLong);
+    Parser<Double> DOUBLE = new Abstract<>(ConfigNode::setValue, ConfigNode::getGenericDouble);
     Parser<Float> FLOAT = new Abstract<>(ConfigNode::setValue, ConfigNode::getFloat);
     Parser<Boolean> BOOLEAN = new Abstract<>(ConfigNode::setValue, ConfigNode::getBoolean);
     Parser<UUID> UNIQUE_ID = new Abstract<>((n, t, v) -> n.setValue(t, v.toString()), (n, t) -> {
         Optional<String> opValue = n.getString(t);
         return opValue.map(UUID::fromString);
     });
-    Parser<Module> MODULE = new Abstract<>((n, t, v) -> n.setValue(t, v.getId()), (n, t) -> {
+    Parser<Plugin> PLUGIN = new Abstract<>((n, t, v) -> n.setValue(t, v.getId()), (n, t) -> {
         Optional<String> opValue = n.getString(t);
-        System.out.println("string: " + opValue.isPresent());
         if (opValue.isEmpty()) {
             return Optional.empty();
         }
-        System.out.println("Looking for " + opValue.get());
-        var modules = Blocks.getInstance().getAllEnabledPlugins().getAll(c -> Arrays.asList(c.getModules()));
-        System.out.println("Modules: " + modules.parallelStream().map(m -> m.getId()).collect(Collectors.toList()));
-        return modules.parallelStream().filter(m -> m.getId().equals(opValue.get())).findAny();
+        return Blocks
+                .getInstance()
+                .getPlugins()
+                .parallelStream()
+                .filter(m -> m.getId().equals(opValue.get()))
+                .findAny();
     });
     Parser<Rectangle> RECTANGLE = new Abstract<>((n, t, v) -> {
         n.getNode(t).setValue("x", v.getX());
@@ -45,12 +45,12 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
         n.getNode(t).setValue("width", v.getWidth());
         n.getNode(t).setValue("height", v.getHeight());
     }, (n, t) -> {
-        Optional<Integer> opX = n.getNode(t).getInteger("x");
-        Optional<Integer> opY = n.getNode(t).getInteger("y");
-        Optional<Integer> opWidth = n.getNode(t).getInteger("width");
-        Optional<Integer> opHeight = n.getNode(t).getInteger("height");
+        OptionalInt opX = n.getNode(t).getInteger("x");
+        OptionalInt opY = n.getNode(t).getInteger("y");
+        OptionalInt opWidth = n.getNode(t).getInteger("width");
+        OptionalInt opHeight = n.getNode(t).getInteger("height");
         if (opX.isPresent() && opY.isPresent() && opWidth.isPresent() && opHeight.isPresent()) {
-            return Optional.of(new Rectangle(opX.get(), opY.get(), opWidth.get(), opHeight.get()));
+            return Optional.of(new Rectangle(opX.getAsInt(), opY.getAsInt(), opWidth.getAsInt(), opHeight.getAsInt()));
         }
         return Optional.empty();
     });

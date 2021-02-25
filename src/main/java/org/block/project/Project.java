@@ -1,7 +1,7 @@
-package org.block.project.module.project;
+package org.block.project;
 
 import javafx.scene.shape.Rectangle;
-import org.block.project.module.Module;
+import org.block.plugin.Plugin;
 import org.block.serialization.ConfigImplementation;
 import org.block.serialization.FixedTitle;
 import org.block.serialization.json.JSONConfigNode;
@@ -13,8 +13,8 @@ import java.util.Optional;
 
 public interface Project {
 
-    FixedTitle<Module> CONFIG_MODULE = new FixedTitle<>("id", Parser.MODULE, "Meta", "Module");
-    FixedTitle<String> CONFIG_MODULE_VERSION = new FixedTitle<>("version", Parser.STRING, "Meta", "Module");
+    FixedTitle<Plugin> CONFIG_PLUGIN = new FixedTitle<>("id", Parser.PLUGIN, "Meta", "Plugin");
+    FixedTitle<String> CONFIG_PLUGIN_VERSION = new FixedTitle<>("version", Parser.STRING, "Meta", "Plugin");
     FixedTitle<String> CONFIG_PROJECT_NAME = new FixedTitle<>("name", Parser.STRING, "Meta");
     FixedTitle.Listable<String> CONFIG_PROJECT_VERSION = new FixedTitle.Listable<>("versions", Parser.STRING, "Meta");
     FixedTitle<Rectangle> CONFIG_PROJECT_WINDOW_LOCATION = new FixedTitle<>("Location", Parser.RECTANGLE, "Meta", "Graphics");
@@ -64,13 +64,11 @@ public interface Project {
      * @throws IOException           If the file cannot be opened
      * @throws IllegalStateException If the module cannot be found
      */
-    default Module getExpectedModule() throws IOException {
-        JSONConfigNode json = ConfigImplementation.JSON.load(getFile().toPath());
-        Optional<Module> opModule = CONFIG_MODULE.deserialize(json);
-        if (opModule.isPresent()) {
-            return opModule.get();
-        }
-        throw new IllegalStateException("Could not find module");
+    default Plugin getExpectedPlugin() throws IOException {
+        JSONConfigNode json = ConfigImplementation.JSON.load(this.getFile().toPath());
+        return CONFIG_PLUGIN
+                .deserialize(json)
+                .orElseThrow(() -> new IllegalStateException("Could not find plugin"));
     }
 
     /**
@@ -85,11 +83,11 @@ public interface Project {
     interface Loaded extends Project {
 
         /**
-         * Gets the module that has the project loaded, if the project is not loaded then this should return {@link Project#getExpectedModule()}
+         * Gets the module that has the project loaded, if the project is not loaded then this should return {@link Project#getExpectedPlugin()}
          *
          * @return The module of the project
          */
-        Module getModule();
+        Plugin getPlugin();
     }
 
 }

@@ -2,8 +2,8 @@ package org.block.network.common.packets.project;
 
 import org.block.network.common.Connection;
 import org.block.network.common.packets.Packet;
-import org.block.project.module.Module;
-import org.block.project.module.project.Project;
+import org.block.plugin.Plugin;
+import org.block.project.Project;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -11,8 +11,8 @@ import java.util.Optional;
 
 public class SendProjectPacketBuilder implements Packet.PacketBuilder {
 
-    public static final String MODULE_ID = "ModuleID";
-    public static final String MODULE_VERSION = "ModuleVer";
+    public static final String PLUGIN_ID = "ModuleID";
+    public static final String PLUGIN_VERSION = "ModuleVer";
     private Project project;
     private LocalTime time = LocalTime.now();
 
@@ -29,15 +29,15 @@ public class SendProjectPacketBuilder implements Packet.PacketBuilder {
         return Optional.ofNullable(this.project);
     }
 
-    public Optional<Module> getModule() {
+    public Optional<Plugin> getPlugin() {
         if (this.project == null) {
             return Optional.empty();
         }
         if (this.project instanceof Project.Loaded) {
-            return Optional.of(((Project.Loaded) this.project).getModule());
+            return Optional.of(((Project.Loaded) this.project).getPlugin());
         }
         try {
-            return Optional.of(this.project.getExpectedModule());
+            return Optional.of(this.project.getExpectedPlugin());
         } catch (IOException e) {
             e.printStackTrace();
             return Optional.empty();
@@ -54,8 +54,8 @@ public class SendProjectPacketBuilder implements Packet.PacketBuilder {
         if (this.project == null) {
             throw new IllegalStateException("Project not set");
         }
-        Module module = this.getModule().get();
-        return this.time + "\t" + MODULE_ID + ": " + module.getId() + " | " + MODULE_VERSION + ": " + module.getVersion();
+        var plugin = this.getPlugin().orElseThrow();
+        return this.time + "\t" + PLUGIN_ID + ": " + plugin.getId() + " | " + PLUGIN_VERSION + ": " + plugin.getVersion();
     }
 
     @Override

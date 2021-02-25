@@ -8,8 +8,8 @@ import org.block.Blocks;
 import org.block.panel.common.navigation.NavigationBar;
 import org.block.panel.common.navigation.NavigationItem;
 import org.block.panel.main.FXMainDisplay;
-import org.block.project.module.Module;
-import org.block.project.module.project.UnloadedProject;
+import org.block.plugin.Plugin;
+import org.block.project.UnloadedProject;
 import org.block.util.GeneralUntil;
 import org.block.util.ToStringWrapper;
 import org.jetbrains.annotations.NotNull;
@@ -93,10 +93,10 @@ public class ProjectsPanel extends VBox {
                     return;
                 }
                 UnloadedProject project = wrapper.getValue();
-                Module module = project.getExpectedModule();
+                Plugin plugin = project.getExpectedPlugin();
                 double[] pos = this.splitPane.getDividerPositions();
                 splitItems.remove(1);
-                Region info = module.createDisplayInfo(project);
+                Region info = plugin.createDisplayInfo(project);
                 VBox wrapped = this.createProjectInfo(project, info);
                 splitItems.add(wrapped);
                 this.splitPane.setDividerPositions(pos);
@@ -145,14 +145,9 @@ public class ProjectsPanel extends VBox {
     private NavigationBar createNavBar() {
         var createOption = new NavigationItem.TreeNavigationItem("Create", () -> {
             var createMenuNavigation = new ArrayList<NavigationItem.EndNavigationItem>();
-            Blocks.getInstance()
-                    .getAllEnabledPlugins()
-                    .getAll(c -> {
-                        var modules = c.getModules();
-                        return Arrays.asList(modules);
-                    })
+            Blocks.getInstance().getPlugins()
                     .parallelStream()
-                    .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getDisplayName(), (e) -> m.onProjectCreator(ProjectsPanel.this))));
+                    .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getName(), (e) -> m.newProjectCreate(Blocks.getInstance().LAUNCH_WINDOW))));
             createMenuNavigation.sort(Comparator.comparing(Labeled::getText));
             return createMenuNavigation.toArray(new NavigationItem.EndNavigationItem[0]);
         });

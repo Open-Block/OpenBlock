@@ -4,11 +4,13 @@ import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.network.common.Connection;
 import org.block.network.common.packets.Packet;
+import org.block.plugin.Plugin;
 
 import java.time.LocalTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class VerifyConnectionPacketBuilder implements Packet.PacketBuilder {
 
@@ -19,7 +21,7 @@ public class VerifyConnectionPacketBuilder implements Packet.PacketBuilder {
     public static final int REQUEST_TYPE_INIT = 0;
     private LocalTime time = LocalTime.now();
     private int[] version = Blocks.VERSION;
-    private Set<String> plugins = Blocks.getInstance().getAllPlugins().get(pc -> pc.getPluginMeta().id());
+    private Set<String> plugins = Blocks.getInstance().getPlugins().parallelStream().map(Plugin::getId).collect(Collectors.toSet());
     private int request;
     private String id;
 

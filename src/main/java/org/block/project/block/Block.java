@@ -3,7 +3,7 @@ package org.block.project.block;
 import org.block.Blocks;
 import org.block.panel.main.BlockRender;
 import org.block.project.block.type.called.CodeStartBlock;
-import org.block.project.module.project.Project;
+import org.block.project.Project;
 
 import java.io.File;
 import java.util.Collection;

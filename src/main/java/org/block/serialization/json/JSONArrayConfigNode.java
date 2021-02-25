@@ -6,9 +6,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class JSONArrayConfigNode implements ConfigNode {
 
@@ -44,18 +44,18 @@ public class JSONArrayConfigNode implements ConfigNode {
     }
 
     @Override
-    public Optional<Integer> getInteger(String title) {
-        return getNumber(title, Number::intValue);
+    public OptionalInt getInteger(String title) {
+        return getNumber(title, Number::intValue, OptionalInt::empty, OptionalInt::of);
     }
 
     @Override
-    public Optional<Long> getLong(String title) {
-        return getNumber(title, Number::longValue);
+    public OptionalLong getLong(String title) {
+        return getNumber(title, Number::longValue, OptionalLong::empty, OptionalLong::of);
     }
 
     @Override
-    public Optional<Double> getDouble(String title) {
-        return getNumber(title, Number::doubleValue);
+    public OptionalDouble getDouble(String title) {
+        return getNumber(title, Number::doubleValue, OptionalDouble::empty, OptionalDouble::of);
     }
 
     @Override
@@ -135,5 +135,13 @@ public class JSONArrayConfigNode implements ConfigNode {
             return Optional.empty();
         }
         return Optional.of(function.apply(number));
+    }
+
+    public <T extends Number, O> O getNumber(String title, Function<Number, T> function, Supplier<O> empty, Function<T, O> map) {
+        Number number = this.path.optNumber(Integer.parseInt(title));
+        if (number == null) {
+            return empty.get();
+        }
+        return map.apply(function.apply(number));
     }
 }
