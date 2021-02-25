@@ -31,7 +31,7 @@ public interface ConfigNode {
      * @param title The key to the location
      * @return The Integer from the title, returns {@link Optional#empty()} if none can be found. Depending on the implementation this may return '0' if no value can be found.
      */
-    Optional<Integer> getInteger(String title);
+    OptionalInt getInteger(String title);
 
     /**
      * Gets a Long value from the title
@@ -39,7 +39,7 @@ public interface ConfigNode {
      * @param title The key to the location
      * @return The Long from the title, returns {@link Optional#empty()} if none can be found. Depending on the implementation this may return '0' if no value can be found.
      */
-    Optional<Long> getLong(String title);
+    OptionalLong getLong(String title);
 
     /**
      * Gets a Double value from the title
@@ -47,7 +47,7 @@ public interface ConfigNode {
      * @param title The key to the location
      * @return The Double from the title, returns {@link Optional#empty()} if none can be found. Depending on the implementation this may return '0.0' if no value can be found.
      */
-    Optional<Double> getDouble(String title);
+    OptionalDouble getDouble(String title);
 
     /**
      * Gets a Float value from the title
