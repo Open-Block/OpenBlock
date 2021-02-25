@@ -48,6 +48,6 @@ public class GeneralSettings extends SettingsPane {
     }
 
     private void init() {
-        this.getOptions().addAll(this.projectPath, this.logPath, this.debugPath);
+        this.getOptions().addAll(this.projectPath, this.pluginPath, this.logPath, this.debugPath);
     }
 }

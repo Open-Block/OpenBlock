@@ -9,9 +9,9 @@ import org.block.plugin.Plugin;
 import org.block.plugin.ResourcePlugin;
 import org.block.project.Project;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -132,6 +132,7 @@ public abstract class Blocks {
         var pluginPath = this.getSettings().getValue(this.getSettings().getPluginPath());
         if (!pluginPath.canWrite()){
             //TODO CANNOT WRITE
+            throw new IllegalStateException("Cannot write");
         }
         try {
             if(!pluginPath.exists()) {
@@ -139,12 +140,15 @@ public abstract class Blocks {
             }
         } catch (IOException e) {
             //TODO CANNOT WRITE
+            throw new IllegalStateException(e);
         }
         Stream.of(ResourcePlugin.values()).forEach(p -> {
             try {
-                p.copyTo(pluginPath);
+                File file = p.copyTo(pluginPath);
+                System.out.println("Created plugin: " + file.getAbsolutePath());
             } catch (IOException e) {
                 System.err.println("Could not create plugin " + p.name());
+                e.printStackTrace();
             }
         });
     }

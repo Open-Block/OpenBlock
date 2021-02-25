@@ -26,8 +26,15 @@ public enum ResourcePlugin {
         return this.resourcePath;
     }
 
-    public void copyTo(File file) throws IOException {
+    public File copyTo(File file) throws IOException {
         var stream = Blocks.class.getResourceAsStream(this.resourcePath);
-        Files.copy(stream, file.toPath());
+        var location = this.getStorageLocation(file);
+        if(location.exists()){
+            if (!location.delete()){
+                throw new IOException("Could not delete file");
+            }
+        }
+        Files.copy(stream, location.toPath());
+        return location;
     }
 }
