@@ -2,7 +2,6 @@ package org.temp;
 
 import com.gluonhq.charm.down.Services;
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.block.Blocks;
 import org.block.DesktopBlocks;
@@ -12,17 +11,24 @@ import org.util.storage.DesktopStorageFactory;
 import org.util.storage.DesktopStorageService;
 
 import java.io.File;
+import java.io.IOException;
 
 public class FXProjectsPanelTest extends Application {
     @Override
     public void start(Stage stage) {
-        ShinyOutputStream.createDefault();
-        Blocks.setInstance(new DesktopBlocks(stage, "Home"));
-        stage.setTitle("Test");
-        stage.setScene(new Scene(new ProjectsPanel(new File("Projects"))));
-        stage.setWidth(500);
-        stage.setHeight(500);
-        stage.show();
+        try {
+            ShinyOutputStream.createDefault();
+            Blocks.setInstance(new DesktopBlocks(stage, "Home"));
+            stage.setTitle("Test");
+            var panel = new ProjectsPanel(new File("Projects"));
+            Blocks.getInstance().registerWindow("Home", panel);
+            Blocks.getInstance().setWindow("Home");
+            stage.setWidth(500);
+            stage.setHeight(500);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

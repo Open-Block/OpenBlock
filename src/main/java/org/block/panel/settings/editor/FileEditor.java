@@ -1,46 +1,27 @@
 package org.block.panel.settings.editor;
 
 import com.gluonhq.charm.glisten.control.AutoCompleteTextField;
-import com.gluonhq.charm.glisten.control.settings.Option;
 import com.gluonhq.charm.glisten.control.settings.OptionEditor;
 import javafx.beans.property.Property;
-import javafx.util.StringConverter;
-import org.util.mappers.MappedBindedProperty;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class FileEditor implements OptionEditor<File> {
+public class FileEditor implements OptionEditor<String>, ParsedEditor<File> {
 
-    private final AutoCompleteTextField<File> field = new AutoCompleteTextField<>();
+    private final AutoCompleteTextField<String> field = new AutoCompleteTextField<>();
     private final FileFilter filter;
-    private final MappedBindedProperty<String, File> mappedValue = new MappedBindedProperty<>(this.field.textProperty(), File::getAbsolutePath, File::new);
 
-    public FileEditor(Option<File> option) {
-        this(option, pathname -> true);
+    public FileEditor() {
+        this(pathname -> true);
     }
 
-    public FileEditor(Option<File> option, FileFilter fileFilter) {
+    public FileEditor(FileFilter fileFilter) {
         this.filter = fileFilter;
-        this.valueProperty().bindBidirectional(option.valueProperty());
-
-        this.field.setCompleterMode(AutoCompleteTextField.CompleterMode.SEARCH_AUTOMATICALLY);
-
-        this.field.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(File file) {
-                return file.getAbsolutePath();
-            }
-
-            @Override
-            public File fromString(String s) {
-                return new File(s);
-            }
-        });
-
         this.field.setCompleter(s -> {
             File file = new File(s);
             var filter = "";
@@ -48,16 +29,12 @@ public class FileEditor implements OptionEditor<File> {
                 filter = file.getName();
                 file = file.getParentFile();
             }
-            System.out.println("filefilter on: " + file.getAbsolutePath());
             var files = file.listFiles(fileFilter);
             if (files == null) {
-                System.out.println("\tNo files found");
                 return Collections.emptyList();
             }
             final var finalFilter = filter;
-            var array = Arrays.asList(files).parallelStream().filter(f -> f.getName().startsWith(finalFilter)).collect(Collectors.toList());
-            System.out.println("\tFiles Found: " + array.size());
-            return array;
+            return Arrays.asList(files).parallelStream().filter(f -> f.getName().startsWith(finalFilter)).map(File::getPath).collect(Collectors.toList());
         });
     }
 
@@ -66,22 +43,37 @@ public class FileEditor implements OptionEditor<File> {
     }
 
     @Override
-    public AutoCompleteTextField<File> getEditor() {
+    public AutoCompleteTextField<String> getEditor() {
         return this.field;
     }
 
     @Override
-    public Property<File> valueProperty() {
-        return this.mappedValue;
+    public Property<String> valueProperty() {
+        return this.field.textProperty();
     }
 
     @Override
-    public File getValue() {
-        return this.field.getValue();
+    public String getValue() {
+        return this.field.getText();
     }
 
     @Override
-    public void setValue(File file) {
-        this.field.setText(file.getPath());
+    public void setValue(String filePath) {
+        System.out.println("setting as " + filePath);
+        this.field.setText(filePath);
+    }
+
+    @Override
+    public Optional<File> getParsedValue() {
+        var value = this.getValue();
+        if (value == null || value.strip().length() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(new File(value));
+    }
+
+    @Override
+    public void setParsedValue(File value) {
+        this.setValue(value.getPath());
     }
 }

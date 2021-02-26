@@ -14,7 +14,7 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
 
     @Override
     public JSONConfigNode load(String json) {
-        if (json.length() == 0) {
+        if (json.strip().length() == 0) {
             return new JSONConfigNode(new JSONObject());
         }
         return new JSONConfigNode(new JSONObject(json));
@@ -50,12 +50,12 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
             if (at == '}' || at == ']') {
                 tab--;
                 if (tabBefore) {
-                    newPage += tab(tab);
+                    newPage += this.tab(tab);
                 }
                 if ((A + 1) != singleLined.length() && singleLined.charAt(A + 1) == ',') {
-                    newPage += "\n" + tab(tab) + at;
+                    newPage += "\n" + this.tab(tab) + at;
                 } else {
-                    newPage += "\n" + tab(tab) + at + "\n";
+                    newPage += "\n" + this.tab(tab) + at + "\n";
                 }
                 continue;
             }
@@ -69,7 +69,7 @@ public class JSONConfigImplementation implements ConfigImplementation<JSONConfig
             }
             if (tabBefore) {
                 tabBefore = false;
-                newPage += tab(tab);
+                newPage += this.tab(tab);
             }
             newPage += at;
         }

@@ -2,13 +2,16 @@ package org.block;
 
 import com.gluonhq.charm.glisten.mvc.View;
 import javafx.scene.Parent;
+import org.block.panel.common.AboutToRender;
 import org.temp.FXProjectPanelsAndroid;
+
+import java.io.IOException;
 
 public class MobileBlocks extends Blocks {
 
     private final FXProjectPanelsAndroid launch;
 
-    public MobileBlocks(FXProjectPanelsAndroid launch, String main) {
+    public MobileBlocks(FXProjectPanelsAndroid launch, String main) throws IOException {
         super(main);
         this.launch = launch;
         this.init();
@@ -22,7 +25,11 @@ public class MobileBlocks extends Blocks {
 
     @Override
     public void setWindow(String title) {
-        this.launch.switchView(title);
+        var opResult = this.launch.switchView(title);
+        if (opResult.isEmpty()) {
+            return;
+        }
+        opResult.get().getChildren().stream().filter(n -> n instanceof AboutToRender).forEach(n -> ((AboutToRender) n).onRender());
     }
 
     @Override
@@ -40,11 +47,19 @@ public class MobileBlocks extends Blocks {
 
     @Override
     public double getHeight() {
-        return this.launch.getView().getHeight();
+        var view = this.launch.getView();
+        if (view == null) {
+            return 0;
+        }
+        return view.getHeight();
     }
 
     @Override
     public double getWidth() {
-        return this.launch.getView().getWidth();
+        var view = this.launch.getView();
+        if (view == null) {
+            return 0;
+        }
+        return view.getWidth();
     }
 }

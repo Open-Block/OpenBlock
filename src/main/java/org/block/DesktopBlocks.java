@@ -5,8 +5,11 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import org.array.utils.ArrayUtils;
+import org.block.panel.common.AboutToRender;
 import org.block.panel.common.dialog.Dialog;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +18,7 @@ public class DesktopBlocks extends Blocks {
     private final Map<String, Scene> views = new HashMap<>();
     private final Stage stage;
 
-    public DesktopBlocks(Stage stage, String main) {
+    public DesktopBlocks(Stage stage, String main) throws IOException {
         super(main);
         this.stage = stage;
         this.init();
@@ -30,9 +33,13 @@ public class DesktopBlocks extends Blocks {
     public void setWindow(String title) {
         Scene scene = this.views.get(title);
         if (scene == null) {
+            System.err.println("Windows: " + ArrayUtils.toString(", ", t -> t, this.views.keySet()));
             throw new IllegalStateException("The window of '" + title + "' has not been registered");
         }
         this.stage.setScene(scene);
+        if (scene.getRoot() instanceof AboutToRender) {
+            ((AboutToRender) scene.getRoot()).onRender();
+        }
     }
 
     @Override

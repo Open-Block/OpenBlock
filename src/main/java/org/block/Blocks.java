@@ -6,16 +6,12 @@ import org.block.network.server.ServerConnection;
 import org.block.panel.settings.GeneralSettings;
 import org.block.panel.settings.SettingsDisplay;
 import org.block.plugin.Plugin;
-import org.block.plugin.ResourcePlugin;
 import org.block.project.Project;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public abstract class Blocks {
 
@@ -25,13 +21,14 @@ public abstract class Blocks {
     public final String GENERAL_SETTINGS_WINDOW = "GeneralSettings";
     public final String BLOCKS_WINDOW = "Blocks";
     private final Set<Plugin> plugins = new HashSet<>();
-    private final GeneralSettings settings = new GeneralSettings();
+    private final GeneralSettings settings;
     private Project.Loaded loadedProject;
     private ServerConnection server;
     private ClientConnection client;
 
-    public Blocks(String titleOfMain) {
+    public Blocks(String titleOfMain) throws IOException {
         this.LAUNCH_WINDOW = titleOfMain;
+        this.settings = new GeneralSettings();
     }
 
     public abstract Parent getWindow();
@@ -126,26 +123,6 @@ public abstract class Blocks {
     }
 
     protected void init() {
-        this.registerWindow(this.GENERAL_SETTINGS_WINDOW, new SettingsDisplay<>(new GeneralSettings(), this.LAUNCH_WINDOW));
-
-
-        var pluginPath = this.getSettings().getValue(this.getSettings().getPluginPath());
-        try {
-            if (!pluginPath.exists()) {
-                Files.createDirectories(pluginPath.toPath());
-            }
-        } catch (IOException e) {
-            //TODO CANNOT WRITE
-            throw new IllegalStateException(e);
-        }
-        Stream.of(ResourcePlugin.values()).forEach(p -> {
-            try {
-                File file = p.copyTo(pluginPath);
-                System.out.println("Created plugin: " + file.getAbsolutePath());
-            } catch (IOException e) {
-                System.err.println("Could not create plugin " + p.name());
-                e.printStackTrace();
-            }
-        });
+        this.registerWindow(this.GENERAL_SETTINGS_WINDOW, new SettingsDisplay<>(this.settings, this.LAUNCH_WINDOW));
     }
 }

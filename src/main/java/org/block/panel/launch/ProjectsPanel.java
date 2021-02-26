@@ -9,6 +9,7 @@ import org.block.panel.common.navigation.NavigationBar;
 import org.block.panel.common.navigation.NavigationItem;
 import org.block.panel.main.FXMainDisplay;
 import org.block.plugin.Plugin;
+import org.block.plugin.ResourcePlugin;
 import org.block.project.UnloadedProject;
 import org.block.util.GeneralUntil;
 import org.block.util.ToStringWrapper;
@@ -16,22 +17,25 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Optional;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProjectsPanel extends VBox {
 
     private final File projectsDirectory;
     private final SplitPane splitPane = new SplitPane();
     private final NavigationBar navBar;
+    private final TextField search;
     private final ListView<ToStringWrapper<UnloadedProject>> projectListView;
+    private final Set<UnloadedProject> projects = new HashSet<>();
 
     public ProjectsPanel(@NotNull File projectsDirectory) {
         this.projectsDirectory = projectsDirectory;
         this.navBar = this.createNavBar();
         this.projectListView = this.createProjectList();
+        this.search = this.createSearch();
         this.init();
     }
 
@@ -48,17 +52,64 @@ public class ProjectsPanel extends VBox {
     }
 
     private void init() {
-        this.splitPane.getItems().add(this.projectListView);
+        var vBox = new VBox(this.search, this.projectListView);
+        this.splitPane.getItems().add(vBox);
         this.splitPane.getItems().add(new Pane());
         this.splitPane.setDividerPosition(0, this.splitPane.getDividerPositions()[0] / 2);
         VBox.setVgrow(this.splitPane, Priority.ALWAYS);
         this.getChildren().addAll(this.navBar, this.splitPane);
         new Thread(this::searchForProjects).start();
 
+        var pluginPath = Blocks.getInstance().getSettings().getPluginPath().getValue();
+        try {
+            if (!pluginPath.exists()) {
+                Files.createDirectories(pluginPath.toPath());
+            }
+        } catch (IOException e) {
+            //TODO CANNOT WRITE
+            throw new IllegalStateException(e);
+        }
+        Stream.of(ResourcePlugin.values()).forEach(p -> {
+            try {
+                File file = p.copyTo(pluginPath);
+                System.out.println("Created plugin: " + file.getAbsolutePath());
+            } catch (IOException e) {
+                System.err.println("Could not create plugin " + p.name());
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    private String toDisplayName(UnloadedProject project) {
+        try {
+            return project.getDisplayName();
+        } catch (IOException ioException) {
+            return project.getFile().getName();
+        }
+    }
+
+    private TextField createSearch() {
+        var field = new TextField();
+        field.setOnKeyTyped(e -> {
+            System.out.println("Key Press: " + field.getText());
+            var filtered = this.projects.parallelStream()
+                    .filter(p -> {
+                        var displayName = this.toDisplayName(p);
+                        var compare = field.getText().toLowerCase();
+                        System.out.println("\tComparing: " + displayName + " vs " + compare);
+                        return displayName.toLowerCase().contains(compare.toLowerCase());
+                    })
+                    .sorted(Comparator.comparing(this::toDisplayName))
+                    .map(p -> new ToStringWrapper<>(p, u -> this.toDisplayName(p)))
+                    .collect(Collectors.toList());
+            this.projectListView.getItems().clear();
+            this.projectListView.getItems().addAll(filtered);
+        });
+        return field;
     }
 
     private void searchForProjects() {
-        System.out.println("ProjectDir: " + this.projectsDirectory);
         File[] files = this.projectsDirectory.listFiles(File::isDirectory);
         if (files == null) {
             return;
@@ -69,18 +120,19 @@ public class ProjectsPanel extends VBox {
                 System.err.println("Invalid folder found: " + openBlockFile.getAbsolutePath());
                 continue;
             }
-            ObservableList<ToStringWrapper<UnloadedProject>> projects = this.projectListView.getItems();
-            if (projects.parallelStream().anyMatch(p -> p.getValue().getDirectory().equals(folder))) {
+            if (this.projects.parallelStream().anyMatch(p -> p.getDirectory().equals(folder))) {
                 continue;
             }
-            projects.add(new ToStringWrapper<>(new UnloadedProject(folder), (p) -> {
-                try {
-                    return p.getDisplayName();
-                } catch (IOException e) {
-                    return p.getFile().getName();
-                }
-            }));
+            this.projects.add(new UnloadedProject(folder));
         }
+        this.projectListView.getItems().clear();
+        this.projectListView.getItems().addAll(this.projects.parallelStream().map(p -> new ToStringWrapper<>(p, u -> {
+            try {
+                return u.getDisplayName();
+            } catch (IOException e) {
+                return u.getFile().getName();
+            }
+        })).collect(Collectors.toSet()));
     }
 
     private ListView<ToStringWrapper<UnloadedProject>> createProjectList() {

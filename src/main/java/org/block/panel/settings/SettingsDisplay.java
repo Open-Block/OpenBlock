@@ -7,7 +7,9 @@ import javafx.scene.layout.VBox;
 import org.block.Blocks;
 import org.block.panel.common.dialog.Dialog;
 
-public class SettingsDisplay<N extends Node> extends VBox implements Dialog {
+import java.io.IOException;
+
+public class SettingsDisplay<N extends Node & Settings> extends VBox implements Dialog {
 
     private final String origin;
     private final N display;
@@ -31,6 +33,11 @@ public class SettingsDisplay<N extends Node> extends VBox implements Dialog {
         VBox.setVgrow(this.display, Priority.ALWAYS);
         var button = new Button("Back");
         button.setOnAction(e -> {
+            try {
+                this.display.save();
+            } catch (IOException ioException) {
+                throw new IllegalStateException(ioException);
+            }
             Blocks.getInstance().setWindow(this.origin);
         });
         this.getChildren().addAll(this.display, button);
