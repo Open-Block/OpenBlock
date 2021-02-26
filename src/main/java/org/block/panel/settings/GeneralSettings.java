@@ -1,22 +1,53 @@
 package org.block.panel.settings;
 
 import com.gluonhq.attach.storage.StorageService;
+import com.gluonhq.attach.util.Platform;
 import com.gluonhq.attach.util.Services;
 import com.gluonhq.charm.glisten.control.SettingsPane;
 import com.gluonhq.charm.glisten.control.settings.DefaultOption;
 import com.gluonhq.charm.glisten.control.settings.Option;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import org.block.panel.settings.editor.FileEditor;
+import org.util.storage.DesktopStorageService;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class GeneralSettings extends SettingsPane {
 
-    public static final File DEFAULT_PROJECT_PATH = Services.get(StorageService.class).flatMap(s -> s.getPublicStorage("OpenBlocks").map(f -> new File(f, "Projects"))).orElse(new File("Projects"));
-    public static final File DEFAULT_LOG_PATH = Services.get(StorageService.class).flatMap(s -> s.getPublicStorage("OpenBlocks").map(f -> new File(f, "logs/log.txt"))).orElse(new File("logs/log.txt"));
-    public static final File DEFAULT_DEBUG_PATH = Services.get(StorageService.class).flatMap(s -> s.getPublicStorage("OpenBlocks").map(f -> new File(f, "logs/debug.txt"))).orElse(new File("logs/debug.txt"));
-    public static final File DEFAULT_PLUGIN_PATH = Services.get(StorageService.class).flatMap(s -> s.getPublicStorage("OpenBlocks").map(f -> new File(f, "Plugins"))).orElse(new File("Plugins"));
+    public static final Supplier<File> ROOT_PUBLIC_PATH = () -> {
+        var opServices = Services.get(StorageService.class);
+        if (opServices.isEmpty() && Platform.isDesktop()) {
+            opServices = Optional.of(new DesktopStorageService());
+        }
+        if (opServices.isEmpty()) {
+            System.out.println("No storage service");
+            return new File("OpenBlocks");
+        }
+        var opPublicStorage = opServices.get().getPublicStorage("OpenBlocks");
+        if (opPublicStorage.isPresent()) {
+            return opPublicStorage.get();
+        }
+        var opPrivateStorage = opServices.get().getPrivateStorage();
+        return opPrivateStorage.orElseGet(() -> new File("OpenBlocks"));
+    };
+    public static final Supplier<File> ROOT_PRIVATE_PATH = () -> {
+        var opServices = Services.get(StorageService.class);
+        if (opServices.isEmpty() && Platform.isDesktop()) {
+            opServices = Optional.of(new DesktopStorageService());
+        }
+        if (opServices.isEmpty()) {
+            System.out.println("No storage service");
+            return new File("OpenBlocks");
+        }
+        var opPrivateStorage = opServices.get().getPrivateStorage();
+        return opPrivateStorage.orElseGet(() -> new File("OpenBlocks"));
+    };
+    public static final File DEFAULT_PROJECT_PATH = new File(ROOT_PUBLIC_PATH.get(), "Projects");
+    public static final File DEFAULT_LOG_PATH = new File(ROOT_PRIVATE_PATH.get(), "logs/log.txt");
+    public static final File DEFAULT_DEBUG_PATH = new File(ROOT_PRIVATE_PATH.get(), "logs/debug.txt");
+    public static final File DEFAULT_PLUGIN_PATH = new File(ROOT_PRIVATE_PATH.get(), "Plugins");
 
     private final Option<File> projectPath = new DefaultOption<>(MaterialDesignIcon.APPS.graphic(), "Projects", "Paths", "Paths", DEFAULT_PROJECT_PATH, true, o -> new FileEditor(o, File::isDirectory));
     private final Option<File> logPath = new DefaultOption<>(MaterialDesignIcon.APPS.graphic(), "Log", "Paths", "Paths", DEFAULT_LOG_PATH, true, FileEditor::new);
@@ -27,11 +58,11 @@ public class GeneralSettings extends SettingsPane {
         this.init();
     }
 
-    public <T> T getValue(Option<T> option){
+    public <T> T getValue(Option<T> option) {
         return option.valueProperty().getValue();
     }
 
-    public Option<File> getPluginPath(){
+    public Option<File> getPluginPath() {
         return this.pluginPath;
     }
 

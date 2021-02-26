@@ -130,13 +130,9 @@ public abstract class Blocks {
 
 
         var pluginPath = this.getSettings().getValue(this.getSettings().getPluginPath());
-        if (!pluginPath.canWrite()){
-            //TODO CANNOT WRITE
-            throw new IllegalStateException("Cannot write: " + pluginPath.getAbsolutePath());
-        }
         try {
-            if(!pluginPath.exists()) {
-                Files.createDirectory(pluginPath.toPath());
+            if (!pluginPath.exists()) {
+                Files.createDirectories(pluginPath.toPath());
             }
         } catch (IOException e) {
             //TODO CANNOT WRITE

@@ -8,27 +8,31 @@ import java.util.Optional;
 public class DesktopStorageService implements StorageService {
     @Override
     public Optional<File> getPrivateStorage() {
-        return Optional.of(new File(System.getProperty("user.home")));
+        String appData = System.getenv("APPDATA");
+        if (appData == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new File(appData, "OpenBlocks"));
     }
 
     @Override
     public Optional<File> getPublicStorage(String s) {
-        return getPrivateStorage();
+        return Optional.of(new File(System.getProperty("user.home"), "." + s));
     }
 
     @Override
     public boolean isExternalStorageWritable() {
-        if (getPrivateStorage().isEmpty()) {
+        if (this.getPrivateStorage().isEmpty()) {
             return false;
         }
-        return getPrivateStorage().get().canWrite();
+        return this.getPrivateStorage().get().canWrite();
     }
 
     @Override
     public boolean isExternalStorageReadable() {
-        if (getPrivateStorage().isEmpty()) {
+        if (this.getPrivateStorage().isEmpty()) {
             return false;
         }
-        return getPrivateStorage().get().canRead();
+        return this.getPrivateStorage().get().canRead();
     }
 }
