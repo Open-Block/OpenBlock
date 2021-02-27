@@ -10,12 +10,14 @@ import org.block.panel.common.navigation.NavigationItem;
 import org.block.panel.main.FXMainDisplay;
 import org.block.plugin.Plugin;
 import org.block.plugin.ResourcePlugin;
+import org.block.plugin.file.PluginStreamReader;
 import org.block.project.UnloadedProject;
 import org.block.util.GeneralUntil;
 import org.block.util.ToStringWrapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
@@ -109,6 +111,22 @@ public class ProjectsPanel extends VBox {
         return field;
     }
 
+    private Set<Plugin> searchForPlugins(){
+        var plugins = new HashSet<Plugin>();
+        var pluginFolder = Blocks.getInstance().getSettings().getPluginPath().getValue();
+        var pluginFolders = pluginFolder.listFiles(File::isDirectory);
+        for(var rootPluginFolder : pluginFolders){
+            try {
+                var pluginLoader = new File(rootPluginFolder, rootPluginFolder.getName() + ".json");
+                var pluginStreamReader = new PluginStreamReader(new FileInputStream(pluginLoader));
+                plugins.add(pluginStreamReader.readPlugin());
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        return plugins;
+    }
+
     private void searchForProjects() {
         File[] files = this.projectsDirectory.listFiles(File::isDirectory);
         if (files == null) {
@@ -197,7 +215,11 @@ public class ProjectsPanel extends VBox {
     private NavigationBar createNavBar() {
         var createOption = new NavigationItem.TreeNavigationItem("Create", () -> {
             var createMenuNavigation = new ArrayList<NavigationItem.EndNavigationItem>();
-            Blocks.getInstance().getPlugins()
+            var plugins = Blocks.getInstance().getPlugins();
+            if(plugins.isEmpty()){
+                plugins = searchForPlugins();
+            }
+           plugins
                     .parallelStream()
                     .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getName(), (e) -> m.newProjectCreate(Blocks.getInstance().LAUNCH_WINDOW))));
             createMenuNavigation.sort(Comparator.comparing(Labeled::getText));

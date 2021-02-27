@@ -1,4 +1,4 @@
-module Blocks {
+module OpenBlocks {
 
     requires javafx.base;
     requires javafx.controls;

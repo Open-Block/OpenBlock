@@ -4,37 +4,50 @@ import org.block.Blocks;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public enum ResourcePlugin {
 
-    STANDARD_JAVA("StandardJava.json", "/plugins/StandardJava.json");
+    STANDARD_JAVA("StandardJava", "/plugins/StandardJava/StandardJava.json");
 
     private final String defaultPath;
-    private final String resourcePath;
+    private final String[] resourcePaths;
 
-    ResourcePlugin(String defaultPath, String resourcePath) {
+    ResourcePlugin(String defaultPath, String... resourcePath) {
         this.defaultPath = defaultPath;
-        this.resourcePath = resourcePath;
+        this.resourcePaths = resourcePath;
     }
 
     public File getStorageLocation(File file) {
         return new File(file, this.defaultPath);
     }
 
-    public String getResourcePath() {
-        return this.resourcePath;
+    public String[] getResourcePath() {
+        return this.resourcePaths;
     }
 
     public File copyTo(File file) throws IOException {
-        var stream = Blocks.class.getResourceAsStream(this.resourcePath);
-        var location = this.getStorageLocation(file);
-        if(location.exists()){
-            if (!location.delete()){
-                throw new IOException("Could not delete file");
+        var files = new HashMap<String, InputStream>();
+        for(var resource : this.resourcePaths){
+            var stream = Blocks.class.getResourceAsStream(resource);
+            if(stream == null){
+                throw new IOException("No Resource at location of '" + resource + "'");
             }
+            files.put(resource, stream);
         }
-        Files.copy(stream, location.toPath());
-        return location;
+        for(var entry : files.entrySet()) {
+            var location = new File(file, entry.getKey().substring(9));
+            if (location.exists()) {
+                if (!location.delete()) {
+                    throw new IOException("Could not delete file");
+                }
+            }
+            Files.createDirectories(location.getParentFile().toPath());
+            Files.copy(entry.getValue(), location.toPath());
+        }
+        return file;
     }
 }

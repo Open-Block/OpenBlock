@@ -18,8 +18,8 @@ public class FXProjectPanelsAndroid extends MobileApplication {
     public void init() {
         this.addViewFactory(HOME_VIEW, () -> {
             try {
-                View view = new View(new ProjectsPanel(new File("Projects")));
                 Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
+                View view = new View(new ProjectsPanel(new File("Projects")));
                 //ShinyOutputStream.createDefault();
                 this.setTitle("Open Blocks");
                 return view;
