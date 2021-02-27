@@ -33,7 +33,7 @@ public class ProjectsPanel extends VBox {
     private final ListView<ToStringWrapper<UnloadedProject>> projectListView;
     private final Set<UnloadedProject> projects = new HashSet<>();
 
-    public ProjectsPanel(@NotNull File projectsDirectory) {
+    public ProjectsPanel(@NotNull File projectsDirectory) throws IOException {
         this.projectsDirectory = projectsDirectory;
         this.navBar = this.createNavBar();
         this.projectListView = this.createProjectList();
@@ -53,7 +53,7 @@ public class ProjectsPanel extends VBox {
         return this.splitPane;
     }
 
-    private void init() {
+    private void init() throws IOException {
         var vBox = new VBox(this.search, this.projectListView);
         this.splitPane.getItems().add(vBox);
         this.splitPane.getItems().add(new Pane());
@@ -63,14 +63,10 @@ public class ProjectsPanel extends VBox {
         new Thread(this::searchForProjects).start();
 
         var pluginPath = Blocks.getInstance().getSettings().getPluginPath().getValue();
-        try {
             if (!pluginPath.exists()) {
                 Files.createDirectories(pluginPath.toPath());
             }
-        } catch (IOException e) {
-            //TODO CANNOT WRITE
-            throw new IllegalStateException(e);
-        }
+
         Stream.of(ResourcePlugin.values()).forEach(p -> {
             try {
                 File file = p.copyTo(pluginPath);
