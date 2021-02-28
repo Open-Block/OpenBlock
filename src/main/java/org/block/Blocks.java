@@ -122,6 +122,14 @@ public abstract class Blocks {
         return instance;
     }
 
+    public static String exceptionToString(Throwable throwable){
+        var message = throwable.getLocalizedMessage() + "\n\n" + throwable.getMessage() + "\n";
+        for (var trace : throwable.getStackTrace()){
+            message = message + trace.toString() + "\n";
+        }
+        return message;
+    }
+
     protected void init() {
         this.registerWindow(this.GENERAL_SETTINGS_WINDOW, new SettingsDisplay<>(this.settings, this.LAUNCH_WINDOW));
     }

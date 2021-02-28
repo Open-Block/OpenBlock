@@ -5,6 +5,7 @@ import com.gluonhq.charm.glisten.control.ExceptionDialog;
 import com.gluonhq.charm.glisten.control.TextArea;
 import com.gluonhq.charm.glisten.mvc.View;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import org.array.utils.ArrayUtils;
 import org.block.Blocks;
@@ -26,9 +27,8 @@ public class FXProjectPanelsAndroid extends MobileApplication {
                     this.setTitle("Open Blocks");
                     return view;
                 } catch (Exception e) {
-                    var dialog = new ExceptionDialog();
-                    dialog.setException(e);
-                    dialog.showAndWait();
+                    var area = new TextArea(Blocks.exceptionToString(e));
+                    return new View(new ScrollPane(area));
                 }
             }
         });
