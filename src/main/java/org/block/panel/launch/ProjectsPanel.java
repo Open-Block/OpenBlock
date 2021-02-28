@@ -63,9 +63,9 @@ public class ProjectsPanel extends VBox {
         new Thread(this::searchForProjects).start();
 
         var pluginPath = Blocks.getInstance().getSettings().getPluginPath().getValue();
-            if (!pluginPath.exists()) {
-                Files.createDirectories(pluginPath.toPath());
-            }
+        if (!pluginPath.exists()) {
+            Files.createDirectories(pluginPath.toPath());
+        }
 
         Stream.of(ResourcePlugin.values()).forEach(p -> {
             try {

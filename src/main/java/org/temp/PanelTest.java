@@ -10,7 +10,10 @@ import java.io.File;
 public class PanelTest extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        FileViewer viewer = new FileViewer(new File(System.getProperty("user.home")), (f) -> {});
+        stage.setWidth(500);
+        stage.setHeight(500);
+        FileViewer viewer = new FileViewer();
+        viewer.setStartingFile(new File(System.getProperty("user.home")));
         viewer.setFilter((f) -> !f.getName().endsWith(".jar"));
         stage.setScene(new Scene(viewer));
         stage.show();

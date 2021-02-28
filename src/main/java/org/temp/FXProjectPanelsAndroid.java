@@ -1,6 +1,7 @@
 package org.temp;
 
 import com.gluonhq.charm.glisten.application.MobileApplication;
+import com.gluonhq.charm.glisten.control.ExceptionDialog;
 import com.gluonhq.charm.glisten.control.TextArea;
 import com.gluonhq.charm.glisten.mvc.View;
 import javafx.scene.control.Label;
@@ -17,15 +18,18 @@ public class FXProjectPanelsAndroid extends MobileApplication {
     @Override
     public void init() {
         this.addViewFactory(HOME_VIEW, () -> {
-            try {
-                Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
-                View view = new View(new ProjectsPanel(new File("Projects")));
-                //ShinyOutputStream.createDefault();
-                this.setTitle("Open Blocks");
-                return view;
-            } catch (Throwable e) {
-                String stackTrace = ArrayUtils.toString("\n\t", t -> t.getFileName() + "[" + t.getLineNumber() + "]", e.getStackTrace());
-                return new View(new VBox(new Label(e.getMessage()), new TextArea(stackTrace)));
+            while(true) {
+                try {
+                    Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
+                    View view = new View(new ProjectsPanel(new File("Projects")));
+                    //ShinyOutputStream.createDefault();
+                    this.setTitle("Open Blocks");
+                    return view;
+                } catch (Exception e) {
+                    var dialog = new ExceptionDialog();
+                    dialog.setException(e);
+                    dialog.showAndWait();
+                }
             }
         });
 
