@@ -122,9 +122,9 @@ public abstract class Blocks {
         return instance;
     }
 
-    public static String exceptionToString(Throwable throwable){
-        var message = throwable.getLocalizedMessage() + "\n\n" + throwable.getMessage() + "\n";
-        for (var trace : throwable.getStackTrace()){
+    public static String exceptionToString(Throwable throwable) {
+        var message = throwable.getClass().getName() + "\n\n" + throwable.getLocalizedMessage() + "\n" + throwable.getMessage() + "\n";
+        for (var trace : throwable.getStackTrace()) {
             message = message + trace.toString() + "\n";
         }
         return message;

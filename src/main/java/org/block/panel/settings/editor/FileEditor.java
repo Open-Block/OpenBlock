@@ -59,7 +59,6 @@ public class FileEditor implements OptionEditor<String>, ParsedEditor<File> {
 
     @Override
     public void setValue(String filePath) {
-        System.out.println("setting as " + filePath);
         this.field.setText(filePath);
     }
 

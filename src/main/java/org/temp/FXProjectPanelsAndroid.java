@@ -1,13 +1,9 @@
 package org.temp;
 
 import com.gluonhq.charm.glisten.application.MobileApplication;
-import com.gluonhq.charm.glisten.control.ExceptionDialog;
 import com.gluonhq.charm.glisten.control.TextArea;
 import com.gluonhq.charm.glisten.mvc.View;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
-import org.array.utils.ArrayUtils;
 import org.block.Blocks;
 import org.block.MobileBlocks;
 import org.block.panel.launch.ProjectsPanel;
@@ -19,7 +15,7 @@ public class FXProjectPanelsAndroid extends MobileApplication {
     @Override
     public void init() {
         this.addViewFactory(HOME_VIEW, () -> {
-            while(true) {
+            while (true) {
                 try {
                     Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
                     View view = new View(new ProjectsPanel(new File("Projects")));
@@ -28,6 +24,7 @@ public class FXProjectPanelsAndroid extends MobileApplication {
                     return view;
                 } catch (Exception e) {
                     var area = new TextArea(Blocks.exceptionToString(e));
+                    area.setDisable(true);
                     return new View(new ScrollPane(area));
                 }
             }
