@@ -18,28 +18,27 @@ public class FXProjectPanelsAndroid extends MobileApplication {
     @Override
     public void init() {
         this.addViewFactory(HOME_VIEW, () -> {
-            while (true) {
-                try {
-                    Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
-                    View view = new View(new ProjectsPanel(new File("Projects")));
-                    //ShinyOutputStream.createDefault();
-                    this.setTitle("Open Blocks");
-                    return view;
-                } catch (AccessDeniedException e) {
-                    FileViewer viewer = new FileViewer();
-                    viewer.setBackWindow(HOME_VIEW);
-                    viewer.setStartingFile(GeneralSettings.ROOT_PUBLIC_PATH.get());
-                    viewer.setAcceptFolders(true);
-                    viewer.setFilter((f) -> false);
-                    viewer.setSelected((f) -> {
-                        GeneralSettings.ROOT_PRIVATE_PATH = () -> f;
-                        GeneralSettings.ROOT_PUBLIC_PATH = () -> f;
-                    });
-                } catch (Exception e) {
-                    var area = new TextArea(Blocks.exceptionToString(e));
-                    area.setDisable(true);
-                    return new View(new ScrollPane(area));
-                }
+            try {
+                Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
+                View view = new View(new ProjectsPanel(new File("Projects")));
+                //ShinyOutputStream.createDefault();
+                this.setTitle("Open Blocks");
+                return view;
+            } catch (AccessDeniedException e) {
+                FileViewer viewer = new FileViewer();
+                viewer.setBackWindow(HOME_VIEW);
+                viewer.setStartingFile(GeneralSettings.ROOT_PUBLIC_PATH.get());
+                viewer.setAcceptFolders(true);
+                viewer.setFilter((f) -> false);
+                viewer.setSelected((f) -> {
+                    GeneralSettings.ROOT_PRIVATE_PATH = () -> f;
+                    GeneralSettings.ROOT_PUBLIC_PATH = () -> f;
+                });
+                return new View(viewer);
+            } catch (Exception e) {
+                var area = new TextArea(Blocks.exceptionToString(e));
+                area.setDisable(true);
+                return new View(new ScrollPane(area));
             }
         });
 
