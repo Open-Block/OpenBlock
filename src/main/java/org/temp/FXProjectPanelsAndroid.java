@@ -6,9 +6,12 @@ import com.gluonhq.charm.glisten.mvc.View;
 import javafx.scene.control.ScrollPane;
 import org.block.Blocks;
 import org.block.MobileBlocks;
+import org.block.panel.common.dialog.FileViewer;
 import org.block.panel.launch.ProjectsPanel;
+import org.block.panel.settings.GeneralSettings;
 
 import java.io.File;
+import java.nio.file.AccessDeniedException;
 
 public class FXProjectPanelsAndroid extends MobileApplication {
 
@@ -22,6 +25,16 @@ public class FXProjectPanelsAndroid extends MobileApplication {
                     //ShinyOutputStream.createDefault();
                     this.setTitle("Open Blocks");
                     return view;
+                } catch (AccessDeniedException e) {
+                    FileViewer viewer = new FileViewer();
+                    viewer.setBackWindow(HOME_VIEW);
+                    viewer.setStartingFile(GeneralSettings.ROOT_PUBLIC_PATH.get());
+                    viewer.setAcceptFolders(true);
+                    viewer.setFilter((f) -> false);
+                    viewer.setSelected((f) -> {
+                        GeneralSettings.ROOT_PRIVATE_PATH = () -> f;
+                        GeneralSettings.ROOT_PUBLIC_PATH = () -> f;
+                    });
                 } catch (Exception e) {
                     var area = new TextArea(Blocks.exceptionToString(e));
                     area.setDisable(true);

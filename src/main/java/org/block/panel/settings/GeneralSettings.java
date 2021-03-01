@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 public class GeneralSettings extends SettingsPane implements Settings, AboutToRender {
 
-    public static final Supplier<File> ROOT_PUBLIC_PATH = () -> {
+    public static Supplier<File> ROOT_PUBLIC_PATH = () -> {
         var opServices = Services.get(StorageService.class);
         if (opServices.isEmpty() && Platform.isDesktop()) {
             opServices = Optional.of(new DesktopStorageService());
@@ -35,7 +35,8 @@ public class GeneralSettings extends SettingsPane implements Settings, AboutToRe
         var opPrivateStorage = opServices.get().getPrivateStorage();
         return opPrivateStorage.orElseGet(() -> new File("OpenBlocks"));
     };
-    public static final Supplier<File> ROOT_PRIVATE_PATH = () -> {
+    public static final File DEFAULT_PROJECT_PATH = new File(ROOT_PUBLIC_PATH.get(), "Projects");
+    public static Supplier<File> ROOT_PRIVATE_PATH = () -> {
         var opServices = Services.get(StorageService.class);
         if (opServices.isEmpty() && Platform.isDesktop()) {
             opServices = Optional.of(new DesktopStorageService());
@@ -47,7 +48,6 @@ public class GeneralSettings extends SettingsPane implements Settings, AboutToRe
         var opPrivateStorage = opServices.get().getPrivateStorage();
         return opPrivateStorage.orElseGet(() -> new File("OpenBlocks"));
     };
-    public static final File DEFAULT_PROJECT_PATH = new File(ROOT_PUBLIC_PATH.get(), "Projects");
     public static final File DEFAULT_LOG_PATH = new File(Platform.isDesktop() ? ROOT_PRIVATE_PATH.get() : ROOT_PUBLIC_PATH.get(), "logs/log.txt");
     public static final File DEFAULT_DEBUG_PATH = new File(Platform.isDesktop() ? ROOT_PRIVATE_PATH.get() : ROOT_PUBLIC_PATH.get(), "logs/debug.txt");
     public static final File DEFAULT_PLUGIN_PATH = new File(Platform.isDesktop() ? ROOT_PRIVATE_PATH.get() : ROOT_PUBLIC_PATH.get(), "Plugins");

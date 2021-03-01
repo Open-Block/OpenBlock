@@ -175,14 +175,6 @@ public class FileViewer extends HBox implements Dialog {
         return this;
     }
 
-    public Consumer<File> getOnSelect() {
-        return this.selected;
-    }
-
-    public void setOnSelect(Consumer<File> consumer) {
-        this.selected = consumer;
-    }
-
     public File getStartingFile() {
         return this.startingFile;
     }
