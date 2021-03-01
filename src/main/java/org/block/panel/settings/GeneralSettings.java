@@ -29,7 +29,7 @@ public class GeneralSettings extends SettingsPane implements Settings, AboutToRe
             return new File("OpenBlocks");
         }
         var opPublicStorage = opServices.get().getPublicStorage("OpenBlocks");
-        if (opPublicStorage.isPresent()) {
+        if (opPublicStorage.isPresent() && opServices.get().isExternalStorageReadable() && opServices.get().isExternalStorageWritable()) {
             return opPublicStorage.get();
         }
         var opPrivateStorage = opServices.get().getPrivateStorage();

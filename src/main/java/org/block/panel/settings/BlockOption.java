@@ -10,12 +10,10 @@ import java.util.function.Function;
 public class BlockOption<O, T, E extends OptionEditor<O> & ParsedEditor<T>> extends DefaultOption<O> {
 
     private final T defaultValue;
-    private final Function<T, O> function;
 
     public BlockOption(Node graphic, String caption, String description, String catalogue, T defaultValue, Function<T, O> function, E editor) {
         super(graphic, caption, description, catalogue, function.apply(defaultValue), true, v -> editor);
         this.defaultValue = defaultValue;
-        this.function = function;
     }
 
     public T getDefaultValue() {
