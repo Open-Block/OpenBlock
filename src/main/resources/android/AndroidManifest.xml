@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0"
+          android:compileSdkVersion="29" android:compileSdkVersionCodename="10" package="org.blocks.Blocks"
+          platformBuildVersionCode="29" platformBuildVersionName="10" android:requestLegacyExternalStorage="true">
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="29"/>
+    <supports-screens android:xlargeScreens="true"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <application android:label="Blocks" android:icon="@mipmap/ic_launcher" android:debuggable="true"
+                 android:appComponentFactory="androidx.core.app.CoreComponentFactory">
+        <activity android:name="com.gluonhq.helloandroid.MainActivity"
+                  android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.gluonhq.helloandroid.PermissionRequestActivity"/>
+    </application>
+</manifest>
