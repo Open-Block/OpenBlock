@@ -1,7 +1,5 @@
 package org.temp;
 
-import com.gluonhq.attach.storage.StorageService;
-import com.gluonhq.charm.down.Services;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.TextArea;
 import com.gluonhq.charm.glisten.mvc.View;
@@ -9,6 +7,7 @@ import javafx.scene.control.ScrollPane;
 import org.block.Blocks;
 import org.block.MobileBlocks;
 import org.block.panel.launch.ProjectsPanel;
+import org.block.panel.settings.GeneralSettings;
 
 import java.io.File;
 
@@ -18,7 +17,7 @@ public class FXProjectPanelsAndroid extends MobileApplication {
     public void init() {
         this.addViewFactory(HOME_VIEW, () -> {
             try {
-                Services.get(StorageService.class).orElseThrow().getPublicStorage("OpenBlocks").orElseThrow().mkdirs();
+                GeneralSettings.ROOT_PUBLIC_PATH.get().mkdirs();
 
 
                 Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
