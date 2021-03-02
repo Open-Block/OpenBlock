@@ -7,7 +7,6 @@ import javafx.scene.control.ScrollPane;
 import org.block.Blocks;
 import org.block.MobileBlocks;
 import org.block.panel.launch.ProjectsPanel;
-import org.block.panel.settings.GeneralSettings;
 
 import java.io.File;
 
@@ -17,9 +16,6 @@ public class FXProjectPanelsAndroid extends MobileApplication {
     public void init() {
         this.addViewFactory(HOME_VIEW, () -> {
             try {
-                GeneralSettings.ROOT_PUBLIC_PATH.get().mkdirs();
-
-
                 Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
                 View view = new View(new ProjectsPanel(new File("Projects")));
                 //ShinyOutputStream.createDefault();

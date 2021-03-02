@@ -25,15 +25,14 @@ public class GeneralSettings extends SettingsPane implements Settings, AboutToRe
             opServices = Optional.of(new DesktopStorageService());
         }
         if (opServices.isEmpty()) {
-            System.out.println("No storage service");
-            return new File("OpenBlocks");
+            return new File("OpenBlocksError");
         }
         var opPublicStorage = opServices.get().getPublicStorage("OpenBlocks");
         if (opPublicStorage.isPresent() && opServices.get().isExternalStorageReadable() && opServices.get().isExternalStorageWritable()) {
             return opPublicStorage.get();
         }
         var opPrivateStorage = opServices.get().getPrivateStorage();
-        return opPrivateStorage.orElseGet(() -> new File("OpenBlocks"));
+        return opPrivateStorage.orElseGet(() -> new File("OpenBlocksError"));
     };
     public static final File DEFAULT_PROJECT_PATH = new File(ROOT_PUBLIC_PATH.get(), "Projects");
     public static Supplier<File> ROOT_PRIVATE_PATH = () -> {
