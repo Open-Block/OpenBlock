@@ -1,5 +1,7 @@
 package org.temp;
 
+import com.gluonhq.attach.storage.StorageService;
+import com.gluonhq.charm.down.Services;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.TextArea;
 import com.gluonhq.charm.glisten.mvc.View;
@@ -19,6 +21,9 @@ public class FXProjectPanelsAndroid extends MobileApplication {
     public void init() {
         this.addViewFactory(HOME_VIEW, () -> {
             try {
+                Services.get(StorageService.class).orElseThrow().getPublicStorage("OpenBlocks").orElseThrow().mkdirs();
+
+
                 Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
                 View view = new View(new ProjectsPanel(new File("Projects")));
                 //ShinyOutputStream.createDefault();
