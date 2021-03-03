@@ -3,6 +3,7 @@ package org.block;
 import javafx.scene.Parent;
 import org.block.network.client.ClientConnection;
 import org.block.network.server.ServerConnection;
+import org.block.panel.plugin.PluginCreator;
 import org.block.panel.settings.GeneralSettings;
 import org.block.panel.settings.SettingsDisplay;
 import org.block.plugin.Plugin;
@@ -19,9 +20,11 @@ public abstract class Blocks {
     private static Blocks instance;
     public final String LAUNCH_WINDOW;
     public final String GENERAL_SETTINGS_WINDOW = "GeneralSettings";
+    public final String PLUGIN_CREATOR_WINDOW = "PluginCreator";
     public final String BLOCKS_WINDOW = "Blocks";
     private final Set<Plugin> plugins = new HashSet<>();
     private final GeneralSettings settings;
+    private final PluginCreator pluginCreatorPanel = new PluginCreator();
     private Project.Loaded loadedProject;
     private ServerConnection server;
     private ClientConnection client;
@@ -81,6 +84,10 @@ public abstract class Blocks {
         this.plugins.add(container);
     }
 
+    public PluginCreator getPluginCreatorPanel() {
+        return this.pluginCreatorPanel;
+    }
+
     public static int[] parseVersion(String version) {
         String[] split = version.split("\\.");
         int[] ret = new int[4];
@@ -132,5 +139,6 @@ public abstract class Blocks {
 
     protected void init() {
         this.registerWindow(this.GENERAL_SETTINGS_WINDOW, new SettingsDisplay<>(this.settings, this.LAUNCH_WINDOW));
+        this.registerWindow(this.PLUGIN_CREATOR_WINDOW, new PluginCreator());
     }
 }

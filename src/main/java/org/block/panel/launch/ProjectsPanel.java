@@ -107,16 +107,16 @@ public class ProjectsPanel extends VBox {
         return field;
     }
 
-    private Set<Plugin> searchForPlugins(){
+    private Set<Plugin> searchForPlugins() {
         var plugins = new HashSet<Plugin>();
         var pluginFolder = Blocks.getInstance().getSettings().getPluginPath().getValue();
         var pluginFolders = pluginFolder.listFiles(File::isDirectory);
-        for(var rootPluginFolder : pluginFolders){
+        for (var rootPluginFolder : pluginFolders) {
             try {
                 var pluginLoader = new File(rootPluginFolder, rootPluginFolder.getName() + ".json");
                 var pluginStreamReader = new PluginStreamReader(new FileInputStream(pluginLoader));
                 plugins.add(pluginStreamReader.readPlugin());
-            }catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -212,12 +212,16 @@ public class ProjectsPanel extends VBox {
         var createOption = new NavigationItem.TreeNavigationItem("Create", () -> {
             var createMenuNavigation = new ArrayList<NavigationItem.EndNavigationItem>();
             var plugins = Blocks.getInstance().getPlugins();
-            if(plugins.isEmpty()){
-                plugins = searchForPlugins();
+            if (plugins.isEmpty()) {
+                plugins = this.searchForPlugins();
             }
-           plugins
+            plugins
                     .parallelStream()
-                    .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getName(), (e) -> m.newProjectCreate(Blocks.getInstance().LAUNCH_WINDOW))));
+                    .forEach(m -> createMenuNavigation.add(new NavigationItem.EndNavigationItem(m.getName(), (e) -> {
+                        var panel = Blocks.getInstance().getPluginCreatorPanel();
+                        panel.setPlugin(m);
+                        Blocks.getInstance().setWindow(Blocks.getInstance().PLUGIN_CREATOR_WINDOW);
+                    })));
             createMenuNavigation.sort(Comparator.comparing(Labeled::getText));
             return createMenuNavigation.toArray(new NavigationItem.EndNavigationItem[0]);
         });

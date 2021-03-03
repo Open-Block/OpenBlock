@@ -2,7 +2,6 @@ package org.block.plugin;
 
 import javafx.scene.layout.Region;
 import org.block.jsf.data.jsfclass.JSFClass;
-import org.block.panel.common.dialog.Dialog;
 import org.block.project.Project;
 import org.block.project.UnloadedProject;
 import org.block.serialization.ConfigImplementation;
@@ -43,15 +42,12 @@ public class Plugin {
         return this.classes;
     }
 
-    public Project.Loaded load(UnloadedProject project, ConfigImplementation<?> configImplementation){
+    public Project.Loaded load(UnloadedProject project, ConfigImplementation<?> configImplementation) {
         throw new IllegalStateException("Not implemented");
     }
 
-    public Region createDisplayInfo(UnloadedProject project){
+    public Region createDisplayInfo(UnloadedProject project) {
         throw new IllegalStateException("Not implemented");
     }
 
-    public Dialog newProjectCreate(String previous){
-        throw new IllegalStateException("Not implemented");
-    }
 }
