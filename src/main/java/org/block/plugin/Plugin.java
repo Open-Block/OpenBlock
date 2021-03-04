@@ -50,4 +50,8 @@ public class Plugin {
         throw new IllegalStateException("Not implemented");
     }
 
+    @Override
+    public String toString() {
+        return "Plugin[Id: " + this.id + ", Name: " + this.name + ", Version: " + this.version + "]";
+    }
 }

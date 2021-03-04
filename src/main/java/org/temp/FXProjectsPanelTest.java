@@ -10,7 +10,6 @@ import org.util.print.ShinyOutputStream;
 import org.util.storage.DesktopStorageFactory;
 import org.util.storage.DesktopStorageService;
 
-import java.io.File;
 import java.io.IOException;
 
 public class FXProjectsPanelTest extends Application {
@@ -20,7 +19,7 @@ public class FXProjectsPanelTest extends Application {
             ShinyOutputStream.createDefault();
             Blocks.setInstance(new DesktopBlocks(stage, "Home"));
             stage.setTitle("Test");
-            var panel = new ProjectsPanel(new File("Projects"));
+            var panel = new ProjectsPanel(Blocks.getInstance().getSettings().getProjectPath().getValue());
             Blocks.getInstance().registerWindow("Home", panel);
             Blocks.getInstance().setWindow("Home");
             stage.setWidth(500);

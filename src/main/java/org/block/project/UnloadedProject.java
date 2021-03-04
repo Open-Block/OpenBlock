@@ -9,7 +9,10 @@ import org.block.serialization.json.JSONConfigNode;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.TreeSet;
 
 public final class UnloadedProject implements Project {
 
@@ -39,16 +42,6 @@ public final class UnloadedProject implements Project {
     }
 
     public void saveTempData() throws IOException {
-        File file = this.getFile();
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-        }
         JSONConfigNode node = ConfigImplementation.JSON.createEmptyNode();
         Project.CONFIG_PROJECT_NAME.serialize(node, this.tempName);
         Project.CONFIG_PLUGIN.serialize(node, this.tempPlugin);

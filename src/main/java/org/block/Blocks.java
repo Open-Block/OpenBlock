@@ -139,6 +139,6 @@ public abstract class Blocks {
 
     protected void init() {
         this.registerWindow(this.GENERAL_SETTINGS_WINDOW, new SettingsDisplay<>(this.settings, this.LAUNCH_WINDOW));
-        this.registerWindow(this.PLUGIN_CREATOR_WINDOW, new PluginCreator());
+        this.registerWindow(this.PLUGIN_CREATOR_WINDOW, this.pluginCreatorPanel);
     }
 }

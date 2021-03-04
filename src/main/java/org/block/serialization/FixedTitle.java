@@ -17,6 +17,7 @@ public class FixedTitle<N> {
     protected final String title;
     protected final Parser<?> parser;
     protected final String[] node;
+
     /**
      * Init the FixedTitle
      *
@@ -39,6 +40,14 @@ public class FixedTitle<N> {
         this.title = title;
         this.parser = parser;
         this.node = node;
+    }
+
+    public String[] getNode() {
+        return this.node;
+    }
+
+    public String getTitle() {
+        return this.title;
     }
 
     /**
@@ -84,10 +93,12 @@ public class FixedTitle<N> {
             super(parser, title, node);
         }
 
+        @Override
         public void serialize(ConfigNode node, List<N> value) {
             node.getNode(this.node).setCollection(this.title, ((Parser<N>) this.parser), value);
         }
 
+        @Override
         public Optional<List<N>> deserialize(ConfigNode node) {
             return Optional.of(node.getNode(this.node).getCollection(this.title, ((Parser<N>) this.parser)));
         }

@@ -1,5 +1,6 @@
 package org.block.plugin.file;
 
+import org.block.Blocks;
 import org.block.jsf.data.jsfclass.JSFClass;
 import org.block.plugin.Plugin;
 import org.block.serialization.ConfigImplementation;
@@ -28,10 +29,12 @@ public class PluginStreamReader {
         var id = rootNode.getString(Plugin.ID_NODE).orElseThrow(() -> new IOException("Unknown Id"));
         var name = rootNode.getString(Plugin.NAME_NODE).orElseThrow(() -> new IOException("Unknown Name"));
         var version = rootNode.getString(Plugin.VERSION_NODE).orElseThrow(() -> new IOException("Unknown Version"));
-        return new Plugin(id, name, version);
+        var plugin = new Plugin(id, name, version);
+        Blocks.getInstance().registerPlugin(plugin);
+        return plugin;
     }
 
-    public void loadDepends(Plugin plugin, AsyncCollectionResult<CollectionEventStore, Set<CollectionEventStore>> event){
+    public void loadDepends(Plugin plugin, AsyncCollectionResult<CollectionEventStore, Set<CollectionEventStore>> event) {
         var json = new BufferedReader(new InputStreamReader(this.stream)).lines().collect(Collectors.joining("\n"));
         var rootNode = ConfigImplementation.JSON.load(json);
         var dependents = rootNode.getCollection(Plugin.CLASSES_NODE, new DependencyNodeParser());

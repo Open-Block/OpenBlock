@@ -8,8 +8,6 @@ import org.block.Blocks;
 import org.block.MobileBlocks;
 import org.block.panel.launch.ProjectsPanel;
 
-import java.io.File;
-
 public class FXProjectPanelsAndroid extends MobileApplication {
 
     @Override
@@ -17,7 +15,7 @@ public class FXProjectPanelsAndroid extends MobileApplication {
         this.addViewFactory(HOME_VIEW, () -> {
             try {
                 Blocks.setInstance(new MobileBlocks(this, HOME_VIEW));
-                View view = new View(new ProjectsPanel(new File("Projects")));
+                View view = new View(new ProjectsPanel(Blocks.getInstance().getSettings().getProjectPath().getValue()));
                 //ShinyOutputStream.createDefault();
                 this.setTitle("Open Blocks");
                 return view;

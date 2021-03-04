@@ -29,6 +29,7 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
     });
     Parser<Plugin> PLUGIN = new Abstract<>((n, t, v) -> n.setValue(t, v.getId()), (n, t) -> {
         Optional<String> opValue = n.getString(t);
+        System.out.println("Finding plugin of " + opValue);
         if (opValue.isEmpty()) {
             return Optional.empty();
         }

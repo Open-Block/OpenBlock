@@ -11,7 +11,9 @@ import org.block.panel.main.FXMainDisplay;
 import org.block.plugin.Plugin;
 import org.block.plugin.ResourcePlugin;
 import org.block.plugin.file.PluginStreamReader;
+import org.block.project.Project;
 import org.block.project.UnloadedProject;
+import org.block.serialization.ConfigImplementation;
 import org.block.util.GeneralUntil;
 import org.block.util.ToStringWrapper;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +34,8 @@ public class ProjectsPanel extends VBox {
     private final TextField search;
     private final ListView<ToStringWrapper<UnloadedProject>> projectListView;
     private final Set<UnloadedProject> projects = new HashSet<>();
+    private final Button delete = new Button("Delete");
+    private final Button create = new Button("Load");
 
     public ProjectsPanel(@NotNull File projectsDirectory) throws IOException {
         this.projectsDirectory = projectsDirectory;
@@ -45,12 +49,49 @@ public class ProjectsPanel extends VBox {
         return this.projectListView;
     }
 
+    public Collection<UnloadedProject> getProjects() {
+        return Collections.unmodifiableCollection(this.projects);
+    }
+
     public File getProjectDirectory() {
         return this.projectsDirectory;
     }
 
     public SplitPane getSplitPane() {
         return this.splitPane;
+    }
+
+    public void searchForProjects() {
+        this.projects.clear();
+        String[] files = this.projectsDirectory.list();
+        if (files == null) {
+            System.out.println("No Files found in " + this.projectsDirectory.getAbsolutePath());
+            return;
+        }
+        for (String fileName : files) {
+            File folder = new File(this.projectsDirectory, fileName);
+            if (!folder.isDirectory()) {
+                continue;
+            }
+            System.out.println("Looking in folder: " + folder.getName());
+            File openBlockFile = new File(folder, "OpenBlocks.json");
+            if (!openBlockFile.exists()) {
+                System.err.println("Invalid folder found: " + openBlockFile.getAbsolutePath());
+                continue;
+            }
+            if (this.projects.parallelStream().anyMatch(p -> p.getDirectory().equals(folder))) {
+                continue;
+            }
+            this.projects.add(new UnloadedProject(folder));
+        }
+        this.projectListView.getItems().clear();
+        this.projectListView.getItems().addAll(this.projects.parallelStream().map(p -> new ToStringWrapper<>(p, u -> {
+            try {
+                return u.getDisplayName();
+            } catch (IOException e) {
+                return u.getFile().getName();
+            }
+        })).collect(Collectors.toSet()));
     }
 
     private void init() throws IOException {
@@ -90,7 +131,6 @@ public class ProjectsPanel extends VBox {
     private TextField createSearch() {
         var field = new TextField();
         field.setOnKeyTyped(e -> {
-            System.out.println("Key Press: " + field.getText());
             var filtered = this.projects.parallelStream()
                     .filter(p -> {
                         var displayName = this.toDisplayName(p);
@@ -123,32 +163,6 @@ public class ProjectsPanel extends VBox {
         return plugins;
     }
 
-    private void searchForProjects() {
-        File[] files = this.projectsDirectory.listFiles(File::isDirectory);
-        if (files == null) {
-            return;
-        }
-        for (File folder : files) {
-            File openBlockFile = new File(folder, "OpenBlocks.json");
-            if (!openBlockFile.exists()) {
-                System.err.println("Invalid folder found: " + openBlockFile.getAbsolutePath());
-                continue;
-            }
-            if (this.projects.parallelStream().anyMatch(p -> p.getDirectory().equals(folder))) {
-                continue;
-            }
-            this.projects.add(new UnloadedProject(folder));
-        }
-        this.projectListView.getItems().clear();
-        this.projectListView.getItems().addAll(this.projects.parallelStream().map(p -> new ToStringWrapper<>(p, u -> {
-            try {
-                return u.getDisplayName();
-            } catch (IOException e) {
-                return u.getFile().getName();
-            }
-        })).collect(Collectors.toSet()));
-    }
-
     private ListView<ToStringWrapper<UnloadedProject>> createProjectList() {
         ListView<ToStringWrapper<UnloadedProject>> projectListView = new ListView<>();
         projectListView.setOnMouseClicked((event) -> {
@@ -159,10 +173,19 @@ public class ProjectsPanel extends VBox {
                     return;
                 }
                 UnloadedProject project = wrapper.getValue();
-                Plugin plugin = project.getExpectedPlugin();
+                Region info;
                 double[] pos = this.splitPane.getDividerPositions();
                 splitItems.remove(1);
-                Region info = plugin.createDisplayInfo(project);
+
+                try {
+                    Plugin plugin = project.getExpectedPlugin();
+                    info = plugin.createDisplayInfo(project);
+                    this.create.setDisable(false);
+                } catch (IllegalStateException e) {
+                    var pluginId = ConfigImplementation.JSON.load(project.getFile().toPath()).getNode(Project.CONFIG_PLUGIN.getNode()).getString(Project.CONFIG_PLUGIN.getTitle()).orElse("");
+                    info = new Label("Cannot find the attached plugin: " + pluginId);
+                    this.create.setDisable(true);
+                }
                 VBox wrapped = this.createProjectInfo(project, info);
                 splitItems.add(wrapped);
                 this.splitPane.setDividerPositions(pos);
@@ -178,30 +201,30 @@ public class ProjectsPanel extends VBox {
     }
 
     private VBox createProjectInfo(UnloadedProject project, Region region) {
-        Button load = new Button("Load");
-        load.setOnAction((event) -> {
+        this.create.setOnAction((event) -> {
             FXMainDisplay display = new FXMainDisplay();
             Blocks.getInstance().registerWindow(Blocks.getInstance().BLOCKS_WINDOW, display);
             Blocks.getInstance().setWindow(Blocks.getInstance().BLOCKS_WINDOW);
         });
-        Button delete = new Button("Delete");
-        delete.setOnAction((event) -> {
+        this.delete.setOnAction((event) -> {
             GeneralUntil.getFiles(project.getDirectory()).parallelStream().forEach(File::delete);
+            project.getDirectory().delete();
 
             Optional<ToStringWrapper<UnloadedProject>> opWrapper = this.projectListView.getItems().parallelStream().filter(w -> w.getValue().equals(project)).findFirst();
             if (opWrapper.isEmpty()) {
                 return;
             }
             this.projectListView.getItems().remove(opWrapper.get());
+            this.searchForProjects();
         });
-        HBox box = new HBox(delete, load);
+        HBox box = new HBox(this.delete, this.create);
 
         VBox area = new VBox(region, box);
         VBox.setVgrow(region, Priority.ALWAYS);
         area.setFillWidth(true);
 
-        load.prefWidthProperty().bind(area.widthProperty());
-        delete.prefWidthProperty().bind(area.widthProperty());
+        this.create.prefWidthProperty().bind(area.widthProperty());
+        this.delete.prefWidthProperty().bind(area.widthProperty());
 
         region.prefWidthProperty().bind(area.widthProperty());
         region.prefHeightProperty().bind(area.heightProperty());
