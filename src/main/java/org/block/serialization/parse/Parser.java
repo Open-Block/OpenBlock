@@ -37,7 +37,10 @@ public interface Parser<T> extends Serialize<T>, Deserialize<T> {
                 .getInstance()
                 .getPlugins()
                 .parallelStream()
-                .filter(m -> m.getId().equals(opValue.get()))
+                .filter(m -> {
+                    System.out.println("\tComparing: " + m.getId() + " | " + opValue.get() + " | " + m.getId().equals(opValue.get()));
+                    return m.getId().equals(opValue.get());
+                })
                 .findAny();
     });
     Parser<Rectangle> RECTANGLE = new Abstract<>((n, t, v) -> {

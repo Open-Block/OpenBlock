@@ -130,6 +130,8 @@ public class ProjectsPanel extends VBox {
 
     private TextField createSearch() {
         var field = new TextField();
+        field.setAccessibleText("Search Projects");
+        field.setPromptText("Search Projects");
         field.setOnKeyTyped(e -> {
             var filtered = this.projects.parallelStream()
                     .filter(p -> {
@@ -155,7 +157,9 @@ public class ProjectsPanel extends VBox {
             try {
                 var pluginLoader = new File(rootPluginFolder, rootPluginFolder.getName() + ".json");
                 var pluginStreamReader = new PluginStreamReader(new FileInputStream(pluginLoader));
-                plugins.add(pluginStreamReader.readPlugin());
+                var plugin = pluginStreamReader.readPlugin();
+                plugins.add(plugin);
+                Blocks.getInstance().registerPlugin(plugin);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -166,6 +170,9 @@ public class ProjectsPanel extends VBox {
     private ListView<ToStringWrapper<UnloadedProject>> createProjectList() {
         ListView<ToStringWrapper<UnloadedProject>> projectListView = new ListView<>();
         projectListView.setOnMouseClicked((event) -> {
+            if (Blocks.getInstance().getPlugins().isEmpty()) {
+                this.searchForPlugins();
+            }
             ObservableList<Node> splitItems = this.splitPane.getItems();
             try {
                 ToStringWrapper<UnloadedProject> wrapper = projectListView.getSelectionModel().getSelectedItem();
@@ -180,11 +187,22 @@ public class ProjectsPanel extends VBox {
                 try {
                     Plugin plugin = project.getExpectedPlugin();
                     info = plugin.createDisplayInfo(project);
+                    info.setMaxHeight(Double.MAX_VALUE);
+                    info.setMaxWidth(Double.MAX_VALUE);
                     this.create.setDisable(false);
                 } catch (IllegalStateException e) {
-                    var pluginId = ConfigImplementation.JSON.load(project.getFile().toPath()).getNode(Project.CONFIG_PLUGIN.getNode()).getString(Project.CONFIG_PLUGIN.getTitle()).orElse("");
+                    var pluginId = ConfigImplementation.JSON
+                            .load(project.getFile().toPath())
+                            .getNode(Project.CONFIG_PLUGIN.getNode())
+                            .getString(Project.CONFIG_PLUGIN.getTitle())
+                            .orElse("");
                     info = new Label("Cannot find the attached plugin: " + pluginId);
                     this.create.setDisable(true);
+                    e.printStackTrace();
+                } catch (Throwable e) {
+                    info = new Label(e.getMessage());
+                    this.create.setDisable(true);
+                    e.printStackTrace();
                 }
                 VBox wrapped = this.createProjectInfo(project, info);
                 splitItems.add(wrapped);
