@@ -1,10 +1,12 @@
 package org.block.project.block.java.variable;
 
-import org.block.project.block.BlockGraphics;
+import org.block.project.block.Block;
 import org.block.project.block.BlockType;
 import org.block.project.block.group.AbstractBlockGroup;
+import org.block.project.block.group.BlockGroupNode;
 import org.block.project.block.java.value.AbstractValue;
 import org.block.project.block.java.value.StringBlock;
+import org.block.project.block.BlockNode;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
 import org.block.project.block.type.value.ValueBlock;
 import org.block.serialization.ConfigNode;
@@ -16,16 +18,14 @@ public class VariableBlock extends AbstractAttachableBlock {
 
     public static final String SECTION_BODY = "variable:body";
     public static final String SECTION_NAME = "variable:name";
-    private int marginX = 8;
-    private int marginY = 8;
-    public VariableBlock(int x, int y) {
-        this(x, y, null, null);
+
+    public VariableBlock() {
+        this(null, null);
     }
 
-    public VariableBlock(int x, int y, StringBlock name, ValueBlock<?> block) {
-        super(x, y);
-        this.blockGroups.add(new NameBlockGroup(0));
-        this.blockGroups.add(new BodyBlockGroup(0));
+    public VariableBlock(StringBlock name, ValueBlock<?> block) {
+        this.blockGroups.add(new NameBlockGroup(this));
+        this.blockGroups.add(new BodyBlockGroup(this));
     }
 
     public BodyBlockGroup getBodyBlockGroup() {
@@ -41,7 +41,7 @@ public class VariableBlock extends AbstractAttachableBlock {
     }
 
     @Override
-    public BlockGraphics getGraphicShape() {
+    public BlockNode<? extends Block> getNode() {
         throw new IllegalStateException("Not Implemented");
     }
 
@@ -112,13 +112,13 @@ public class VariableBlock extends AbstractAttachableBlock {
     public static class VariableBlockType implements BlockType<VariableBlock> {
 
         @Override
-        public VariableBlock build(int x, int y) {
-            return new VariableBlock(x, y);
+        public VariableBlock build() {
+            return new VariableBlock();
         }
 
         @Override
         public VariableBlock build(ConfigNode node) {
-            return null;
+            throw new IllegalStateException("Not implemented");
         }
 
         @Override
@@ -134,15 +134,41 @@ public class VariableBlock extends AbstractAttachableBlock {
 
     public static class NameBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
 
-        public NameBlockGroup(int relativeY) {
-            super(SECTION_NAME, "Name", relativeY);
+        private VariableBlock parent;
+
+        public NameBlockGroup(VariableBlock parent) {
+            super(SECTION_NAME, "Name");
+            this.parent = parent;
+        }
+
+        @Override
+        public Block getBlock() {
+            return this.parent;
+        }
+
+        @Override
+        public BlockGroupNode<? extends Block> getBlockNode() {
+            throw new IllegalStateException("Not implemented");
         }
     }
 
     public static class BodyBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<ValueBlock<?>> {
 
-        public BodyBlockGroup(int relativeY) {
-            super(SECTION_BODY, "Body", relativeY);
+        private VariableBlock parent;
+
+        public BodyBlockGroup(VariableBlock parent) {
+            super(SECTION_BODY, "Body");
+            this.parent = parent;
+        }
+
+        @Override
+        public Block getBlock() {
+            return this.parent;
+        }
+
+        @Override
+        public BlockGroupNode<? extends Block> getBlockNode() {
+            throw new IllegalStateException("Not implemented");
         }
     }
 }

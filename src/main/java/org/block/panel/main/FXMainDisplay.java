@@ -12,15 +12,16 @@ import org.block.panel.main.selector.GroupSelector;
 import org.block.panel.main.selector.Selector;
 import org.block.project.block.Block;
 import org.block.project.block.BlockType;
+import org.block.project.block.BlockNode;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class FXMainDisplay extends VBox {
 
-    private VBox blocks = this.createBlocksView();
-    private MenuBar navBar = this.createNavBar();
-    private Pane panel = this.createBlockView();
+    private final VBox blocks = this.createBlocksView();
+    private final MenuBar navBar = this.createNavBar();
+    private final Pane panel = this.createBlockView();
 
     public FXMainDisplay() {
         this.init();
@@ -40,8 +41,8 @@ public class FXMainDisplay extends VBox {
 
     public List<Block> getDisplayingBlocks() {
         return this.panel.getChildren().stream()
-                .filter((node) -> node instanceof BlockRender)
-                .map((node) -> ((BlockRender) node).getBlock())
+                .filter((node) -> node instanceof BlockNode)
+                .map((node) -> ((BlockNode<? extends Block>) node).getBlock())
                 .collect(Collectors.toList());
     }
 
@@ -60,7 +61,7 @@ public class FXMainDisplay extends VBox {
     }
 
     private void registerBlocks(VBox box) {
-        BlockSelector minusBlockSelector = new BlockSelector(BlockType.BLOCK_TYPE_MINUS.buildDefault(0, 0), "Negate", "Take");
+        BlockSelector minusBlockSelector = new BlockSelector(BlockType.BLOCK_TYPE_MINUS.buildDefault(), "Negate", "Take");
 
         GroupSelector mathSelector = new GroupSelector("Math", "Mathematics");
         mathSelector.addChild(minusBlockSelector);

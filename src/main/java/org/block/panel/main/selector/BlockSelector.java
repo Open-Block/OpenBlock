@@ -1,11 +1,12 @@
 package org.block.panel.main.selector;
 
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import org.block.panel.main.BlockRender;
 import org.block.project.block.Block;
+import org.block.project.block.BlockNode;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,26 +14,26 @@ import java.util.Set;
 
 public class BlockSelector extends Parent implements Selector {
 
-    private final BlockRender render;
+    private final BlockNode<? extends Block> blockNode;
     private final Set<String> search = new HashSet<>();
 
     public BlockSelector(Block block, String... search) {
-        this(block.getGraphicRender(), search);
+        this(block.getNode(), search);
     }
 
-    public BlockSelector(BlockRender render, String... search) {
-        this.render = render;
-        Label label = new Label(render.getBlock().getType().getName());
-        VBox box = new VBox(label, render);
-        VBox.setVgrow(render, Priority.ALWAYS);
+    public BlockSelector(BlockNode<? extends Block> blockNode, String... search) {
+        this.blockNode = blockNode;
+        Label label = new Label(blockNode.getBlock().getType().getName());
+        VBox box = new VBox(label, (Node)blockNode);
+        VBox.setVgrow((Node)blockNode, Priority.ALWAYS);
         this.getChildren().add(box);
         this.search.add(this.getTitle());
         this.search.addAll(Arrays.asList(search));
 
     }
 
-    public BlockRender getRender() {
-        return this.render;
+    public BlockNode<? extends Block> getBlockNode() {
+        return this.blockNode;
     }
 
     @Override
@@ -42,6 +43,6 @@ public class BlockSelector extends Parent implements Selector {
 
     @Override
     public String getTitle() {
-        return this.render.getBlock().getType().getName();
+        return this.blockNode.getBlock().getType().getName();
     }
 }

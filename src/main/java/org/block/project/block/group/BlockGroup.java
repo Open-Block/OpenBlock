@@ -1,6 +1,7 @@
 package org.block.project.block.group;
 
 import org.block.project.block.Block;
+import org.vector.type.Vector2;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,57 +9,61 @@ import java.util.stream.Collectors;
 
 public interface BlockGroup {
 
-    /**
-     * Gets the id of the block group.
-     *
-     * @return The id the block group
-     */
     String getId();
 
-    /**
-     * Gets the name of the block group.
-     * This will be the name displayed if a error directly relates
-     * to this group.
-     * <p>
-     * For example: "The block 'Block type' required a number block within 'this name' sector"
-     *
-     * @return
-     */
     String getName();
 
-    /**
-     * Gets the sectors within the block group. This will typically be unmodifiable however if the
-     * blockgroup allows unlimited then it will be modifiable.
-     *
-     * @return
-     */
+    Block getBlock();
+
+    BlockGroupNode<? extends Block> getBlockNode();
+
     List<BlockSector<?>> getSectors();
 
-    /**
-     * Gets the Y position related to its parent
-     *
-     * @return Y position related to its parent
-     */
-    int getRelativeYPosition();
+    default double getRelativeYPosition() {
+        return this.getBlockNode().getBoundsInParent().getMinY();
+    }
 
-    void setRelativeYPosition(int pos);
+    default double getRelativeXPosition() {
+        return this.getBlockNode().getBoundsInParent().getMinY();
+    }
 
     boolean removeSector(Block block);
 
-    default int getHeight() {
-        int height = 0;
+    default double getHeight() {
+        double height = 0;
         for (BlockSector<?> sector : this.getSectors()) {
             height = Math.max(sector.getHeight(), height);
         }
         return height;
     }
 
-    default int getWidth() {
-        int width = 0;
+    default double getWidth() {
+        double width = 0;
         for (BlockSector<?> sector : this.getSectors()) {
             width = Math.max(sector.getWidth(), width);
         }
         return width;
+    }
+
+    default boolean contains(Vector2<Double> vector2) {
+        return contains(vector2.getX(), vector2.getZ());
+    }
+
+    default boolean contains(double x, double y) {
+        double relX = this.getRelativeXPosition();
+        double relY = this.getRelativeYPosition();
+        if (y < relY) {
+            return false;
+        }
+        if (x < relX) {
+            return false;
+        }
+        double differenceX = x - relX;
+        double differenceY = y - relY;
+        if (differenceX >= getWidth()) {
+            return false;
+        }
+        return !(differenceY >= getHeight());
     }
 
     default List<BlockSector<?>> getApplicableSectors(Block block) {

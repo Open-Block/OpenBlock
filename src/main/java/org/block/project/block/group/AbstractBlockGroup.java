@@ -1,6 +1,7 @@
 package org.block.project.block.group;
 
 import org.block.project.block.Block;
+import org.block.project.block.BlockNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +11,11 @@ public abstract class AbstractBlockGroup implements BlockGroup {
 
     private final String id;
     private final String name;
-    private int relativeY;
-    public AbstractBlockGroup(String id, String name, int relativeY) {
+
+
+    public AbstractBlockGroup(String id, String name) {
         this.id = id;
         this.name = name;
-        this.relativeY = relativeY;
     }
 
     @Override
@@ -27,22 +28,12 @@ public abstract class AbstractBlockGroup implements BlockGroup {
         return this.name;
     }
 
-    @Override
-    public int getRelativeYPosition() {
-        return this.relativeY;
-    }
-
-    @Override
-    public void setRelativeYPosition(int pos) {
-        this.relativeY = pos;
-    }
-
-    public static class AbstractListBlockGroup extends AbstractBlockGroup {
+    public abstract static class AbstractListBlockGroup extends AbstractBlockGroup {
 
         protected final List<BlockSector<?>> blockSectors = new ArrayList<>();
 
-        public AbstractListBlockGroup(String id, String name, int relativeY) {
-            super(id, name, relativeY);
+        public AbstractListBlockGroup(String id, String name) {
+            super(id, name);
         }
 
         @Override
@@ -57,12 +48,12 @@ public abstract class AbstractBlockGroup implements BlockGroup {
         }
     }
 
-    public static class AbstractSingleBlockGroup<B extends Block> extends AbstractBlockGroup implements SingleBlockGroup<B> {
+    public abstract static class AbstractSingleBlockGroup<B extends Block> extends AbstractBlockGroup implements SingleBlockGroup<B> {
 
         protected BlockSector<B> sector;
 
-        public AbstractSingleBlockGroup(String id, String name, int relativeY) {
-            super(id, name, relativeY);
+        public AbstractSingleBlockGroup(String id, String name) {
+            super(id, name);
         }
 
         @Override

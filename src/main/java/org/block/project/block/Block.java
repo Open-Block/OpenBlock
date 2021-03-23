@@ -1,9 +1,8 @@
 package org.block.project.block;
 
 import org.block.Blocks;
-import org.block.panel.main.BlockRender;
-import org.block.project.block.type.called.CodeStartBlock;
 import org.block.project.Project;
+import org.block.project.block.type.called.CodeStartBlock;
 
 import java.io.File;
 import java.util.Collection;
@@ -16,21 +15,23 @@ import java.util.UUID;
  */
 public interface Block {
 
-    BlockGraphics getGraphicShape();
-
     /**
      * Gets the X position on the panel
      *
      * @return Gets the X position in pixels
      */
-    int getX();
+    default double getX() {
+        throw new IllegalStateException("Not Implemented");
+    }
 
     /**
      * Gets the Y position on the panel
      *
      * @return Gets the Y position in pixels
      */
-    int getY();
+    default double getY() {
+        throw new IllegalStateException("Not Implemented");
+    }
 
     /**
      * Sets the X position on the panel.
@@ -38,56 +39,22 @@ public interface Block {
      * @param x The new X position
      * @throws IndexOutOfBoundsException If the new position is less then 0
      */
-    void setX(int x);
+    default void setX(double x){
+        setPosition(x, getY());
+    }
 
     /**
      * Sets the Y position on the panel.
      *
      * @param y the new Y position
      */
-    void setY(int y);
+    default void setY(double y){
+        setPosition(getX(), y);
+    }
 
-    /**
-     * Checks if the block is currently selected.
-     *
-     * @return If the Block is selected
-     */
-    boolean isSelected();
-
-    /**
-     * Sets if the block is selected. Please note that the panel needs to be repainted for visual changes to take affect.
-     *
-     * @param selected Sets if the block is selected
-     */
-    void setSelected(boolean selected);
-
-    /**
-     * Checks if the block is highlighted.
-     *
-     * @return If the block is highlighted
-     */
-    boolean isHighlighted();
-
-    /**
-     * Sets if the block is highlighted. Please note that the panel needs ot be repainted for visual changes to take affect.
-     *
-     * @param selected If the block will be selected
-     */
-    void setHighlighted(boolean selected);
-
-    /**
-     * Reports the block as having an error. Only the paint implementation should need to check this
-     *
-     * @return Is showing an error
-     */
-    boolean isShowingError();
-
-    /**
-     * Sets if the block should be showing an error, the blocks own implementation should not be calling this
-     *
-     * @param error If the block has an error.
-     */
-    void setShowingError(boolean error);
+    default void setPosition(double x, double y){
+        throw new IllegalStateException("Not Implemented");
+    }
 
     /**
      * Gets a unique id for the block.
@@ -121,25 +88,6 @@ public interface Block {
      */
     BlockType<? extends Block> getType();
 
-    /**
-     * This is the layer to show on the panel, the higher the layer then the more blocks this block will appear ontop of.
-     * By default the layer should be 0, with the implementation that built the block then setting it the value to the highest current layer.
-     * The layer will be changed based on other blocks being selected, hovered, dragged, etc however this will be done on the panels implementation.
-     * This just needs to store the value
-     *
-     * @return The current layer the block is on.
-     */
-    int getLayer();
-
-    /**
-     * Sets the layer to show on the panel, the higher the layer then the more blocks this block will appear ontop of.
-     * Note. This value should not be changed while the block is on the BlockDisplayPanel as the layer is what is
-     * compared using the TreeSet.
-     *
-     * @param layer The new layer.
-     */
-    void setLayer(int layer);
-
     Optional<CodeStartBlock> getParent();
 
     void setParent(CodeStartBlock block);
@@ -156,8 +104,8 @@ public interface Block {
      *
      * @return Gets the height in pixels
      */
-    default int getHeight() {
-        return this.getGraphicShape().getHeight();
+    default double getHeight() {
+        return this.getNode().getBoundsInLocal().getHeight();
     }
 
     /**
@@ -165,14 +113,12 @@ public interface Block {
      *
      * @return Gets the width in pixels
      */
-    default int getWidth() {
-        return this.getGraphicShape().getWidth();
+    default double getWidth() {
+        return this.getNode().getBoundsInLocal().getWidth();
     }
 
 
-    default BlockRender getGraphicRender() {
-        return new BlockRender(this);
-    }
+    BlockNode<? extends Block> getNode();
 
     /**
      * Deletes the block from the panel, does all the checks to remove everything correctly

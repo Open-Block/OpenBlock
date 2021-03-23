@@ -107,9 +107,6 @@ public class BlockUtils {
     private static void handle(Block block, FXMainDisplay panel, Project.Loaded project, Set<Block> load, Consumer<Block> loaded) {
         load.add(block);
 
-        while (panel.getDisplayingBlocks().contains(block)) {
-            block.setLayer(block.getLayer() + 1);
-        }
         //TODO handle all
 
         panel.getDisplayingBlocks().add(block);

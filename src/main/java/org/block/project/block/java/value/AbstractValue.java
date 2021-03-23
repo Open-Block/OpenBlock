@@ -1,7 +1,8 @@
 package org.block.project.block.java.value;
 
 import org.block.project.block.AbstractBlock;
-import org.block.project.block.BlockGraphics;
+import org.block.project.block.Block;
+import org.block.project.block.BlockNode;
 import org.block.project.block.type.TextBlock;
 import org.block.project.block.type.value.ConnectedValueBlock;
 
@@ -18,31 +19,24 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Connecte
     protected final Function<V, String> toString;
     protected V value;
     protected String text;
-    protected int marginX = 2;
-    protected int marginY = 2;
 
     /**
      * Th init of the Abstract value.
      * This uses {@link Object#toString()} to calculate the display name
      *
-     * @param x     The X position
-     * @param y     The Y position
      * @param value The attached value
      */
-    public AbstractValue(int x, int y, V value) {
-        this(x, y, value, Object::toString);
+    public AbstractValue(V value) {
+        this(value, Object::toString);
     }
 
     /**
      * The init of the Abstract value
      *
-     * @param x        The X position
-     * @param y        The Y position
      * @param value    The attached value
      * @param toString The generic convection of the value to a String
      */
-    public AbstractValue(int x, int y, V value, Function<V, String> toString) {
-        super(x, y);
+    public AbstractValue(V value, Function<V, String> toString) {
         this.toString = toString;
         this.setValue(value);
     }
@@ -58,7 +52,7 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Connecte
     }
 
     @Override
-    public BlockGraphics getGraphicShape() {
+    public BlockNode<? extends Block> getNode() {
         throw new IllegalStateException("Not implemented");
     }
 

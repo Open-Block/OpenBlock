@@ -2,7 +2,7 @@ package org.block.project.block;
 
 import org.block.project.block.java.method.MethodBlock;
 import org.block.project.block.java.method.call.JavaMethodCallBlock;
-import org.block.project.block.java.operation.number.MinusOperation;
+import org.block.project.block.java.operation.number.minus.MinusOperation;
 import org.block.project.block.java.specific.ReturnBlock;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.java.value.number.IntegerBlock;
@@ -24,10 +24,9 @@ import java.util.UUID;
  */
 public interface BlockType<B extends Block> {
 
-    FixedTitle<Integer> TITLE_X = new FixedTitle<>("X", Parser.INTEGER);
-    FixedTitle<Integer> TITLE_Y = new FixedTitle<>("Y", Parser.INTEGER);
+    FixedTitle<Double> TITLE_X = new FixedTitle<>("X", Parser.DOUBLE);
+    FixedTitle<Double> TITLE_Y = new FixedTitle<>("Y", Parser.DOUBLE);
     FixedTitle<UUID> TITLE_UUID = new FixedTitle<>("UUID", Parser.UNIQUE_ID);
-    FixedTitle<Integer> TITLE_LAYER = new FixedTitle<>("Layer", Parser.INTEGER);
     FixedTitle.Listable<UUID> TITLE_DEPENDS = new FixedTitle.Listable<>("Depends", Parser.UNIQUE_ID);
     FixedTitle<String> TITLE_CLASS = new FixedTitle<>("Class", Parser.STRING);
 
@@ -43,11 +42,9 @@ public interface BlockType<B extends Block> {
     /**
      * Creates a new instance of a block with the provided position
      *
-     * @param x The X position
-     * @param y The Y position
      * @return The newly created Block
      */
-    B build(int x, int y);
+    B build();
 
     /**
      * Creates a new instance of a block with the values found within the provided ConfigNode
@@ -82,20 +79,17 @@ public interface BlockType<B extends Block> {
     default void write(@NotNull ConfigNode node, @NotNull B block) {
         TITLE_X.serialize(node, block.getX());
         TITLE_Y.serialize(node, block.getY());
-        TITLE_LAYER.serialize(node, block.getLayer());
         TITLE_UUID.serialize(node, block.getUniqueId());
     }
 
     /**
      * Creates a new instanceof a block with the provided position.
      * This function is used in the chooser, therefore you can have different settings for the chooser version
-     * if the implementation allows for it, by default it uses the {@link BlockType#build(int x, int y)}
+     * if the implementation allows for it, by default it uses the {@link BlockType#build()}
      *
-     * @param x The X position
-     * @param y The Y position
      * @return The newly created Block
      */
-    default B buildDefault(int x, int y) {
-        return build(x, y);
+    default B buildDefault() {
+        return build();
     }
 }

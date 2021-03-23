@@ -13,11 +13,9 @@ public class BooleanBlock extends AbstractValue<Boolean> {
     /**
      * Used to init the block
      *
-     * @param x The X position
-     * @param y The Y position
      */
-    public BooleanBlock(int x, int y) {
-        super(x, y, true, m -> m.toString());
+    public BooleanBlock() {
+        super(true, Object::toString);
     }
 
     @Override
@@ -32,6 +30,6 @@ public class BooleanBlock extends AbstractValue<Boolean> {
 
     @Override
     public BlockType<?> getType() {
-        return null;
+        throw new IllegalStateException("Not Implemented");
     }
 }

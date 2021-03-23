@@ -3,13 +3,10 @@ package org.block.project.block.java.method;
 import org.block.Blocks;
 import org.block.panel.main.FXMainDisplay;
 import org.block.project.block.Block;
-import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
-import org.block.project.block.group.AbstractBlockGroup;
-import org.block.project.block.group.AbstractBlockSector;
-import org.block.project.block.group.BlockSector;
-import org.block.project.block.group.UnlimitedBlockGroup;
+import org.block.project.block.group.*;
 import org.block.project.block.java.value.StringBlock;
+import org.block.project.block.BlockNode;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
 import org.block.project.block.type.called.CalledBlock;
 import org.block.project.block.type.called.CodeStartBlock;
@@ -32,12 +29,11 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
     private int marginX = 8;
     private int marginY = 8;
 
-    public MethodBlock(int x, int y) {
-        this(x, y, null);
+    public MethodBlock() {
+        this(null);
     }
 
-    public MethodBlock(int x, int y, StringBlock block) {
-        super(x, y);
+    public MethodBlock(StringBlock block) {
         this.blockGroups.add(new MethodBlock.NameBlockGroup(SECTION_NAME, "Name", block));
         /*this.attached.put(SECTION_NAME, "Name", new MethodBlock.StringBlockList(12, name));
         this.attached.put(SECTION_VALUE, "Value", new MethodBlock.VariableBlockList());*/
@@ -52,7 +48,7 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
     }
 
     @Override
-    public BlockGraphics getGraphicShape() {
+    public BlockNode<? extends Block> getNode() {
         throw new IllegalStateException("Not implemented");
     }
 
@@ -112,8 +108,8 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
         public static final FixedTitle<UUID> TITLE = new FixedTitle<>("title", Parser.UNIQUE_ID);
 
         @Override
-        public MethodBlock build(int x, int y) {
-            return new MethodBlock(x, y);
+        public MethodBlock build() {
+            return new MethodBlock();
         }
 
         @Override
@@ -122,18 +118,19 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
             if (opUUID.isEmpty()) {
                 throw new IllegalStateException("Unknown Unique Id");
             }
-            Optional<Integer> opX = TITLE_X.deserialize(node);
+            Optional<Double> opX = TITLE_X.deserialize(node);
             if (opX.isEmpty()) {
                 throw new IllegalStateException("Unknown X position");
             }
-            Optional<Integer> opY = TITLE_Y.deserialize(node);
+            Optional<Double> opY = TITLE_Y.deserialize(node);
             if (opY.isEmpty()) {
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
             FXMainDisplay panel = (FXMainDisplay) Blocks.getInstance().getWindow();
             List<Block> blocks = panel.getDisplayingBlocks();
-            MethodBlock methodBlock = new MethodBlock(opX.get(), opY.get());
+            MethodBlock methodBlock = new MethodBlock();
+            methodBlock.setPosition(opX.get(), opY.get());
             methodBlock.id = opUUID.get();
 
 
@@ -187,16 +184,42 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
 
     public class NameBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
 
+        public class NameBlockSector extends AbstractBlockSector<StringBlock> {
+
+            public NameBlockSector(StringBlock block) {
+                super(NameBlockGroup.this, StringBlock.class, block);
+            }
+
+            @Override
+            public void setAttachedBlock(@Nullable Block block) throws IllegalArgumentException {
+                super.setAttachedBlock(block);
+                NameBlockGroup.this.blockNode.updateBlock();
+            }
+        }
+
+        private NodeMethodNameBlock blockNode;
+
         public NameBlockGroup(String id, String name, @Nullable StringBlock block) {
-            super(id, name, MethodBlock.this.marginY);
-            this.sector = new AbstractBlockSector<>(this, StringBlock.class, block);
+            super(id, name);
+            this.sector = new NameBlockSector(block);
+            this.blockNode = new NodeMethodNameBlock(this);
+        }
+
+        @Override
+        public Block getBlock() {
+            return MethodBlock.this;
+        }
+
+        @Override
+        public NodeMethodNameBlock getBlockNode() {
+            return this.blockNode;
         }
     }
 
     public class BodyBlockGroup extends AbstractBlockGroup.AbstractListBlockGroup implements UnlimitedBlockGroup {
 
-        public BodyBlockGroup(String id, String name, int relativeY) {
-            super(id, name, relativeY);
+        public BodyBlockGroup(String id, String name) {
+            super(id, name);
         }
 
         @Override
@@ -212,6 +235,16 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
             AbstractBlockSector<Block> sector = new AbstractBlockSector<>(this, Block.class, block);
             this.blockSectors.add(pos, sector);
             return true;
+        }
+
+        @Override
+        public MethodBlock getBlock() {
+            return MethodBlock.this;
+        }
+
+        @Override
+        public BlockGroupNode<? extends BlockNode<?>> getBlockNode() {
+            return null;
         }
     }
 }

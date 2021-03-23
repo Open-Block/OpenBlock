@@ -8,6 +8,7 @@ import org.block.project.block.type.value.ValueBlock;
 import org.block.serialization.ConfigNode;
 import org.block.serialization.parse.Parser;
 import org.block.util.ClassCompare;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Collection;
@@ -24,8 +25,8 @@ import java.util.UUID;
  */
 public abstract class NumberBlock<V extends Number> extends AbstractValue<V> implements MutableConnectedValueBlock<V> {
 
-    public NumberBlock(int x, int y, V value) {
-        super(x, y, value, Object::toString);
+    public NumberBlock(V value) {
+        super(value, Object::toString);
     }
 
     @Override
@@ -53,25 +54,23 @@ public abstract class NumberBlock<V extends Number> extends AbstractValue<V> imp
 
         @Override
         public NumberBlock<N> build(ConfigNode node) {
-            Optional<Integer> opX = TITLE_X.deserialize(node);
-            if (!opX.isPresent()) {
+            Optional<Double> opX = TITLE_X.deserialize(node);
+            if (opX.isEmpty()) {
                 throw new IllegalStateException("Could not find position X");
             }
-            Optional<Integer> opY = TITLE_Y.deserialize(node);
-            if (!opY.isPresent()) {
+            Optional<Double> opY = TITLE_Y.deserialize(node);
+            if (opY.isEmpty()) {
                 throw new IllegalStateException("Could not find position Y");
             }
             Optional<N> opValue = node.getValue("Title", this.parser);
-            if (!opValue.isPresent()) {
+            if (opValue.isEmpty()) {
                 throw new IllegalStateException("Could not find value");
             }
             Optional<UUID> opUUID = TITLE_UUID.deserialize(node);
-            if (!opValue.isPresent()) {
-                throw new IllegalStateException("Could not find ID");
-            }
-            NumberBlock<N> block = this.build(opX.get(), opY.get());
+            NumberBlock<N> block = this.build();
+            block.setPosition(opX.get(), opY.get());
             block.setValue(opValue.get());
-            block.id = opUUID.get();
+            block.id = opUUID.orElseThrow(() -> new IllegalStateException("No Id"));
             //block.layer = TITLE_LAYER.deserialize(node).orElse(Blocks.getInstance().getLoadedProject().get().getPanel().getBlocksPanel().getBlocks().size());
             return block;
         }
@@ -87,7 +86,7 @@ public abstract class NumberBlock<V extends Number> extends AbstractValue<V> imp
         }
 
         @Override
-        public void write(ConfigNode node, NumberBlock<N> block) {
+        public void write(@NotNull ConfigNode node, @NotNull NumberBlock<N> block) {
             BlockType.super.write(node, block);
             node.setValue("Title", this.parser, block.getValue());
         }

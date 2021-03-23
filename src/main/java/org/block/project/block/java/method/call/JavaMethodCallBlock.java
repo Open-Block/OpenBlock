@@ -19,10 +19,8 @@ import java.util.stream.Stream;
 public class JavaMethodCallBlock<C> extends AbstractAttachableBlock implements MethodCallBlock {
 
     private final JavaMethodCallBlock.JavaMethodCallBlockType<C> type;
-    private final int marginX = 3;
-    private final int marginY = 3;
-    public JavaMethodCallBlock(int x, int y, JavaMethodCallBlock.JavaMethodCallBlockType<C> type) {
-        super(x, y);
+
+    public JavaMethodCallBlock(JavaMethodCallBlock.JavaMethodCallBlockType<C> type) {
         this.type = type;
 
         //this.attached.put(MethodCallBlock.METHOD_BLOCK_GROUP, new JavaMethodNameBlockList(5));
@@ -144,13 +142,13 @@ public class JavaMethodCallBlock<C> extends AbstractAttachableBlock implements M
         }
 
         @Override
-        public JavaMethodCallBlock<T> build(int x, int y) {
-            return new JavaMethodCallBlock<>(x, y, this);
+        public JavaMethodCallBlock<T> build() {
+            return new JavaMethodCallBlock<>(this);
         }
 
         @Override
         public JavaMethodCallBlock<T> build(ConfigNode node) {
-            return new JavaMethodCallBlock<>(0, 0, this);
+            return new JavaMethodCallBlock<>(this);
         }
 
         @Override

@@ -1,9 +1,11 @@
 package org.block.project.block.java.method.call;
 
-import org.block.project.block.BlockGraphics;
+import org.block.project.block.Block;
 import org.block.project.block.group.AbstractBlockGroup;
 import org.block.project.block.group.BlockGroup;
+import org.block.project.block.group.BlockGroupNode;
 import org.block.project.block.java.value.StringBlock;
+import org.block.project.block.BlockNode;
 import org.block.project.block.type.attachable.AttachableBlock;
 import org.block.project.block.type.value.ValueBlock;
 
@@ -33,21 +35,21 @@ public interface MethodCallBlock extends AttachableBlock, ValueBlock<Object> {
     }
 
     @Override
-    default BlockGraphics getGraphicShape() {
+    default BlockNode<? extends Block> getNode() {
         throw new IllegalStateException("Not Implemented");
     }
 
-    class MethodNameBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
+    abstract class MethodNameBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
 
-        public MethodNameBlockGroup(int relativeY) {
-            super(METHOD_NAME_BLOCK_GROUP, "Name", relativeY);
+        public MethodNameBlockGroup() {
+            super(METHOD_NAME_BLOCK_GROUP, "Name");
         }
     }
 
     abstract class MethodParameterBlockGroup extends AbstractBlockGroup.AbstractListBlockGroup {
 
-        public MethodParameterBlockGroup(String id, String name, int relativeY) {
-            super(id, name, relativeY);
+        public MethodParameterBlockGroup(String id, String name) {
+            super(id, name);
         }
 
         public abstract void update();

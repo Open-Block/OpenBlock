@@ -18,8 +18,6 @@ import java.util.*;
 public abstract class AbstractNumberOperation extends AbstractAttachableBlock implements ValueBlock<Number>, TextBlock {
 
     private final String operator;
-    protected int marginX = 8;
-    protected int marginY = 8;
     private String name;
 
     /**
@@ -30,8 +28,7 @@ public abstract class AbstractNumberOperation extends AbstractAttachableBlock im
      * @param text     The text to display, this would typically be the English word for the operation
      * @param operator The Java maths operator
      */
-    public AbstractNumberOperation(int x, int y, String text, String operator) {
-        super(x, y);
+    public AbstractNumberOperation(String text, String operator) {
         this.operator = operator;
         setText(text);
     }

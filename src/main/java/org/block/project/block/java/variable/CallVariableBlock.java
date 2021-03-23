@@ -1,10 +1,11 @@
 package org.block.project.block.java.variable;
 
 import org.block.project.block.Block;
-import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 import org.block.project.block.group.AbstractBlockGroup;
+import org.block.project.block.group.BlockGroupNode;
 import org.block.project.block.java.value.StringBlock;
+import org.block.project.block.BlockNode;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
 import org.block.project.block.type.called.CodeStartBlock;
 import org.block.project.block.type.called.LinkedBlock;
@@ -22,9 +23,8 @@ public class CallVariableBlock extends AbstractAttachableBlock implements ValueB
 
     public static final String VARIABLE_SECTION = "call:variable";
 
-    public CallVariableBlock(int x, int y) {
-        super(x, y);
-        this.blockGroups.add(new VariableLinkBlockGroup(0));
+    public CallVariableBlock() {
+        this.blockGroups.add(new VariableLinkBlockGroup(this));
     }
 
     public VariableLinkBlockGroup getVariableBlockGroup() {
@@ -74,7 +74,7 @@ public class CallVariableBlock extends AbstractAttachableBlock implements ValueB
     }
 
     @Override
-    public BlockGraphics getGraphicShape() {
+    public BlockNode<? extends Block> getNode() {
         throw new IllegalStateException("Not implemented");
     }
 
@@ -104,13 +104,13 @@ public class CallVariableBlock extends AbstractAttachableBlock implements ValueB
     public static class VariableBlockType implements BlockType<CallVariableBlock> {
 
         @Override
-        public CallVariableBlock build(int x, int y) {
-            return new CallVariableBlock(x, y);
+        public CallVariableBlock build() {
+            return new CallVariableBlock();
         }
 
         @Override
         public CallVariableBlock build(ConfigNode node) {
-            return null;
+            throw new IllegalStateException("Not implemented");
         }
 
         @Override
@@ -126,8 +126,21 @@ public class CallVariableBlock extends AbstractAttachableBlock implements ValueB
 
     public static class VariableLinkBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<StringBlock> {
 
-        public VariableLinkBlockGroup(int relativeY) {
-            super(VARIABLE_SECTION, "Variable", relativeY);
+        private CallVariableBlock parent;
+
+        public VariableLinkBlockGroup(CallVariableBlock parent) {
+            super(VARIABLE_SECTION, "Variable");
+            this.parent = parent;
+        }
+
+        @Override
+        public Block getBlock() {
+            return this.parent;
+        }
+
+        @Override
+        public BlockGroupNode<? extends Block> getBlockNode() {
+            throw new IllegalStateException("Not implemented");
         }
     }
 }

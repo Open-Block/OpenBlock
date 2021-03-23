@@ -15,9 +15,9 @@ public interface BlockSector<B extends Block> {
 
     boolean canAccept(Block block);
 
-    int getHeight();
+    double getHeight();
 
-    int getWidth();
+    double getWidth();
 
     default void removeAttachedBlock() {
         this.setAttachedBlock(null);

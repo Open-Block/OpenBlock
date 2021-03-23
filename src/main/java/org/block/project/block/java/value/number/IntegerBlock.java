@@ -1,6 +1,5 @@
 package org.block.project.block.java.value.number;
 
-import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 import org.block.serialization.parse.Parser;
 
@@ -8,13 +7,8 @@ import java.util.function.Consumer;
 
 public class IntegerBlock extends NumberBlock<Integer> {
 
-    public IntegerBlock(int x, int y, Integer value) {
-        super(x, y, value);
-    }
-
-    @Override
-    public BlockGraphics getGraphicShape() {
-        throw new IllegalStateException("Not implemented");
+    public IntegerBlock(Integer value) {
+        super(value);
     }
 
     @Override
@@ -34,8 +28,8 @@ public class IntegerBlock extends NumberBlock<Integer> {
         }
 
         @Override
-        public NumberBlock<Integer> build(int x, int y) {
-            return new IntegerBlock(x, y, 0);
+        public NumberBlock<Integer> build() {
+            return new IntegerBlock(0);
         }
     }
 }

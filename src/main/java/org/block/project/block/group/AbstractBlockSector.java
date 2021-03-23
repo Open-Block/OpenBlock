@@ -61,7 +61,7 @@ public class AbstractBlockSector<B extends Block> implements BlockSector<B> {
     }
 
     @Override
-    public int getHeight() {
+    public double getHeight() {
         if (this.block == null) {
             return 20;
         }
@@ -69,7 +69,7 @@ public class AbstractBlockSector<B extends Block> implements BlockSector<B> {
     }
 
     @Override
-    public int getWidth() {
+    public double getWidth() {
         if (this.block == null) {
             return 50;
         }

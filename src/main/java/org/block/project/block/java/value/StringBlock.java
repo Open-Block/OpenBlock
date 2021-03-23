@@ -1,6 +1,5 @@
 package org.block.project.block.java.value;
 
-import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 import org.block.project.block.type.value.MutableConnectedValueBlock;
 import org.block.serialization.ConfigNode;
@@ -18,19 +17,14 @@ import java.util.function.Function;
 
 public class StringBlock extends AbstractValue<String> implements MutableConnectedValueBlock<String> {
 
-    public StringBlock(int x, int y, String value) {
-        this(x, y, value, v -> v);
+    public StringBlock(String value) {
+        this(value, v -> v);
     }
 
 
-    public StringBlock(int x, int y, String value, Function<String, String> toString) {
-        super(x, y, value, toString);
+    public StringBlock(String value, Function<String, String> toString) {
+        super(value, toString);
         //this.registerEventListener(new OnClickListener());
-    }
-
-    @Override
-    public BlockGraphics getGraphicShape() {
-        return null;
     }
 
     @Override
@@ -58,17 +52,17 @@ public class StringBlock extends AbstractValue<String> implements MutableConnect
         public static final FixedTitle<String> TITLE = new FixedTitle<>("Title", Parser.STRING);
 
         @Override
-        public StringBlock build(int x, int y) {
-            return new StringBlock(x, y, "");
+        public StringBlock build() {
+            return new StringBlock("");
         }
 
         @Override
         public StringBlock build(ConfigNode node) {
-            Optional<Integer> opX = TITLE_X.deserialize(node);
+            Optional<Double> opX = TITLE_X.deserialize(node);
             if (!opX.isPresent()) {
                 throw new IllegalStateException("Could not find position X");
             }
-            Optional<Integer> opY = TITLE_Y.deserialize(node);
+            Optional<Double> opY = TITLE_Y.deserialize(node);
             if (!opY.isPresent()) {
                 throw new IllegalStateException("Could not find position Y");
             }
@@ -80,7 +74,8 @@ public class StringBlock extends AbstractValue<String> implements MutableConnect
             if (!opValue.isPresent()) {
                 throw new IllegalStateException("Could not find ID");
             }
-            StringBlock block = this.build(opX.get(), opY.get());
+            StringBlock block = this.build();
+            block.setPosition(opX.get(), opY.get());
             block.setValue(opValue.get());
             block.id = opUUID.get();
             TITLE.deserialize(node).ifPresent(v -> block.value = v);
@@ -104,8 +99,8 @@ public class StringBlock extends AbstractValue<String> implements MutableConnect
         }
 
         @Override
-        public StringBlock buildDefault(int x, int y) {
-            return new StringBlock(x, y, "Text");
+        public StringBlock buildDefault() {
+            return new StringBlock("Text");
         }
     }
 

@@ -33,8 +33,8 @@ public interface AttachableBlock extends Block {
         return this.getGroups().parallelStream().filter(g -> g.getId().equalsIgnoreCase(id)).findFirst();
     }
 
-    default Optional<BlockGroup> getGroup(int y) {
-        return this.getGroups().parallelStream().filter(g -> g.getRelativeSector(y - g.getRelativeYPosition()).isPresent()).findFirst();
+    default Optional<BlockGroup> getGroup(double x, double y) {
+        return this.getGroups().parallelStream().filter(g -> g.contains(x, y)).findFirst();
     }
 
     default List<BlockGroup> getApplicableGroups(Block block) {

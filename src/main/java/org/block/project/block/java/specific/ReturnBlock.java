@@ -3,9 +3,10 @@ package org.block.project.block.java.specific;
 import org.block.Blocks;
 import org.block.panel.main.FXMainDisplay;
 import org.block.project.block.Block;
-import org.block.project.block.BlockGraphics;
 import org.block.project.block.BlockType;
 import org.block.project.block.group.AbstractBlockGroup;
+import org.block.project.block.BlockNode;
+import org.block.project.block.group.BlockGroupNode;
 import org.block.project.block.type.attachable.AbstractAttachableBlock;
 import org.block.project.block.type.value.ValueBlock;
 import org.block.serialization.ConfigNode;
@@ -17,21 +18,13 @@ import java.util.*;
 public class ReturnBlock extends AbstractAttachableBlock {
 
     public static final String RETURN_BLOCK = "return:value";
-    private int marginX = 2;
-    private int marginY = 4;
 
-    public ReturnBlock(int x, int y) {
-        super(x, y);
+    public ReturnBlock() {
         this.blockGroups.add(new ReturnBlockGroup());
     }
 
     public ReturnBlockGroup getReturnBlockList() {
         return (ReturnBlockGroup) this.getGroup("Return").get();
-    }
-
-    @Override
-    public BlockGraphics getGraphicShape() {
-        throw new IllegalStateException("Not implemented");
     }
 
     @Override
@@ -56,11 +49,16 @@ public class ReturnBlock extends AbstractAttachableBlock {
         return BlockType.BLOCK_TYPE_RETURN;
     }
 
+    @Override
+    public BlockNode<? extends Block> getNode() {
+        throw new IllegalStateException("Not Implemented");
+    }
+
     public static class ReturnBlockType implements BlockType<ReturnBlock> {
 
         @Override
-        public ReturnBlock build(int x, int y) {
-            return new ReturnBlock(x, y);
+        public ReturnBlock build() {
+            return new ReturnBlock();
         }
 
         @Override
@@ -69,18 +67,19 @@ public class ReturnBlock extends AbstractAttachableBlock {
             if (opUUID.isEmpty()) {
                 throw new IllegalStateException("Unknown Unique Id");
             }
-            Optional<Integer> opX = TITLE_X.deserialize(node);
+            Optional<Double> opX = TITLE_X.deserialize(node);
             if (opX.isEmpty()) {
                 throw new IllegalStateException("Unknown X position");
             }
-            Optional<Integer> opY = TITLE_Y.deserialize(node);
+            Optional<Double> opY = TITLE_Y.deserialize(node);
             if (opY.isEmpty()) {
                 throw new IllegalStateException("Unknown Y position");
             }
             List<UUID> connected = TITLE_DEPENDS.deserialize(node).get();
             FXMainDisplay panel = ((FXMainDisplay) Blocks.getInstance().getWindow());
             List<Block> blocks = panel.getDisplayingBlocks();
-            ReturnBlock methodBlock = new ReturnBlock(opX.get(), opY.get());
+            ReturnBlock methodBlock = new ReturnBlock();
+            methodBlock.setPosition(opX.get(), opY.get());
             ReturnBlockGroup returnBlockGroup = methodBlock.getReturnBlockList();
             methodBlock.id = opUUID.get();
             for (UUID uuid : connected) {
@@ -116,7 +115,17 @@ public class ReturnBlock extends AbstractAttachableBlock {
     public class ReturnBlockGroup extends AbstractBlockGroup.AbstractSingleBlockGroup<ValueBlock<Object>> {
 
         public ReturnBlockGroup() {
-            super(RETURN_BLOCK, "Return", 0);
+            super(RETURN_BLOCK, "Return");
+        }
+
+        @Override
+        public Block getBlock() {
+            return ReturnBlock.this;
+        }
+
+        @Override
+        public BlockGroupNode<? extends Block> getBlockNode() {
+            throw new IllegalStateException("Not implemented");
         }
     }
 }
