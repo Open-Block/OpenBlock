@@ -3,12 +3,17 @@ package org.block.project.block.java.value.number;
 import org.block.project.block.BlockType;
 import org.block.serialization.parse.Parser;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class IntegerBlock extends NumberBlock<Integer> {
 
     public IntegerBlock(Integer value) {
-        super(value);
+        super(null, value);
+    }
+    
+    public IntegerBlock(UUID uuid, Integer value) {
+        super(uuid, value);
     }
 
     @Override

@@ -17,13 +17,17 @@ import java.util.function.Function;
 
 public class StringBlock extends AbstractValue<String> implements MutableConnectedValueBlock<String> {
 
-    public StringBlock(String value) {
-        this(value, v -> v);
+    public StringBlock(String value){
+        this(null, value);
+    }
+
+    public StringBlock(UUID uuid, String value) {
+        this(uuid, value, v -> v);
     }
 
 
-    public StringBlock(String value, Function<String, String> toString) {
-        super(value, toString);
+    public StringBlock(UUID uuid, String value, Function<String, String> toString) {
+        super(uuid, value, toString);
         //this.registerEventListener(new OnClickListener());
     }
 
@@ -59,21 +63,18 @@ public class StringBlock extends AbstractValue<String> implements MutableConnect
         @Override
         public StringBlock build(ConfigNode node) {
             Optional<Double> opX = TITLE_X.deserialize(node);
-            if (!opX.isPresent()) {
+            if (opX.isEmpty()) {
                 throw new IllegalStateException("Could not find position X");
             }
             Optional<Double> opY = TITLE_Y.deserialize(node);
-            if (!opY.isPresent()) {
+            if (opY.isEmpty()) {
                 throw new IllegalStateException("Could not find position Y");
             }
             Optional<String> opValue = node.getString("Title");
-            if (!opValue.isPresent()) {
+            if (opValue.isEmpty()) {
                 throw new IllegalStateException("Could not find value");
             }
             Optional<UUID> opUUID = TITLE_UUID.deserialize(node);
-            if (!opValue.isPresent()) {
-                throw new IllegalStateException("Could not find ID");
-            }
             StringBlock block = this.build();
             block.setPosition(opX.get(), opY.get());
             block.setValue(opValue.get());

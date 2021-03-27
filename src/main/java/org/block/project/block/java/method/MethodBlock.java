@@ -29,11 +29,16 @@ public class MethodBlock extends AbstractAttachableBlock implements CodeStartBlo
     private int marginX = 8;
     private int marginY = 8;
 
-    public MethodBlock() {
+    public MethodBlock(){
         this(null);
     }
 
-    public MethodBlock(StringBlock block) {
+    public MethodBlock(UUID uuid) {
+        this(uuid, null);
+    }
+
+    public MethodBlock(UUID uuid, StringBlock block) {
+        super(uuid);
         this.blockGroups.add(new MethodBlock.NameBlockGroup(SECTION_NAME, "Name", block));
         /*this.attached.put(SECTION_NAME, "Name", new MethodBlock.StringBlockList(12, name));
         this.attached.put(SECTION_VALUE, "Value", new MethodBlock.VariableBlockList());*/

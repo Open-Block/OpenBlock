@@ -6,6 +6,7 @@ import org.block.project.block.BlockNode;
 import org.block.project.block.type.TextBlock;
 import org.block.project.block.type.value.ConnectedValueBlock;
 
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
@@ -26,8 +27,8 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Connecte
      *
      * @param value The attached value
      */
-    public AbstractValue(V value) {
-        this(value, Object::toString);
+    public AbstractValue(UUID uuid, V value) {
+        this(uuid, value, Object::toString);
     }
 
     /**
@@ -36,7 +37,8 @@ public abstract class AbstractValue<V> extends AbstractBlock implements Connecte
      * @param value    The attached value
      * @param toString The generic convection of the value to a String
      */
-    public AbstractValue(V value, Function<V, String> toString) {
+    public AbstractValue(UUID uuid, V value, Function<V, String> toString) {
+        super(uuid);
         this.toString = toString;
         this.setValue(value);
     }

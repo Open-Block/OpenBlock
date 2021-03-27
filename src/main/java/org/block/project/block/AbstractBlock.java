@@ -2,6 +2,7 @@ package org.block.project.block;
 
 import org.block.project.block.type.called.CodeStartBlock;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,8 +11,8 @@ public abstract class AbstractBlock implements Block {
     protected UUID id;
     protected CodeStartBlock codeStartBlock;
 
-    public AbstractBlock() {
-        this.id = UUID.randomUUID();
+    public AbstractBlock(UUID uuid) {
+        this.id = Objects.requireNonNullElseGet(uuid, UUID::randomUUID);
     }
 
     @Override

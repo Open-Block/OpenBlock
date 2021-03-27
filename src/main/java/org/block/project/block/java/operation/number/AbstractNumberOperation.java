@@ -23,12 +23,11 @@ public abstract class AbstractNumberOperation extends AbstractAttachableBlock im
     /**
      * The constructor for abstract number operations
      *
-     * @param x        The X position
-     * @param y        The Y position
      * @param text     The text to display, this would typically be the English word for the operation
      * @param operator The Java maths operator
      */
-    public AbstractNumberOperation(String text, String operator) {
+    public AbstractNumberOperation(UUID uuid, String text, String operator) {
+        super(uuid);
         this.operator = operator;
         setText(text);
     }

@@ -20,7 +20,12 @@ public class JavaMethodCallBlock<C> extends AbstractAttachableBlock implements M
 
     private final JavaMethodCallBlock.JavaMethodCallBlockType<C> type;
 
-    public JavaMethodCallBlock(JavaMethodCallBlock.JavaMethodCallBlockType<C> type) {
+    public JavaMethodCallBlock(JavaMethodCallBlock.JavaMethodCallBlockType<C> type){
+        this(null, type);
+    }
+
+    public JavaMethodCallBlock(UUID uuid, JavaMethodCallBlock.JavaMethodCallBlockType<C> type) {
+        super(uuid);
         this.type = type;
 
         //this.attached.put(MethodCallBlock.METHOD_BLOCK_GROUP, new JavaMethodNameBlockList(5));

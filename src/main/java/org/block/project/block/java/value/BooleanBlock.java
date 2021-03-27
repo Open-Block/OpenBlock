@@ -4,18 +4,19 @@ import org.block.project.block.BlockType;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 /**
  * The custom block to display a pre-set {@link Boolean} value
  */
 public class BooleanBlock extends AbstractValue<Boolean> {
 
-    /**
-     * Used to init the block
-     *
-     */
-    public BooleanBlock() {
-        super(true, Object::toString);
+    public BooleanBlock(){
+        this(null);
+    }
+
+    public BooleanBlock(UUID uuid) {
+        super(uuid, true, Object::toString);
     }
 
     @Override

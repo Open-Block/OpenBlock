@@ -14,16 +14,18 @@ import org.block.serialization.ConfigNode;
 import org.block.util.GeneralUntil;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class CallVariableBlock extends AbstractAttachableBlock implements ValueBlock<Object>, LinkedBlock<VariableBlock> {
 
     public static final String VARIABLE_SECTION = "call:variable";
 
-    public CallVariableBlock() {
+    public CallVariableBlock(){
+        super(null);
+    }
+
+    public CallVariableBlock(UUID uuid) {
+        super(uuid);
         this.blockGroups.add(new VariableLinkBlockGroup(this));
     }
 

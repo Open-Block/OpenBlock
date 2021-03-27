@@ -3,6 +3,7 @@ package org.block.project.block;
 import org.block.project.block.java.method.MethodBlock;
 import org.block.project.block.java.method.call.JavaMethodCallBlock;
 import org.block.project.block.java.operation.number.minus.MinusOperation;
+import org.block.project.block.java.operation.number.minus.MinusOperationType;
 import org.block.project.block.java.specific.ReturnBlock;
 import org.block.project.block.java.value.StringBlock;
 import org.block.project.block.java.value.number.IntegerBlock;
@@ -32,7 +33,7 @@ public interface BlockType<B extends Block> {
 
     IntegerBlock.IntegerBlockType BLOCK_TYPE_INTEGER = new IntegerBlock.IntegerBlockType();
     StringBlock.StringBlockType BLOCK_TYPE_STRING = new StringBlock.StringBlockType();
-    MinusOperation.MinusOperationType BLOCK_TYPE_MINUS = new MinusOperation.MinusOperationType();
+    MinusOperationType BLOCK_TYPE_MINUS = new MinusOperationType();
     VariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE = new VariableBlock.VariableBlockType();
     CallVariableBlock.VariableBlockType BLOCK_TYPE_VARIABLE_USE = new CallVariableBlock.VariableBlockType();
     MethodBlock.MethodBlockType BLOCK_TYPE_METHOD = new MethodBlock.MethodBlockType();

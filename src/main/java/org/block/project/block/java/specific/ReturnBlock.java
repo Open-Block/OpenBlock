@@ -19,7 +19,12 @@ public class ReturnBlock extends AbstractAttachableBlock {
 
     public static final String RETURN_BLOCK = "return:value";
 
-    public ReturnBlock() {
+    public ReturnBlock(){
+        super(null);
+    }
+
+    public ReturnBlock(UUID uuid) {
+        super(uuid);
         this.blockGroups.add(new ReturnBlockGroup());
     }
 

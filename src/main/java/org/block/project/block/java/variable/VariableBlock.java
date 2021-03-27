@@ -19,11 +19,16 @@ public class VariableBlock extends AbstractAttachableBlock {
     public static final String SECTION_BODY = "variable:body";
     public static final String SECTION_NAME = "variable:name";
 
-    public VariableBlock() {
-        this(null, null);
+    public VariableBlock(){
+        this(null);
     }
 
-    public VariableBlock(StringBlock name, ValueBlock<?> block) {
+    public VariableBlock(UUID uuid) {
+        this(null, null, null);
+    }
+
+    public VariableBlock(UUID uuid, StringBlock name, ValueBlock<?> block) {
+        super(uuid);
         this.blockGroups.add(new NameBlockGroup(this));
         this.blockGroups.add(new BodyBlockGroup(this));
     }

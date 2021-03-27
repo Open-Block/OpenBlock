@@ -14,13 +14,18 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.transform.Transform;
 import javafx.util.Callback;
-import org.block.project.block.Block;
 
 import java.util.Set;
 
 public interface BlockNode<B extends Block> extends Styleable, EventTarget {
 
     B getBlock();
+
+    void updateBlock();
+
+    double getWidth();
+
+    double getHeight();
 
     ObjectProperty<String> accessibleHelpProperty();
 

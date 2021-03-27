@@ -15,4 +15,9 @@ public class NodeMethodBlock extends VBox implements BlockNode<MethodBlock> {
     public MethodBlock getBlock() {
         return this.block;
     }
+
+    @Override
+    public void updateBlock() {
+        throw new IllegalStateException("Not Implemented");
+    }
 }

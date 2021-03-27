@@ -25,8 +25,8 @@ import java.util.UUID;
  */
 public abstract class NumberBlock<V extends Number> extends AbstractValue<V> implements MutableConnectedValueBlock<V> {
 
-    public NumberBlock(V value) {
-        super(value, Object::toString);
+    public NumberBlock(UUID uuid, V value) {
+        super(uuid, value, Object::toString);
     }
 
     @Override
